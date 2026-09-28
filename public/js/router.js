@@ -1,6 +1,7 @@
 import homeHtml from "../pages/home.html?raw";
 import seriesHtml from "../pages/series.html?raw";
 import watchHtml from "../pages/watch.html?raw";
+import mylistHtml from "../pages/mylist.html?raw";
 import { initPlayer } from "./player.js";
 import { getAllProgress } from "./storage.js";
 
@@ -8,6 +9,7 @@ const routes = {
   "/": homeHtml,
   "/series": seriesHtml,
   "/watch": watchHtml,
+  "/mylist": mylistHtml,
 };
 
 let pendingEpisode = 1;
@@ -62,6 +64,80 @@ function initHomeInteractions() {
   });
 }
 
+function initMyListScreen() {
+  const tabBar = document.getElementById("mylist-tab-bar");
+  const historyList = document.getElementById("history-drama-list");
+
+  // Render History Tab dynamically from storage
+  if (historyList) {
+    const records = getAllProgress();
+    if (!records || records.length === 0) {
+      historyList.innerHTML = `
+        <div class="mylist-empty-state">
+          <span class="empty-icon">📺</span>
+          <p class="empty-text">No watch history yet. Start watching an episode!</p>
+          <button class="btn-spotlight-play" type="button" data-route="/watch" data-episode="1">
+            ▶ Watch Ep 1 Free
+          </button>
+        </div>
+      `;
+    } else {
+      historyList.innerHTML = records
+        .map(
+          (rec) => `
+          <article class="mylist-card" data-route="/watch" data-episode="${rec.episodeId}">
+            <div class="mylist-poster-wrap">
+              <div class="poster-gradient-art art-blue">
+                <span class="art-symbol">▶</span>
+              </div>
+              <div class="mylist-card-progress-bar">
+                <div class="mylist-card-progress-fill" style="width: ${rec.percentage}%;"></div>
+              </div>
+            </div>
+            <div class="mylist-meta">
+              <h3 class="mylist-title">${rec.seriesTitle}</h3>
+              <p class="mylist-genre">${rec.episodeTitle} • ${rec.percentage}% complete</p>
+              <p class="mylist-ep-info">EP.${rec.episodeId} / EP.5</p>
+            </div>
+          </article>
+        `
+        )
+        .join("");
+    }
+  }
+
+  // Handle Tab Switching: Following vs History vs Reminder Set
+  if (tabBar) {
+    tabBar.addEventListener("click", (e) => {
+      const tab = e.target.closest(".mylist-tab");
+      if (!tab) return;
+
+      const subtab = tab.getAttribute("data-subtab");
+      tabBar.querySelectorAll(".mylist-tab").forEach((btn) => btn.classList.remove("active"));
+      tab.classList.add("active");
+
+      document.querySelectorAll(".mylist-tab-pane").forEach((pane) => {
+        pane.classList.remove("active");
+      });
+
+      const activePane = document.getElementById(`pane-${subtab}`);
+      if (activePane) activePane.classList.add("active");
+    });
+  }
+}
+
+function updateBottomNavActive(path) {
+  const navItems = document.querySelectorAll(".bottom-nav .nav-item");
+  navItems.forEach((btn) => {
+    const route = btn.getAttribute("data-route");
+    if (route === path) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+}
+
 async function renderRoute(path) {
   const mainContent = document.getElementById("main-content");
   if (!mainContent) return;
@@ -77,8 +153,8 @@ async function renderRoute(path) {
     return;
   }
 
-  // Hide bottom navigation on /watch so video fills 100% of viewport
-  const bottomNav = document.querySelector(".bottom-nav") || document.querySelector("nav");
+  // Hide bottom nav on /watch for full-bleed player
+  const bottomNav = document.getElementById("bottom-nav");
   if (bottomNav) {
     bottomNav.style.display = path === "/watch" ? "none" : "flex";
   }
@@ -86,11 +162,15 @@ async function renderRoute(path) {
   mainContent.innerHTML = html;
   window.scrollTo(0, 0);
 
+  updateBottomNavActive(path);
+
   if (path === "/watch") {
     initPlayer(pendingEpisode);
   } else if (path === "/") {
     updateContinueWatching();
     initHomeInteractions();
+  } else if (path === "/mylist") {
+    initMyListScreen();
   }
 }
 
@@ -116,3 +196,5 @@ export function initRouter() {
   const initialPath = window.location.pathname || "/";
   renderRoute(routes[initialPath] ? initialPath : "/");
 }
+
+

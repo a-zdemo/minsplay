@@ -55,6 +55,21 @@ export function initPlayer(initialEp = 1) {
 
   if (!video) return;
 
+  function setPlayIndicator(isPlaying) {
+    if (playToggle) {
+      if (isPlaying) {
+        playToggle.textContent = "⏸";
+        playToggle.style.opacity = "0.7";
+        setTimeout(() => {
+          if (!video.paused) playToggle.style.opacity = "0";
+        }, 600);
+      } else {
+        playToggle.textContent = "▶";
+        playToggle.style.opacity = "1";
+      }
+    }
+  }
+
   function loadEpisode(index) {
     currentEpisodeIndex = index;
     const ep = EPISODES[index];
@@ -62,10 +77,10 @@ export function initPlayer(initialEp = 1) {
 
     const unlocked = isEpisodeUnlocked(ep.id, ep.isFree);
 
-    epName.textContent = `Episode ${ep.id}`;
-    currentTitle.textContent = ep.title;
+    if (epName) epName.textContent = `Episode ${ep.id}`;
+    if (currentTitle) currentTitle.textContent = ep.title;
 
-    // Update strip button statuses
+    // Update strip button states
     if (stripContainer) {
       const buttons = stripContainer.querySelectorAll(".strip-ep-btn");
       buttons.forEach((btn, idx) => {
@@ -84,59 +99,74 @@ export function initPlayer(initialEp = 1) {
     if (!unlocked) {
       video.pause();
       video.removeAttribute("src");
-      lockOverlay.style.display = "flex";
+      video.load();
+      if (lockOverlay) lockOverlay.style.display = "flex";
+      setPlayIndicator(false);
       return;
     }
 
-    lockOverlay.style.display = "none";
-    video.src = ep.src;
+    if (lockOverlay) lockOverlay.style.display = "none";
 
-    // Check if we have saved progress for this episode to resume
+    // Set source and reload media buffer
+    video.src = ep.src;
+    video.load();
+
+    // Check saved resume point
     const saved = getSeriesProgress(SERIES_ID);
     if (saved && saved.episodeId === ep.id && saved.position > 2) {
       video.currentTime = saved.position;
     }
 
-    video.play().catch(() => {
-      playToggle.textContent = "▶";
-    });
+    // Default play button visible until user tap or autoplay kicks in
+    setPlayIndicator(false);
+
+    // Attempt autoplay (Chrome may block unmuted autoplay; that is expected)
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setPlayIndicator(true);
+        })
+        .catch(() => {
+          // Autoplay was blocked: Keep ▶ visible for the user to tap
+          setPlayIndicator(false);
+        });
+    }
   }
 
-  // Periodic progress saving (throttled)
-  let lastSavedSecond = 0;
-  video.addEventListener("timeupdate", () => {
-    const current = Math.floor(video.currentTime);
-    if (current > 0 && current !== lastSavedSecond && current % 2 === 0) {
-      lastSavedSecond = current;
+  // Handle tap anywhere on the video area
+  touchOverlay.onclick = (e) => {
+    e.preventDefault();
+    if (video.paused) {
+      video
+        .play()
+        .then(() => setPlayIndicator(true))
+        .catch((err) => {
+          console.warn("Minsplay: Playback interaction required", err);
+          setPlayIndicator(false);
+        });
+    } else {
+      video.pause();
+      setPlayIndicator(false);
+    }
+  };
+
+  // Keep play button synced with video playback events
+  video.onplaying = () => setPlayIndicator(true);
+  video.onpause = () => setPlayIndicator(false);
+
+  // Periodic watch-progress saving
+  let lastSavedSec = 0;
+  video.ontimeupdate = () => {
+    const cur = Math.floor(video.currentTime);
+    if (cur > 0 && cur !== lastSavedSec && cur % 2 === 0) {
+      lastSavedSec = cur;
       const ep = EPISODES[currentEpisodeIndex];
       saveProgress(SERIES_ID, ep.id, video.currentTime, video.duration || 0);
     }
-  });
+  };
 
-  // Play / Pause handling
-  touchOverlay.addEventListener("click", () => {
-    if (video.paused) {
-      video.play();
-      playToggle.textContent = "⏸";
-      setTimeout(() => (playToggle.style.opacity = "0"), 800);
-    } else {
-      video.pause();
-      playToggle.textContent = "▶";
-      playToggle.style.opacity = "1";
-    }
-  });
-
-  video.addEventListener("play", () => {
-    playToggle.textContent = "⏸";
-    setTimeout(() => (playToggle.style.opacity = "0"), 800);
-  });
-
-  video.addEventListener("pause", () => {
-    playToggle.textContent = "▶";
-    playToggle.style.opacity = "1";
-  });
-
-  // Episode strip navigation
+  // Strip navigation
   if (stripContainer) {
     stripContainer.onclick = (e) => {
       const btn = e.target.closest(".strip-ep-btn");
@@ -147,6 +177,7 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
+  // Prev / Next actions
   if (nextBtn) {
     nextBtn.onclick = () => {
       if (currentEpisodeIndex < EPISODES.length - 1) {
@@ -163,7 +194,7 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Mock Reward Unlock Action
+  // Unlock action
   if (unlockBtn) {
     unlockBtn.onclick = () => {
       const ep = EPISODES[currentEpisodeIndex];
@@ -172,7 +203,7 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Load initial episode
+  // Initial load
   const startIdx = Math.max(0, Math.min(initialEp - 1, EPISODES.length - 1));
   loadEpisode(startIdx);
 }

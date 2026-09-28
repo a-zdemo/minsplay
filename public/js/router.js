@@ -62,6 +62,12 @@ async function renderRoute(path) {
     return;
   }
 
+  // 1. Toggle bottom navigation: hide on /watch for full-screen drama experience
+  const bottomNav = document.querySelector(".bottom-nav") || document.querySelector("nav");
+  if (bottomNav) {
+    bottomNav.style.display = path === "/watch" ? "none" : "flex";
+  }
+
   mainContent.innerHTML = html;
   window.scrollTo(0, 0);
 

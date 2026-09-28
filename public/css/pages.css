@@ -1,12 +1,6 @@
-/* ========================================================================== MINSPLAY — DRAMABOX REVISION STYLESHEET
-DramaBox Sticky Header & Sub-Nav
-3-Column High Density Poster Grid
-Continue Watching & Spotlight Cards
-Series Detail Screen
-100% Full-Bleed DramaBox Player & Swipe Surface ========================================================================== */
-/* Root & Global Containers / .home-page { min-height: 100vh; background-color: #000; color: #fff; padding-bottom: 74px; / Clearance for fixed bottom nav */ }
-/* ========================================
-Pinned Sticky Top Header ======================================== */ .home-sticky-header { position: sticky; top: 0; left: 0; right: 0; z-index: 80; background: rgba(10, 10, 14, 0.96); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+/* Minsplay - DramaBox Stylesheet */
+/* Root and Global Containers */ .home-page { min-height: 100vh; background-color: #000; color: #fff; padding-bottom: 74px; }
+/* 1. Pinned Sticky Top Header */ .home-sticky-header { position: sticky; top: 0; left: 0; right: 0; z-index: 80; background: rgba(10, 10, 14, 0.96); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
 .home-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px 6px; }
 /* Search Bar Pill */ .search-input-pill { flex: 1; display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .search-input-pill:active { background: rgba(255, 255, 255, 0.14); }
@@ -22,7 +16,7 @@ Pinned Sticky Top Header ======================================== */ .home-stick
 .tab-item { position: relative; background: transparent; border: none; padding: 6px 0; font-size: 0.95rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); white-space: nowrap; cursor: pointer; transition: color 0.15s ease; -webkit-tap-highlight-color: transparent; }
 .tab-item.active { color: #fff; font-weight: 800; font-size: 1rem; }
 .tab-item.active::after { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; border-radius: 3px; background: #ff2e63; }
-/* ======================================== 2. Home Content Body & Sections ======================================== */ .home-scroll-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 20px; }
+/* 2. Home Content Body & Sections */ .home-scroll-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 20px; }
 .content-section { display: flex; flex-direction: column; gap: 10px; }
 .section-header { display: flex; justify-content: space-between; align-items: center; }
 .section-heading { margin: 0; font-size: 1.12rem; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
@@ -36,14 +30,14 @@ Pinned Sticky Top Header ======================================== */ .home-stick
 .btn-spotlight-play { background: #ff2e63; color: #fff; border: none; border-radius: 20px; padding: 8px 18px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 .btn-spotlight-play:active { transform: scale(0.97); }
 .spotlight-views { font-size: 0.76rem; color: rgba(255, 255, 255, 0.65); font-weight: 600; }
-/* ======================================== 3. 3-Column DramaBox Poster Grid ======================================== */ .drama-grid-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+/* 3. 3-Column DramaBox Poster Grid */ .drama-grid-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .drama-card { display: flex; flex-direction: column; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .drama-card:active { opacity: 0.85; }
 .drama-poster-wrap { position: relative; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; background: #15151c; border: 1px solid rgba(255, 255, 255, 0.08); }
-/* Poster Artwork Placeholders with High Contrast */ .poster-gradient-art { width: 100%; height: 100%; display: flex; align-items: flex-end; padding: 8px; box-sizing: border-box; }
+/* Poster Artwork Placeholders */ .poster-gradient-art { width: 100%; height: 100%; display: flex; align-items: flex-end; padding: 8px; box-sizing: border-box; }
 .art-title { font-size: 0.65rem; font-weight: 900; line-height: 1.1; color: rgba(255, 255, 255, 0.85); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9); letter-spacing: -0.2px; }
 .art-blue { background: linear-gradient(145deg, #1e3c72, #2a5298); } .art-red { background: linear-gradient(145deg, #4b1313, #8a1d1d); } .art-gold { background: linear-gradient(145deg, #443410, #7a5e1e); } .art-purple { background: linear-gradient(145deg, #2d1645, #552782); } .art-emerald { background: linear-gradient(145deg, #103322, #1f6443); } .art-pink { background: linear-gradient(145deg, #44172a, #782649); } .art-dark { background: linear-gradient(145deg, #1c1c24, #2d2d38); } .art-crimson { background: linear-gradient(145deg, #3d0c1c, #6c122f); } .art-violet { background: linear-gradient(145deg, #24143d, #49287a); }
-/* Corner Status Badges (Following, New, Hot) */ .poster-badge { position: absolute; top: 5px; right: 5px; font-size: 0.62rem; font-weight: 800; padding: 2px 5px; border-radius: 4px; }
+/* Corner Status Badges */ .poster-badge { position: absolute; top: 5px; right: 5px; font-size: 0.62rem; font-weight: 800; padding: 2px 5px; border-radius: 4px; }
 .badge-following { background: rgba(15, 15, 22, 0.85); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
 .badge-new { background: rgba(255, 255, 255, 0.88); color: #111; }
 .badge-hot { background: #ff2e63; color: #fff; }
@@ -51,13 +45,13 @@ Pinned Sticky Top Header ======================================== */ .home-stick
 .play-arrow { font-size: 0.62rem; }
 /* Card Titles & Genre Subtext */ .drama-title { margin: 6px 0 2px; font-size: 0.8rem; font-weight: 700; color: #fff; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; min-height: 2em; }
 .drama-genre { margin: 0; font-size: 0.7rem; color: rgba(255, 255, 255, 0.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* Continue Watching Horizontal Scroll Shelf */ .continue-watching-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+/* Continue Watching Shelf */ .continue-watching-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
 .continue-watching-scroll::-webkit-scrollbar { display: none; }
 .continue-card { min-width: 120px; flex-shrink: 0; cursor: pointer; }
 .continue-poster { position: relative; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; background: #1c1c24; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.1); }
 .continue-progress-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(255, 255, 255, 0.25); }
 .continue-progress-fill { height: 100%; background: #ff2e63; }
-/* ========================================================================== 4. Series Detail Screen Styles ========================================================================== */ .series-page { padding-bottom: 5rem; background: #000; min-height: 100vh; }
+/* 4. Series Detail Screen */ .series-page { padding-bottom: 5rem; background: #000; min-height: 100vh; }
 .series-nav { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
 .nav-back-btn { background: transparent; border: none; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; }
 .nav-title { font-size: 1rem; font-weight: 500; color: rgba(255, 255, 255, 0.7); }
@@ -84,7 +78,7 @@ Pinned Sticky Top Header ======================================== */ .home-stick
 .status-tag { font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.55rem; border-radius: 4px; }
 .status-free { background: rgba(39, 201, 63, 0.15); color: #27c93f; }
 .status-locked { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); }
-/* ========================================================================== 5. DramaBox 100% Immersive Full-Bleed Player (Observations 2, 3, 4 & 5) ========================================================================== */ .watch-page { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: #000; overflow: hidden; z-index: 90; }
+/* 5. 100% Immersive Full-Bleed Player */ .watch-page { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: #000; overflow: hidden; z-index: 90; }
 .watch-stage { position: relative; width: 100%; height: 100%; overflow: hidden; }
 .immersive-video { width: 100%; height: 100%; object-fit: cover; background: #000; }
 .gesture-surface { position: absolute; inset: 0; z-index: 10; cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -96,7 +90,7 @@ Pinned Sticky Top Header ======================================== */ .home-stick
 .hud-series-info { display: flex; align-items: center; gap: 0.5rem; }
 .hud-series-title { color: #fff; font-weight: 700; font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
 .hud-ep-indicator { background: #ff2e63; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 4px; }
-/* Right-Hand Action Bar */ .hud-right-actions { right: 12px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+/* Right-Hand Floating Action Bar */ .hud-right-actions { right: 12px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .action-pill-btn { background: transparent; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 0; color: #fff; outline: none; }
 .action-pill-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(15, 15, 20, 0.65); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.18); display: grid; place-items: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); transition: transform 0.15s ease, background 0.15s ease; }
 .action-pill-btn:active .action-pill-icon { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }

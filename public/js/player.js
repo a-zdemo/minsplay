@@ -1,40 +1,41 @@
 import { saveProgress, getSeriesProgress, isEpisodeUnlocked, unlockEpisode } from "./storage.js";
 
+// Fast, lightweight, globally accessible test streams
 export const EPISODES = [
   {
     id: 1,
     title: "Episode 1: The Encounter",
-    duration: "1m 45s",
+    duration: "0m 10s",
     isFree: true,
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://www.w3schools.com/html/mov_bbb.mp4",
   },
   {
     id: 2,
     title: "Episode 2: Deep Water",
-    duration: "2m 10s",
+    duration: "0m 10s",
     isFree: true,
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    src: "https://www.w3schools.com/html/mov_bbb.mp4",
   },
   {
     id: 3,
     title: "Episode 3: The Crossroad",
     duration: "1m 55s",
     isFree: false,
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+    src: "https://www.w3schools.com/html/mov_bbb.mp4",
   },
   {
     id: 4,
     title: "Episode 4: Payback",
     duration: "2m 05s",
     isFree: false,
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+    src: "https://www.w3schools.com/html/mov_bbb.mp4",
   },
   {
     id: 5,
     title: "Episode 5: The Reckoning",
     duration: "2m 30s",
     isFree: false,
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+    src: "https://www.w3schools.com/html/mov_bbb.mp4",
   },
 ];
 
@@ -52,17 +53,22 @@ export function initPlayer(initialEp = 1) {
   const nextBtn = document.getElementById("btn-next-ep");
   const stripContainer = document.getElementById("watch-episode-list");
   const unlockBtn = document.getElementById("btn-unlock-mock");
+  const statusBadge = document.getElementById("video-status-msg");
 
   if (!video) return;
+
+  function showStatus(msg) {
+    if (statusBadge) {
+      statusBadge.textContent = msg;
+      statusBadge.style.display = msg ? "block" : "none";
+    }
+  }
 
   function setPlayIndicator(isPlaying) {
     if (playToggle) {
       if (isPlaying) {
         playToggle.textContent = "⏸";
-        playToggle.style.opacity = "0.7";
-        setTimeout(() => {
-          if (!video.paused) playToggle.style.opacity = "0";
-        }, 600);
+        playToggle.style.opacity = "0";
       } else {
         playToggle.textContent = "▶";
         playToggle.style.opacity = "1";
@@ -80,7 +86,7 @@ export function initPlayer(initialEp = 1) {
     if (epName) epName.textContent = `Episode ${ep.id}`;
     if (currentTitle) currentTitle.textContent = ep.title;
 
-    // Update strip button states
+    // Episode button strip state
     if (stripContainer) {
       const buttons = stripContainer.querySelectorAll(".strip-ep-btn");
       buttons.forEach((btn, idx) => {
@@ -95,19 +101,20 @@ export function initPlayer(initialEp = 1) {
     if (prevBtn) prevBtn.disabled = index === 0;
     if (nextBtn) nextBtn.disabled = index === EPISODES.length - 1;
 
-    // Gating check
+    // Check Lock
     if (!unlocked) {
       video.pause();
       video.removeAttribute("src");
       video.load();
       if (lockOverlay) lockOverlay.style.display = "flex";
       setPlayIndicator(false);
+      showStatus("");
       return;
     }
 
     if (lockOverlay) lockOverlay.style.display = "none";
 
-    // Set source and reload media buffer
+    showStatus("Buffering stream...");
     video.src = ep.src;
     video.load();
 
@@ -117,45 +124,60 @@ export function initPlayer(initialEp = 1) {
       video.currentTime = saved.position;
     }
 
-    // Default play button visible until user tap or autoplay kicks in
     setPlayIndicator(false);
-
-    // Attempt autoplay (Chrome may block unmuted autoplay; that is expected)
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setPlayIndicator(true);
-        })
-        .catch(() => {
-          // Autoplay was blocked: Keep ▶ visible for the user to tap
-          setPlayIndicator(false);
-        });
-    }
   }
 
-  // Handle tap anywhere on the video area
-  touchOverlay.onclick = (e) => {
-    e.preventDefault();
-    if (video.paused) {
-      video
-        .play()
-        .then(() => setPlayIndicator(true))
-        .catch((err) => {
-          console.warn("Minsplay: Playback interaction required", err);
-          setPlayIndicator(false);
-        });
-    } else {
-      video.pause();
-      setPlayIndicator(false);
-    }
+  // Video event handlers
+  video.oncanplay = () => {
+    showStatus("");
   };
 
-  // Keep play button synced with video playback events
-  video.onplaying = () => setPlayIndicator(true);
-  video.onpause = () => setPlayIndicator(false);
+  video.onplaying = () => {
+    showStatus("");
+    setPlayIndicator(true);
+  };
 
-  // Periodic watch-progress saving
+  video.onpause = () => {
+    setPlayIndicator(false);
+  };
+
+  video.onerror = () => {
+    const err = video.error;
+    let message = "Playback error";
+    if (err) {
+      if (err.code === 2) message = "Network error loading video";
+      else if (err.code === 3) message = "Decode error";
+      else if (err.code === 4) message = "Format not supported by browser";
+    }
+    showStatus(message);
+    setPlayIndicator(false);
+  };
+
+  // Tap handler to toggle play/pause
+  if (touchOverlay) {
+    touchOverlay.onclick = (e) => {
+      e.preventDefault();
+      if (video.paused) {
+        showStatus("Loading...");
+        video
+          .play()
+          .then(() => {
+            showStatus("");
+            setPlayIndicator(true);
+          })
+          .catch((err) => {
+            console.warn("Minsplay playback:", err);
+            showStatus("Tap to play");
+            setPlayIndicator(false);
+          });
+      } else {
+        video.pause();
+        setPlayIndicator(false);
+      }
+    };
+  }
+
+  // Periodic watch progress saving
   let lastSavedSec = 0;
   video.ontimeupdate = () => {
     const cur = Math.floor(video.currentTime);
@@ -166,7 +188,7 @@ export function initPlayer(initialEp = 1) {
     }
   };
 
-  // Strip navigation
+  // Strip Navigation
   if (stripContainer) {
     stripContainer.onclick = (e) => {
       const btn = e.target.closest(".strip-ep-btn");
@@ -194,7 +216,7 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Unlock action
+  // Mock Reward Unlock Action
   if (unlockBtn) {
     unlockBtn.onclick = () => {
       const ep = EPISODES[currentEpisodeIndex];

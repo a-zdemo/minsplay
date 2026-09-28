@@ -13,29 +13,46 @@
     </header>
 
     <!-- Video Stage / Viewport -->
-    <div class="video-stage">
+    <div class="video-stage" id="video-stage">
       <video
         id="minsplay-video"
         class="video-player"
         playsinline
         preload="auto"
-        controls
         src=""
       >
         Your browser does not support HTML5 video.
       </video>
 
       <!-- On-Screen Status Indicator -->
-      <div
-        id="video-status-msg"
-        style="position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.75); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; z-index: 6; display: none;"
-      ></div>
+      <div id="video-status-msg" class="video-status-badge"></div>
 
-      <!-- Custom Touch Play/Pause Overlay Indicator -->
+      <!-- Touch Tap Overlay -->
       <div class="video-touch-overlay" id="video-touch-overlay">
+        <!-- Single Center Play/Pause Button -->
         <button class="video-play-toggle" id="video-play-toggle" type="button" aria-label="Play or Pause">
           ▶
         </button>
+      </div>
+
+      <!-- Custom Video Control Bar (Positioned over bottom of video) -->
+      <div class="video-custom-controls" id="video-custom-controls">
+        <input
+          type="range"
+          id="video-seek"
+          class="video-seek-slider"
+          min="0"
+          max="100"
+          value="0"
+          step="0.1"
+          aria-label="Seek Video"
+        />
+        <div class="video-controls-row">
+          <span class="video-time" id="video-time-display">0:00 / 0:10</span>
+          <button class="btn-fullscreen" id="btn-fullscreen" type="button" aria-label="Fullscreen">
+            ⛶
+          </button>
+        </div>
       </div>
 
       <!-- Lock Modal Overlay -->

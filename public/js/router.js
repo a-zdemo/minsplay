@@ -1,14 +1,20 @@
 import homeHtml from "../pages/home.html?raw";
 import seriesHtml from "../pages/series.html?raw";
+import watchHtml from "../pages/watch.html?raw";
+import { initPlayer } from "./player.js";
 
 const routes = {
   "/": homeHtml,
   "/series": seriesHtml,
+  "/watch": watchHtml,
 };
 
-export async function navigateTo(path) {
+let pendingEpisode = 1;
+
+export async function navigateTo(path, episode = 1) {
+  pendingEpisode = episode;
   if (window.location.pathname !== path) {
-    window.history.pushState(null, "", path);
+    window.history.pushState({ path, episode }, "", path);
   }
   await renderRoute(path);
 }
@@ -26,7 +32,6 @@ async function renderRoute(path) {
     mainContent.innerHTML = `
       <section class="error-page" style="padding: 3rem 1.5rem; text-align: center;">
         <h1 style="color: #fff; margin-bottom: 0.5rem;">Page Not Found</h1>
-        <p style="color: #888; margin-bottom: 1.5rem;">The requested screen could not be loaded.</p>
         <button class="btn btn-primary" type="button" data-route="/">Return Home</button>
       </section>
     `;
@@ -35,29 +40,37 @@ async function renderRoute(path) {
 
   mainContent.innerHTML = html;
   window.scrollTo(0, 0);
+
+  // Hook screen-specific logic
+  if (path === "/watch") {
+    initPlayer(pendingEpisode);
+  }
+
   console.log(`Minsplay: Rendered route "${path}"`);
 }
 
 export function initRouter() {
   console.log("Minsplay: Initializing client-side router...");
 
-  // Intercept global click events on data-route elements
+  // Intercept data-route clicks with optional data-episode
   document.addEventListener("click", (e) => {
     const routeTrigger = e.target.closest("[data-route]");
     if (routeTrigger) {
       e.preventDefault();
       const targetRoute = routeTrigger.getAttribute("data-route");
-      navigateTo(targetRoute);
+      const epAttr = routeTrigger.getAttribute("data-episode");
+      const episode = epAttr ? parseInt(epAttr, 10) : 1;
+      navigateTo(targetRoute, episode);
     }
   });
 
-  // Handle browser back/forward buttons
-  window.addEventListener("popstate", () => {
+  window.addEventListener("popstate", (e) => {
     const currentPath = window.location.pathname || "/";
+    const ep = (e.state && e.state.episode) ? e.state.episode : 1;
+    pendingEpisode = ep;
     renderRoute(routes[currentPath] ? currentPath : "/");
   });
 
-  // Initial load
   const initialPath = window.location.pathname || "/";
   renderRoute(routes[initialPath] ? initialPath : "/");
 }

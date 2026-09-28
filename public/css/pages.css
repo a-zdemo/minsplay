@@ -328,3 +328,248 @@
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.4);
 }
+
+/* ==========================================================================
+   Watch / Video Player Screen
+   ========================================================================== */
+
+.watch-page {
+  background: #000;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.watch-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.watch-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(10, 10, 15, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.watch-back-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+}
+
+.watch-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.watch-series-name {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.watch-ep-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* 9:16 vertical drama player container */
+.video-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  max-height: 65vh;
+  background: #050508;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.video-player {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-touch-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.video-play-toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+/* Lock modal over video */
+.video-lock-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 15, 0.92);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 10;
+}
+
+.lock-modal-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lock-icon {
+  font-size: 2.2rem;
+}
+
+.lock-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.lock-desc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.btn-unlock {
+  background: linear-gradient(135deg, #ff2e63, #ff5e3a);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.85rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+/* Watch Sheet Details */
+.watch-details-sheet {
+  padding: 1rem 1.25rem 5rem;
+  background: #0f0f14;
+  flex: 1;
+}
+
+.watch-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.watch-current-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.watch-current-tags {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-icon-fav {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+/* Episode Strip */
+.watch-episode-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.strip-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+.strip-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.strip-ep-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.strip-ep-btn.active {
+  background: #ff2e63;
+  border-color: #ff2e63;
+  color: #fff;
+}
+
+.strip-ep-btn.locked {
+  opacity: 0.6;
+}
+
+/* Navigation buttons */
+.watch-actions-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-nav-ep {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-nav-ep:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

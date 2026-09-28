@@ -1,8 +1,10 @@
+import homeHtml from "../pages/home.html?raw";
+
 const routes = {
-  "/": "/pages/home.html",
+  "/": homeHtml,
 };
 
-async function loadPage(path) {
+export async function loadPage(path) {
   const mainContent = document.getElementById("main-content");
 
   if (!mainContent) {
@@ -10,9 +12,9 @@ async function loadPage(path) {
     return;
   }
 
-  const page = routes[path];
+  const html = routes[path];
 
-  if (!page) {
+  if (!html) {
     mainContent.innerHTML = `
       <section class="error-page">
         <h1>Page not found</h1>
@@ -23,21 +25,10 @@ async function loadPage(path) {
   }
 
   try {
-    const response = await fetch(page);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const html = await response.text();
-
     mainContent.innerHTML = html;
-
     console.log("Minsplay: Home page loaded successfully.");
-
   } catch (error) {
     console.error("Minsplay router error:", error);
-
     mainContent.innerHTML = `
       <section class="error-page">
         <h1>Something went wrong</h1>

@@ -1,122 +1,15 @@
-/* ========================================
-   Buttons
-======================================== */
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-
-  min-height: 44px;
-  padding: 0 var(--space-5);
-
-  border: 0;
-  border-radius: var(--radius-md);
-
-  color: #fff;
-  background: var(--color-primary);
-
-  font-weight: 700;
-}
-
-.btn:active {
-  transform: scale(0.98);
-}
-
-.btn-secondary {
-  background: var(--color-surface-2);
-}
-
-/* ========================================
-   Series Card
-======================================== */
-
-.series-card {
-  min-width: 140px;
-  overflow: hidden;
-
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-}
-
-.series-card-poster {
-  aspect-ratio: 2 / 3;
-  background:
-    linear-gradient(
-      135deg,
-      #292929,
-      #111
-    );
-
-  display: grid;
-  place-items: center;
-
-  color: var(--color-text-muted);
-}
-
-.series-card-info {
-  padding: var(--space-3);
-}
-
-.series-card-title {
-  margin: 0;
-
-  font-size: 14px;
-  font-weight: 700;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.series-card-meta {
-  margin: 4px 0 0;
-
-  color: var(--color-text-secondary);
-  font-size: 12px;
-}
-
-/* ========================================
-   Bottom Navigation
-======================================== */
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 56px;
-  background: rgba(15, 15, 20, 0.95);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 100;
-  padding: 0;
-  margin: 0;
-}
-
-.nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.75rem;
-  height: 100%;
-}
-
-.nav-item.active {
-  color: #ff2e63;
-}
-
-
-.bottom-nav-icon {
-  font-size: 21px;
-  line-height: 1;
-}
+/* ======================================== Buttons ======================================== */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-5); border: 0; border-radius: var(--radius-md); color: #fff; background: var(--color-primary); font-weight: 700; cursor: pointer; }
+.btn:active { transform: scale(0.98); }
+.btn-secondary { background: var(--color-surface-2); }
+/* ======================================== Series Card ======================================== */
+.series-card { min-width: 140px; overflow: hidden; border-radius: var(--radius-md); background: var(--color-surface); }
+.series-card-poster { aspect-ratio: 2 / 3; background: linear-gradient(135deg, #292929, #111); display: grid; place-items: center; color: var(--color-text-muted); }
+.series-card-info { padding: var(--space-3); }
+.series-card-title { margin: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.series-card-meta { margin: 4px 0 0; color: var(--color-text-secondary); font-size: 12px; }
+/* ======================================== Bottom Navigation ======================================== */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 56px; background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-around; align-items: center; z-index: 100; padding: 0; margin: 0; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; height: 100%; background: transparent; border: none; outline: none; cursor: pointer; }
+.nav-item.active { color: #ff2e63; }
+.bottom-nav-icon { font-size: 21px; line-height: 1; }

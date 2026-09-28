@@ -62,6 +62,12 @@ async function renderRoute(path) {
     return;
   }
 
+  // DramaBox UX Pattern 2: Hide bottom navigation on /watch so video fills 100% of viewport
+  const bottomNav = document.querySelector(".bottom-nav") || document.querySelector("nav");
+  if (bottomNav) {
+    bottomNav.style.display = path === "/watch" ? "none" : "flex";
+  }
+
   mainContent.innerHTML = html;
   window.scrollTo(0, 0);
 
@@ -94,3 +100,5 @@ export function initRouter() {
   const initialPath = window.location.pathname || "/";
   renderRoute(routes[initialPath] ? initialPath : "/");
 }
+
+

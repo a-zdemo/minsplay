@@ -1,110 +1,19 @@
-<section class="watch-page">
-  <div class="watch-container">
-
-    <!-- Top Floating Navigation -->
-    <header class="watch-nav">
-      <button class="watch-back-btn" type="button" data-route="/series" aria-label="Back to Series">
-        ←
-      </button>
-      <div class="watch-meta">
-        <span class="watch-series-name">The Beginning</span>
-        <span class="watch-ep-name" id="watch-ep-name">Episode 1</span>
-      </div>
-    </header>
-
-    <!-- Video Stage / Viewport -->
-    <div class="video-stage" id="video-stage">
-      <video
-        id="minsplay-video"
-        class="video-player"
-        playsinline
-        preload="auto"
-        src=""
-      >
-        Your browser does not support HTML5 video.
-      </video>
-
-      <!-- On-Screen Status Indicator -->
-      <div id="video-status-msg" class="video-status-badge"></div>
-
-      <!-- Touch Tap Overlay -->
-      <div class="video-touch-overlay" id="video-touch-overlay">
-        <!-- Single Center Play/Pause Button -->
-        <button class="video-play-toggle" id="video-play-toggle" type="button" aria-label="Play or Pause">
-          ▶
-        </button>
-      </div>
-
-      <!-- Custom Video Control Bar (Positioned over bottom of video) -->
-      <div class="video-custom-controls" id="video-custom-controls">
-        <input
-          type="range"
-          id="video-seek"
-          class="video-seek-slider"
-          min="0"
-          max="100"
-          value="0"
-          step="0.1"
-          aria-label="Seek Video"
-        />
-        <div class="video-controls-row">
-          <span class="video-time" id="video-time-display">0:00 / 0:10</span>
-          <button class="btn-fullscreen" id="btn-fullscreen" type="button" aria-label="Fullscreen">
-            ⛶
-          </button>
-        </div>
-      </div>
-
-      <!-- Lock Modal Overlay -->
-      <div class="video-lock-overlay" id="video-lock-overlay" style="display: none;">
-        <div class="lock-modal-card">
-          <span class="lock-icon">🔒</span>
-          <h3 class="lock-title">Episode Locked</h3>
-          <p class="lock-desc">Complete a quick action to unlock and continue watching.</p>
-          <button class="btn btn-unlock" id="btn-unlock-mock" type="button">
-            🎁 Watch Short Ad to Unlock (Mock)
-          </button>
-          <button class="btn btn-secondary" type="button" data-route="/series">
-            Back to Episodes
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Episode Navigation & Controls -->
-    <div class="watch-details-sheet">
-      <div class="watch-title-row">
-        <div>
-          <h2 class="watch-current-title" id="watch-current-title">Episode 1: The Encounter</h2>
-          <p class="watch-current-tags">Urban • Drama • Complete</p>
-        </div>
-        <button class="btn-icon-fav" type="button" aria-label="Favorite">
-          ♥
-        </button>
-      </div>
-
-      <!-- Dynamic Episode Switcher Strip -->
-      <div class="watch-episode-strip">
-        <span class="strip-label">Episodes:</span>
-        <div class="strip-buttons" id="watch-episode-list">
-          <button class="strip-ep-btn active" data-episode="1" type="button">1</button>
-          <button class="strip-ep-btn" data-episode="2" type="button">2</button>
-          <button class="strip-ep-btn locked" data-episode="3" type="button">3 🔒</button>
-          <button class="strip-ep-btn locked" data-episode="4" type="button">4 🔒</button>
-          <button class="strip-ep-btn locked" data-episode="5" type="button">5 🔒</button>
-        </div>
-      </div>
-
-      <!-- Playback Navigation Actions -->
-      <div class="watch-actions-row">
-        <button class="btn btn-nav-ep" id="btn-prev-ep" type="button" disabled>
-          ⏮ Previous
-        </button>
-        <button class="btn btn-nav-ep" id="btn-next-ep" type="button">
-          Next Episode ⏭
-        </button>
-      </div>
-    </div>
-
-  </div>
-</section>
+<section class="watch-page" id="watch-page-root"> <div class="watch-stage" id="watch-stage">
+<!-- Immersive 9:16 Full-bleed Video --> <video id="minsplay-video" class="immersive-video" playsinline webkit-playsinline preload="auto" src="" > Your browser does not support HTML5 video. </video>
+<!-- Invisible Touch Surface for Tap & Swipe Gestures --> <div class="gesture-surface" id="gesture-surface"></div>
+<!-- Top Floating HUD: Back Navigation & Series Meta --> <header class="video-hud hud-top" id="hud-top"> <button class="hud-circle-btn" id="watch-back-btn" type="button" data-route="/series" aria-label="Back"> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"> <path d="M19 12H5M12 19l-7-7 7-7"/> </svg> </button> <div class="hud-series-info"> <span class="hud-series-title">The Beginning</span> <span class="hud-ep-indicator" id="watch-ep-badge">Ep 1</span> </div> <div class="hud-top-actions"> <button class="hud-circle-btn" id="btn-sound-toggle" type="button" aria-label="Toggle Sound"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="sound-icon-unmuted"> <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon> <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path> </svg> </button> </div> </header>
+<!-- Right-Hand Floating Action Bar --> <aside class="video-hud hud-right-actions" id="hud-right"> <!-- Like / Heart --> <button class="action-pill-btn" id="btn-action-like" type="button" aria-label="Like"> <div class="action-pill-icon" id="like-icon-container"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="like-svg"> <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path> </svg> </div> <span class="action-pill-label" id="like-counter">14.2K</span> </button>
+<!-- Bookmark / Favorite --> <button class="action-pill-btn" id="btn-action-fav" type="button" aria-label="Add to List"> <div class="action-pill-icon" id="fav-icon-container"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="fav-svg"> <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path> </svg> </div> <span class="action-pill-label" id="fav-label">Collect</span> </button>
+<!-- Comments Button --> <button class="action-pill-btn" id="btn-action-comment" type="button" aria-label="Comments"> <div class="action-pill-icon"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path> </svg> </div> <span class="action-pill-label">348</span> </button>
+<!-- Share Button --> <button class="action-pill-btn" id="btn-action-share" type="button" aria-label="Share"> <div class="action-pill-icon"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="18" cy="5" r="3"></circle> <circle cx="6" cy="12" r="3"></circle> <circle cx="18" cy="19" r="3"></circle> <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line> <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line> </svg> </div> <span class="action-pill-label">Share</span> </button>
+<!-- Episodes Drawer Button --> <button class="action-pill-btn action-pill-episodes" id="btn-open-drawer" type="button" aria-label="Episode List"> <div class="action-pill-icon"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <line x1="8" y1="6" x2="21" y2="6"></line> <line x1="8" y1="12" x2="21" y2="12"></line> <line x1="8" y1="18" x2="21" y2="18"></line> <line x1="3" y1="6" x2="3.01" y2="6"></line> <line x1="3" y1="12" x2="3.01" y2="12"></line> <line x1="3" y1="18" x2="3.01" y2="18"></line> </svg> </div> <span class="action-pill-label" id="episodes-drawer-label">5 Eps</span> </button> </aside>
+<!-- Bottom HUD: Episode Details & Slim Scrubber --> <footer class="video-hud hud-bottom" id="hud-bottom"> <div class="hud-meta-row"> <h2 class="hud-current-title" id="watch-current-title">Episode 1: The Encounter</h2> <p class="hud-genre-tags">Urban • Suspense • Counterattack</p> </div>
+<!-- Scrubber Bar Row --> <div class="hud-scrubber-row"> <span class="hud-timestamp" id="hud-time-current">0:00</span> <div class="hud-slider-wrapper"> <input type="range" id="video-seek" class="hud-seek-slider" min="0" max="100" value="0" step="0.1" aria-label="Seek Video" /> </div> <span class="hud-timestamp" id="hud-time-duration">0:10</span> <button class="hud-mini-btn" id="btn-fullscreen-toggle" type="button" aria-label="Fullscreen"> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <polyline points="15 3 21 3 21 9"></polyline> <polyline points="9 21 3 21 3 15"></polyline> <line x1="21" y1="3" x2="14" y2="10"></line> <line x1="3" y1="21" x2="10" y2="14"></line> </svg> </button> </div>
+<!-- Swipe Hints for First-Time Engagement --> <div class="hud-swipe-hint" id="hud-swipe-hint"> <span>▲ Swipe up for next episode</span> </div> </footer>
+<!-- Center Play/Pause Indicator Animation --> <div class="center-play-indicator" id="center-play-indicator"> <div class="center-icon-bubble"> <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"> <polygon points="5 3 19 12 5 21 5 3"></polygon> </svg> </div> </div>
+<!-- On-Screen Status Pill (Buffering / Diagnostics) --> <div class="hud-status-pill" id="hud-status-pill" style="display: none;"></div>
+<!-- Lock Modal Gate (Triggers when selecting Episode 3, 4, 5) --> <div class="watch-lock-modal" id="watch-lock-modal" style="display: none;"> <div class="lock-modal-dialog"> <div class="lock-glow-ring"> <span class="lock-big-emoji">🔒</span> </div> <h3 class="lock-modal-title">Episode Locked</h3> <p class="lock-modal-desc"> Watch a quick sponsor clip to unlock Episode <span id="locked-ep-number">3</span> immediately. </p> <button class="btn btn-unlock-gradient" id="btn-unlock-mock" type="button"> 🎁 Watch Short Ad to Unlock (Mock) </button> <button class="btn btn-ghost-drawer" id="btn-lock-open-drawer" type="button"> Choose Another Episode </button> </div> </div>
+<!-- Slide-Up Episode Drawer Sheet (DramaBox ☰ drawer) --> <div class="episode-drawer-backdrop" id="drawer-backdrop"></div> <div class="episode-drawer-sheet" id="drawer-sheet"> <div class="drawer-header"> <div class="drawer-title-group"> <h3 class="drawer-heading">The Beginning</h3> <span class="drawer-subheading">Select Episode (5 Episodes Total)</span> </div> <button class="drawer-close-btn" id="drawer-close-btn" type="button" aria-label="Close Drawer"> ✕ </button> </div>
+<!-- Episode Grid Selection --> <div class="drawer-grid" id="drawer-episode-grid"> <!-- Rendered dynamically by player.js --> </div> </div>
+<!-- Global Toast Notification --> <div class="watch-toast" id="watch-toast"></div>
+</div> </section>

@@ -144,3 +144,187 @@
 .horizontal-scroll::-webkit-scrollbar {
   display: none;
 }
+/* ==========================================================================
+   Series Detail Screen Styles
+   ========================================================================== */
+
+.series-page {
+  padding-bottom: 5rem;
+}
+
+.series-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1.25rem;
+}
+
+.nav-back-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+}
+
+.nav-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.series-hero {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.series-hero-poster {
+  width: 110px;
+  height: 155px;
+  background: linear-gradient(145deg, #1c1c24, #121217);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.series-hero-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.badge-accent {
+  background: rgba(230, 0, 76, 0.15);
+  color: #ff2e63;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  align-self: flex-start;
+  margin-bottom: 0.4rem;
+}
+
+.series-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.35rem;
+}
+
+.series-tags {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.25rem;
+}
+
+.series-stats {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.series-synopsis {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 1.25rem;
+}
+
+.series-cta {
+  margin-bottom: 1.75rem;
+}
+
+.series-cta .btn {
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #ff2e63;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.episodes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.episode-count-pill {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.episode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.episode-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.episode-card:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.episode-index {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.35);
+  min-width: 1.75rem;
+}
+
+.episode-info {
+  flex: 1;
+}
+
+.episode-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.episode-duration {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.status-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+}
+
+.status-free {
+  background: rgba(39, 201, 63, 0.15);
+  color: #27c93f;
+}
+
+.status-locked {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+}

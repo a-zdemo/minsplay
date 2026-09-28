@@ -1,11 +1,11 @@
-// Test dataset for Series A (The Beginning) per Section 24 of spec
+import { saveProgress, getSeriesProgress, isEpisodeUnlocked, unlockEpisode } from "./storage.js";
+
 export const EPISODES = [
   {
     id: 1,
     title: "Episode 1: The Encounter",
     duration: "1m 45s",
     isFree: true,
-    // Mobile-optimized public test stream (H.264 MP4)
     src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
   },
   {
@@ -39,6 +39,7 @@ export const EPISODES = [
 ];
 
 let currentEpisodeIndex = 0;
+const SERIES_ID = "the-beginning";
 
 export function initPlayer(initialEp = 1) {
   const video = document.getElementById("minsplay-video");
@@ -57,32 +58,30 @@ export function initPlayer(initialEp = 1) {
   function loadEpisode(index) {
     currentEpisodeIndex = index;
     const ep = EPISODES[index];
-
     if (!ep) return;
 
-    // Check unlocked state stored locally
-    const unlockedList = JSON.parse(localStorage.getItem("minsplay_unlocked") || "[]");
-    const isUnlocked = ep.isFree || unlockedList.includes(ep.id);
+    const unlocked = isEpisodeUnlocked(ep.id, ep.isFree);
 
     epName.textContent = `Episode ${ep.id}`;
     currentTitle.textContent = ep.title;
 
-    // Update strip active class
+    // Update strip button statuses
     if (stripContainer) {
       const buttons = stripContainer.querySelectorAll(".strip-ep-btn");
       buttons.forEach((btn, idx) => {
         btn.classList.toggle("active", idx === index);
-        const unlockedThis = EPISODES[idx].isFree || unlockedList.includes(EPISODES[idx].id);
-        btn.classList.toggle("locked", !unlockedThis);
-        btn.innerHTML = unlockedThis ? `${idx + 1}` : `${idx + 1} 🔒`;
+        const epData = EPISODES[idx];
+        const isThisUnlocked = isEpisodeUnlocked(epData.id, epData.isFree);
+        btn.classList.toggle("locked", !isThisUnlocked);
+        btn.innerHTML = isThisUnlocked ? `${idx + 1}` : `${idx + 1} 🔒`;
       });
     }
 
-    // Previous / Next button bounds
     if (prevBtn) prevBtn.disabled = index === 0;
     if (nextBtn) nextBtn.disabled = index === EPISODES.length - 1;
 
-    if (!isUnlocked) {
+    // Gating check
+    if (!unlocked) {
       video.pause();
       video.removeAttribute("src");
       lockOverlay.style.display = "flex";
@@ -91,13 +90,30 @@ export function initPlayer(initialEp = 1) {
 
     lockOverlay.style.display = "none";
     video.src = ep.src;
+
+    // Check if we have saved progress for this episode to resume
+    const saved = getSeriesProgress(SERIES_ID);
+    if (saved && saved.episodeId === ep.id && saved.position > 2) {
+      video.currentTime = saved.position;
+    }
+
     video.play().catch(() => {
-      // Autoplay with sound might require user gesture in Chrome mobile
       playToggle.textContent = "▶";
     });
   }
 
-  // Play/Pause Tap on video
+  // Periodic progress saving (throttled)
+  let lastSavedSecond = 0;
+  video.addEventListener("timeupdate", () => {
+    const current = Math.floor(video.currentTime);
+    if (current > 0 && current !== lastSavedSecond && current % 2 === 0) {
+      lastSavedSecond = current;
+      const ep = EPISODES[currentEpisodeIndex];
+      saveProgress(SERIES_ID, ep.id, video.currentTime, video.duration || 0);
+    }
+  });
+
+  // Play / Pause handling
   touchOverlay.addEventListener("click", () => {
     if (video.paused) {
       video.play();
@@ -120,7 +136,17 @@ export function initPlayer(initialEp = 1) {
     playToggle.style.opacity = "1";
   });
 
-  // Next / Prev listeners
+  // Episode strip navigation
+  if (stripContainer) {
+    stripContainer.onclick = (e) => {
+      const btn = e.target.closest(".strip-ep-btn");
+      if (btn) {
+        const epNum = parseInt(btn.getAttribute("data-episode"), 10);
+        loadEpisode(epNum - 1);
+      }
+    };
+  }
+
   if (nextBtn) {
     nextBtn.onclick = () => {
       if (currentEpisodeIndex < EPISODES.length - 1) {
@@ -137,31 +163,16 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Strip button clicks
-  if (stripContainer) {
-    stripContainer.onclick = (e) => {
-      const btn = e.target.closest(".strip-ep-btn");
-      if (btn) {
-        const epNum = parseInt(btn.getAttribute("data-episode"), 10);
-        loadEpisode(epNum - 1);
-      }
-    };
-  }
-
-  // Mock Unlock Button (Step 8/9 preview)
+  // Mock Reward Unlock Action
   if (unlockBtn) {
     unlockBtn.onclick = () => {
       const ep = EPISODES[currentEpisodeIndex];
-      const unlockedList = JSON.parse(localStorage.getItem("minsplay_unlocked") || "[]");
-      if (!unlockedList.includes(ep.id)) {
-        unlockedList.push(ep.id);
-        localStorage.setItem("minsplay_unlocked", JSON.stringify(unlockedList));
-      }
+      unlockEpisode(ep.id);
       loadEpisode(currentEpisodeIndex);
     };
   }
 
-  // Initial load
+  // Load initial episode
   const startIdx = Math.max(0, Math.min(initialEp - 1, EPISODES.length - 1));
   loadEpisode(startIdx);
 }

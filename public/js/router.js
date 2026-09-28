@@ -21,30 +21,45 @@ export async function navigateTo(path, episode = 1) {
 }
 
 function updateContinueWatching() {
+  const section = document.getElementById("continue-watching-section");
   const container = document.getElementById("continue-watching-list");
-  if (!container) return;
+  if (!container || !section) return;
 
   const records = getAllProgress();
-  if (records.length === 0) return;
+  if (!records || records.length === 0) {
+    section.style.display = "none";
+    return;
+  }
 
+  section.style.display = "flex";
   container.innerHTML = records
     .map(
       (rec) => `
-      <article class="series-card" data-route="/watch" data-episode="${rec.episodeId}">
-        <div class="series-card-poster" style="position: relative;">
-          <span>▶ Play</span>
-          <div class="progress-bar-track" style="position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.2);">
-            <div class="progress-bar-fill" style="width: ${rec.percentage}%; height: 100%; background: #ff2e63;"></div>
+      <article class="continue-card" data-route="/watch" data-episode="${rec.episodeId}">
+        <div class="continue-poster">
+          <span style="font-size: 0.72rem; font-weight: 700; color: #fff;">▶ Ep ${rec.episodeId}</span>
+          <div class="continue-progress-bar">
+            <div class="continue-progress-fill" style="width: ${rec.percentage}%;"></div>
           </div>
         </div>
-        <div class="series-card-info">
-          <h3 class="series-card-title">${rec.seriesTitle}</h3>
-          <p class="series-card-meta">${rec.episodeTitle} • ${rec.percentage}%</p>
-        </div>
+        <h4 class="drama-title" style="margin-top: 4px; font-size: 0.75rem;">${rec.seriesTitle}</h4>
+        <p class="drama-genre">${rec.episodeTitle} • ${rec.percentage}%</p>
       </article>
     `
     )
     .join("");
+}
+
+function initHomeInteractions() {
+  const subNav = document.getElementById("home-sub-nav");
+  if (!subNav) return;
+
+  subNav.addEventListener("click", (e) => {
+    const tabBtn = e.target.closest(".tab-item");
+    if (!tabBtn) return;
+    subNav.querySelectorAll(".tab-item").forEach((btn) => btn.classList.remove("active"));
+    tabBtn.classList.add("active");
+  });
 }
 
 async function renderRoute(path) {
@@ -62,7 +77,7 @@ async function renderRoute(path) {
     return;
   }
 
-  // DramaBox UX Pattern 2: Hide bottom navigation on /watch so video fills 100% of viewport
+  // Hide bottom navigation on /watch so video fills 100% of viewport
   const bottomNav = document.querySelector(".bottom-nav") || document.querySelector("nav");
   if (bottomNav) {
     bottomNav.style.display = path === "/watch" ? "none" : "flex";
@@ -75,6 +90,7 @@ async function renderRoute(path) {
     initPlayer(pendingEpisode);
   } else if (path === "/") {
     updateContinueWatching();
+    initHomeInteractions();
   }
 }
 
@@ -100,5 +116,3 @@ export function initRouter() {
   const initialPath = window.location.pathname || "/";
   renderRoute(routes[initialPath] ? initialPath : "/");
 }
-
-

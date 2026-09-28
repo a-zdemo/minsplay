@@ -13,21 +13,6 @@
     </header>
 
     <!-- Video Stage / Viewport -->
-    <section class="watch-page">
-  <div class="watch-container">
-
-    <!-- Top Floating Navigation -->
-    <header class="watch-nav">
-      <button class="watch-back-btn" type="button" data-route="/series" aria-label="Back to Series">
-        ←
-      </button>
-      <div class="watch-meta">
-        <span class="watch-series-name">The Beginning</span>
-        <span class="watch-ep-name" id="watch-ep-name">Episode 1</span>
-      </div>
-    </header>
-
-    <!-- Video Stage / Viewport -->
     <div class="video-stage">
       <video
         id="minsplay-video"
@@ -41,7 +26,10 @@
       </video>
 
       <!-- On-Screen Status Indicator -->
-      <div id="video-status-msg" style="position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.75); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; z-index: 6; display: none;"></div>
+      <div
+        id="video-status-msg"
+        style="position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.75); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; z-index: 6; display: none;"
+      ></div>
 
       <!-- Custom Touch Play/Pause Overlay Indicator -->
       <div class="video-touch-overlay" id="video-touch-overlay">
@@ -78,7 +66,7 @@
         </button>
       </div>
 
-      <!-- Episode Switcher Strip -->
+      <!-- Dynamic Episode Switcher Strip -->
       <div class="watch-episode-strip">
         <span class="strip-label">Episodes:</span>
         <div class="strip-buttons" id="watch-episode-list">
@@ -90,46 +78,7 @@
         </div>
       </div>
 
-      <!-- Bottom Playback Actions -->
-      <div class="watch-actions-row">
-        <button class="btn btn-nav-ep" id="btn-prev-ep" type="button" disabled>
-          ⏮ Previous
-        </button>
-        <button class="btn btn-nav-ep" id="btn-next-ep" type="button">
-          Next Episode ⏭
-        </button>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-    <!-- Quick Episode Navigation & Controls -->
-    <div class="watch-details-sheet">
-      <div class="watch-title-row">
-        <div>
-          <h2 class="watch-current-title" id="watch-current-title">Episode 1: The Encounter</h2>
-          <p class="watch-current-tags">Urban • Drama • 1m 45s</p>
-        </div>
-        <button class="btn-icon-fav" type="button" aria-label="Favorite">
-          ♥
-        </button>
-      </div>
-
-      <!-- Episode Switcher Strip -->
-      <div class="watch-episode-strip">
-        <span class="strip-label">Episodes:</span>
-        <div class="strip-buttons" id="watch-episode-list">
-          <button class="strip-ep-btn active" data-episode="1" type="button">1</button>
-          <button class="strip-ep-btn" data-episode="2" type="button">2</button>
-          <button class="strip-ep-btn locked" data-episode="3" type="button">3 🔒</button>
-          <button class="strip-ep-btn locked" data-episode="4" type="button">4 🔒</button>
-          <button class="strip-ep-btn locked" data-episode="5" type="button">5 🔒</button>
-        </div>
-      </div>
-
-      <!-- Bottom Playback Actions -->
+      <!-- Playback Navigation Actions -->
       <div class="watch-actions-row">
         <button class="btn btn-nav-ep" id="btn-prev-ep" type="button" disabled>
           ⏮ Previous

@@ -1,89 +1,71 @@
+
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Minsplay - Short Drama Streaming</title>
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/pages.css" />
+  </head>
+  <body>
+    <!-- Dynamic SPA Route Outlet -->
+    <main id="main-content"></main>
 
-<head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  >
-
-  <meta
-    name="theme-color"
-    content="#0f0f0f"
-  >
-
-  <meta
-    name="description"
-    content="Minsplay - Watch series, unlock episodes and earn rewards."
-  >
-
-  <link rel="manifest" href="/manifest.json">
-
-  <link rel="stylesheet" href="/css/reset.css">
-  <link rel="stylesheet" href="/css/variables.css">
-  <link rel="stylesheet" href="/css/global.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/pages.css">
-
-  <title>Minsplay</title>
-</head>
-
-<body>
-
-  <div id="app">
-
-    <main id="main-content">
-      <div class="loading-screen">
-        <p>Loading Minsplay...</p>
-      </div>
-    </main>
-
-    <nav class="bottom-nav" aria-label="Main navigation">
-
-      <button
-        class="bottom-nav-item active"
-        type="button"
-        data-route="/"
-      >
-        <span class="bottom-nav-icon">⌂</span>
-        <span>Home</span>
+    <!-- Authentic DramaBox 5-Tab Fixed Bottom Navigation -->
+    <nav class="bottom-nav" id="bottom-nav">
+      
+      <!-- 1. Home -->
+      <button class="nav-item active" type="button" data-route="/" aria-label="Home">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span class="nav-label">Home</span>
       </button>
 
-      <button
-        class="bottom-nav-item"
-        type="button"
-        data-route="/search"
-      >
-        <span class="bottom-nav-icon">⌕</span>
-        <span>Search</span>
+      <!-- 2. For You (Direct Full-Bleed Player) -->
+      <button class="nav-item" type="button" data-route="/watch" data-episode="1" aria-label="For You">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="3"></rect>
+          <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon>
+        </svg>
+        <span class="nav-label">For You</span>
       </button>
 
-      <button
-        class="bottom-nav-item"
-        type="button"
-        data-route="/rewards"
-      >
-        <span class="bottom-nav-icon">◉</span>
-        <span>Rewards</span>
+      <!-- 3. Member -->
+      <button class="nav-item" type="button" data-route="/series" aria-label="Member">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"></circle>
+          <polygon points="12 6 13.8 9.6 17.8 10.2 14.9 13 15.6 17 12 15.1 8.4 17 9.1 13 6.2 10.2 10.2 9.6 12 6" fill="currentColor"></polygon>
+        </svg>
+        <span class="nav-label">Member</span>
       </button>
 
-      <button
-        class="bottom-nav-item"
-        type="button"
-        data-route="/profile"
-      >
-        <span class="bottom-nav-icon">●</span>
-        <span>Me</span>
+      <!-- 4. My List / History -->
+      <button class="nav-item" type="button" data-route="/series" aria-label="My List">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span class="nav-label">My List</span>
+      </button>
+
+      <!-- 5. Profile -->
+      <button class="nav-item" type="button" data-route="/series" aria-label="Profile">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span class="nav-label">Profile</span>
       </button>
 
     </nav>
 
-  </div>
-
-  <script type="module" src="/js/app.js"></script>
-
-</body>
-
+    <!-- Main Application Bundle -->
+    <script type="module" src="/js/app.js"></script>
+  </body>
 </html>

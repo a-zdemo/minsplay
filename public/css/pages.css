@@ -1,0 +1,146 @@
+/* ========================================
+   Home
+======================================== */
+
+.home-page {
+  padding-bottom: var(--space-7);
+}
+
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: var(--space-5) 0;
+}
+
+.brand {
+  margin: 0;
+
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.header-action {
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: var(--color-surface);
+  color: #fff;
+
+  font-size: 18px;
+}
+
+/* ========================================
+   Hero
+======================================== */
+
+.hero {
+  position: relative;
+
+  min-height: 390px;
+
+  display: flex;
+  align-items: flex-end;
+
+  overflow: hidden;
+
+  border-radius: var(--radius-lg);
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.95),
+      rgba(0, 0, 0, 0.15)
+    ),
+    linear-gradient(
+      135deg,
+      #333,
+      #111
+    );
+}
+
+.hero-content {
+  width: 100%;
+  padding: var(--space-6);
+}
+
+.hero-label {
+  margin: 0 0 var(--space-2);
+
+  color: var(--color-primary);
+
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.hero-title {
+  margin: 0;
+
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.hero-description {
+  max-width: 500px;
+
+  margin: var(--space-3) 0 var(--space-5);
+
+  color: var(--color-text-secondary);
+}
+
+/* ========================================
+   Content Sections
+======================================== */
+
+.content-section {
+  margin-top: var(--space-7);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: var(--space-4);
+}
+
+.section-title {
+  margin: 0;
+
+  font-size: 20px;
+}
+
+.section-link {
+  border: 0;
+  background: transparent;
+
+  color: var(--color-primary);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.horizontal-scroll {
+  display: flex;
+  gap: var(--space-3);
+
+  overflow-x: auto;
+
+  padding-bottom: var(--space-2);
+
+  scrollbar-width: none;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}

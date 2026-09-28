@@ -1,0 +1,211 @@
+<section class="home-page">
+
+  <div class="page-container">
+
+    <header class="home-header">
+
+      <h1 class="brand">
+        Minsplay
+      </h1>
+
+      <button
+        class="header-action"
+        type="button"
+        data-route="/search"
+        aria-label="Search"
+      >
+        🔍
+      </button>
+
+    </header>
+
+
+    <!-- Featured -->
+
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <p class="hero-label">
+          Featured Series
+        </p>
+
+        <h2 class="hero-title">
+          Your next story starts here.
+        </h2>
+
+        <p class="hero-description">
+          Discover exciting short series and unlock
+          new episodes as you watch.
+        </p>
+
+        <button
+          class="btn"
+          type="button"
+          data-route="/series"
+        >
+          Watch Now
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- Continue Watching -->
+
+    <section class="content-section">
+
+      <div class="section-header">
+
+        <h2 class="section-title">
+          Continue Watching
+        </h2>
+
+        <button
+          class="section-link"
+          type="button"
+        >
+          See All
+        </button>
+
+      </div>
+
+      <div class="horizontal-scroll">
+
+        <article class="series-card">
+
+          <div class="series-card-poster">
+            Poster
+          </div>
+
+          <div class="series-card-info">
+
+            <h3 class="series-card-title">
+              Coming Soon
+            </h3>
+
+            <p class="series-card-meta">
+              Episode 1
+            </p>
+
+          </div>
+
+        </article>
+
+        <article class="series-card">
+
+          <div class="series-card-poster">
+            Poster
+          </div>
+
+          <div class="series-card-info">
+
+            <h3 class="series-card-title">
+              Coming Soon
+            </h3>
+
+            <p class="series-card-meta">
+              Episode 2
+            </p>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- Popular -->
+
+    <section class="content-section">
+
+      <div class="section-header">
+
+        <h2 class="section-title">
+          Popular Series
+        </h2>
+
+        <button
+          class="section-link"
+          type="button"
+          data-route="/search"
+        >
+          See All
+        </button>
+
+      </div>
+
+      <div class="horizontal-scroll">
+
+        <article class="series-card">
+
+          <div class="series-card-poster">
+            Poster
+          </div>
+
+          <div class="series-card-info">
+
+            <h3 class="series-card-title">
+              The Beginning
+            </h3>
+
+            <p class="series-card-meta">
+              12 Episodes
+            </p>
+
+          </div>
+
+        </article>
+
+
+        <article class="series-card">
+
+          <div class="series-card-poster">
+            Poster
+          </div>
+
+          <div class="series-card-info">
+
+            <h3 class="series-card-title">
+              Hidden Truth
+            </h3>
+
+            <p class="series-card-meta">
+              24 Episodes
+            </p>
+
+          </div>
+
+        </article>
+
+
+        <article class="series-card">
+
+          <div class="series-card-poster">
+            Poster
+          </div>
+
+          <div class="series-card-info">
+
+            <h3 class="series-card-title">
+              New Life
+            </h3>
+
+            <p class="series-card-meta">
+              18 Episodes
+            </p>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</section>

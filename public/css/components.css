@@ -1,0 +1,127 @@
+/* ========================================
+   Buttons
+======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+
+  min-height: 44px;
+  padding: 0 var(--space-5);
+
+  border: 0;
+  border-radius: var(--radius-md);
+
+  color: #fff;
+  background: var(--color-primary);
+
+  font-weight: 700;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--color-surface-2);
+}
+
+/* ========================================
+   Series Card
+======================================== */
+
+.series-card {
+  min-width: 140px;
+  overflow: hidden;
+
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.series-card-poster {
+  aspect-ratio: 2 / 3;
+  background:
+    linear-gradient(
+      135deg,
+      #292929,
+      #111
+    );
+
+  display: grid;
+  place-items: center;
+
+  color: var(--color-text-muted);
+}
+
+.series-card-info {
+  padding: var(--space-3);
+}
+
+.series-card-title {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.series-card-meta {
+  margin: 4px 0 0;
+
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+/* ========================================
+   Bottom Navigation
+======================================== */
+
+.bottom-nav {
+  position: fixed;
+  z-index: 100;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: var(--nav-height);
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  border-top: 1px solid var(--color-border);
+
+  background: rgba(15, 15, 15, 0.96);
+
+  backdrop-filter: blur(12px);
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  border: 0;
+  background: transparent;
+
+  color: var(--color-text-muted);
+
+  font-size: 11px;
+}
+
+.bottom-nav-item.active {
+  color: var(--color-primary);
+}
+
+.bottom-nav-icon {
+  font-size: 21px;
+  line-height: 1;
+}

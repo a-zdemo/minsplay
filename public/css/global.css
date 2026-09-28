@@ -1,0 +1,64 @@
+html {
+  background: var(--color-bg);
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  line-height: 1.5;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+#main-content {
+  min-height: calc(100vh - var(--nav-height));
+  padding-bottom: var(--nav-height);
+}
+
+.page-container {
+  width: min(
+    calc(100% - 32px),
+    var(--container-width)
+  );
+  margin-inline: auto;
+}
+
+.loading-screen {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  color: var(--color-text-secondary);
+}
+
+.error-page {
+  min-height: 70vh;
+  display: grid;
+  place-content: center;
+  gap: var(--space-3);
+  text-align: center;
+  padding: var(--space-6);
+}
+
+.error-page button {
+  justify-self: center;
+}

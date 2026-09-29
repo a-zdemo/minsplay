@@ -17,7 +17,7 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .tab-item { position: relative; background: transparent; border: none; padding: 6px 0; font-size: 0.95rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); white-space: nowrap; cursor: pointer; transition: color 0.15s ease; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
 .tab-item.active { color: #fff; font-weight: 800; font-size: 1rem; }
 .tab-item.active::after { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; border-radius: 3px; background: #ff2e63; }
-/* ======================================== 2. Home Content Body (With Fixed Header Offset) ======================================== / .home-scroll-body { / 106px top clearance ensures hero banner starts below the fixed header */ padding: 106px 14px 12px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
+/* ======================================== 2. Home Content Body (With Fixed Header Offset) ======================================== */ .home-scroll-body { padding: 106px 14px 12px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
 .content-section { display: flex; flex-direction: column; gap: 10px; width: 100%; }
 .section-header { display: flex; justify-content: space-between; align-items: center; }
 .section-heading { margin: 0; font-size: 1.1rem; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
@@ -59,7 +59,7 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .mylist-tab.active { color: #fff; font-size: 1.15rem; font-weight: 800; }
 .mylist-tab.active::after { content: ""; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 22px; height: 3px; border-radius: 3px; background: #ff2e63; }
 .mylist-manage-btn { background: transparent; border: none; color: rgba(255, 255, 255, 0.7); display: grid; place-items: center; cursor: pointer; padding: 4px; }
-.mylist-body { /* 68px top clearance ensures drama cards start below the fixed header */ padding: 68px 14px 14px; display: flex; flex-direction: column; gap: 24px; }
+.mylist-body { padding: 68px 14px 14px; display: flex; flex-direction: column; gap: 24px; }
 .mylist-tab-pane { display: none; }
 .mylist-tab-pane.active { display: block; }
 .mylist-drama-list { display: flex; flex-direction: column; gap: 14px; }
@@ -146,4 +146,4 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .center-play-indicator.active { opacity: 1; }
 .center-icon-bubble { width: 68px; height: 68px; border-radius: 50%; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; display: grid; place-items: center; }
 .hud-status-pill { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 25; }
-.watch-lock-modal 
+.watch-lock-modal { position: absolute; inset: 0; background: rgba(10, 10, 15, 0.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex;

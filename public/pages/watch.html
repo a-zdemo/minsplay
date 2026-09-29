@@ -162,7 +162,7 @@
         </p>
         <div class="lock-modal-actions">
           <button class="btn-unlock-gradient" id="btn-unlock-mock" type="button">
-            🎁 Watch Short Ad to Unlock (Mock)
+            🎁 Watch Short Ad to Unlock
           </button>
           <button class="btn-ghost-drawer" id="btn-lock-open-drawer" type="button">
             Choose Another Episode
@@ -170,6 +170,52 @@
         </div>
       </div>
     </aside>
+
+    <!-- Realistic 5-Second Rewarded Ad Overlay (z-index: 180, Section 18) -->
+    <section class="rewarded-ad-modal" id="rewarded-ad-modal" style="display: none;">
+      <!-- Ad Top Control Bar -->
+      <div class="ad-top-bar">
+        <div class="ad-badge-group">
+          <span class="ad-pill-tag">AD</span>
+          <span class="ad-timer-pill" id="ad-timer-pill">Reward in 5s</span>
+        </div>
+        <button class="ad-skip-btn disabled" id="ad-skip-btn" type="button" disabled aria-label="Skip Ad">
+          ✕
+        </button>
+      </div>
+
+      <!-- Sponsor Interactive Stage -->
+      <div class="ad-creative-container">
+        <div class="ad-sponsor-card">
+          <div class="ad-sponsor-badge">SPONSORED BY</div>
+          <div class="ad-sponsor-icon-wrap">
+            <span class="ad-sponsor-logo">🐜</span>
+          </div>
+          <h2 class="ad-sponsor-name">Minsplay VIP Club</h2>
+          <p class="ad-sponsor-tagline">
+            Unlock all drama series with zero ads, 4K quality, and daily VIP coin bonuses.
+          </p>
+          <div class="ad-sponsor-cta-wrap">
+            <span class="ad-sponsor-btn">Download VIP Pass</span>
+          </div>
+        </div>
+
+        <!-- Reward Unlocked Splash Card (Appears at 0s) -->
+        <div class="ad-reward-splash" id="ad-reward-splash" style="display: none;">
+          <div class="splash-badge">🎉 REWARD GRANTED!</div>
+          <h3 class="splash-title">Episode Unlocked</h3>
+          <p class="splash-subtitle">Playing now...</p>
+        </div>
+      </div>
+
+      <!-- Bottom Real-time Ad Progress Strip -->
+      <div class="ad-progress-strip">
+        <div class="ad-progress-track">
+          <div class="ad-progress-fill" id="ad-progress-fill"></div>
+        </div>
+        <span class="ad-reward-notice">Watch full clip to unlock episode</span>
+      </div>
+    </section>
 
     <!-- Slide-Up Episode Drawer Sheet (z-index: 210) -->
     <div class="episode-drawer-backdrop" id="drawer-backdrop"></div>

@@ -45,6 +45,10 @@ let isLiked = false;
 let isFavorited = false;
 let likeCount = 14200;
 
+// Ad countdown timers
+let adTimerInterval = null;
+let adProgressInterval = null;
+
 function formatTime(seconds) {
   if (isNaN(seconds) || seconds < 0) return "0:00";
   const m = Math.floor(seconds / 60);
@@ -60,6 +64,13 @@ export function initPlayer(initialEp = 1) {
   const lockedEpNum = document.getElementById("locked-ep-number");
   const unlockBtn = document.getElementById("btn-unlock-mock");
   const statusPill = document.getElementById("hud-status-pill");
+
+  // Rewarded Ad Elements (Section 18)
+  const adModal = document.getElementById("rewarded-ad-modal");
+  const adTimerPill = document.getElementById("ad-timer-pill");
+  const adSkipBtn = document.getElementById("ad-skip-btn");
+  const adProgressFill = document.getElementById("ad-progress-fill");
+  const adRewardSplash = document.getElementById("ad-reward-splash");
 
   // Floating HUD containers
   const hudTop = document.getElementById("hud-top");
@@ -185,7 +196,6 @@ export function initPlayer(initialEp = 1) {
       video.removeAttribute("src");
       video.load();
 
-      // Suppress center play button when locked so it never shows through
       if (playIndicator) playIndicator.classList.remove("active");
       hideHUD();
       showStatus("");
@@ -196,6 +206,7 @@ export function initPlayer(initialEp = 1) {
 
     // Unlocked Episode State
     if (lockModal) lockModal.style.display = "none";
+    if (adModal) adModal.style.display = "none";
     showStatus("Buffering stream...");
 
     video.src = ep.src;
@@ -216,6 +227,100 @@ export function initPlayer(initialEp = 1) {
         if (playIndicator) playIndicator.classList.add("active");
         showHUD();
       });
+  }
+
+  // ========================================
+  // Rewarded Ad Simulation Engine (Section 18)
+  // ========================================
+  function startRewardedAdFlow() {
+    const ep = EPISODES[currentEpisodeIndex];
+    if (!ep || !adModal) return;
+
+    // Hide the lock dialog
+    if (lockModal) lockModal.style.display = "none";
+    if (adRewardSplash) adRewardSplash.style.display = "none";
+
+    // Reset ad UI state
+    adModal.style.display = "flex";
+    if (adSkipBtn) {
+      adSkipBtn.disabled = true;
+      adSkipBtn.classList.add("disabled");
+      adSkipBtn.textContent = "✕";
+    }
+    if (adProgressFill) adProgressFill.style.width = "0%";
+
+    let remainingSeconds = 5;
+    if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
+
+    const totalDurationMs = 5000;
+    const startTime = Date.now();
+
+    // Progress bar fill animation (60fps)
+    clearInterval(adProgressInterval);
+    adProgressInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progressPercent = Math.min(100, (elapsed / totalDurationMs) * 100);
+      if (adProgressFill) {
+        adProgressFill.style.width = `${progressPercent}%`;
+      }
+      if (elapsed >= totalDurationMs) {
+        clearInterval(adProgressInterval);
+      }
+    }, 50);
+
+    // 1-second countdown interval
+    clearInterval(adTimerInterval);
+    adTimerInterval = setInterval(() => {
+      remainingSeconds -= 1;
+
+      if (remainingSeconds > 0) {
+        if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
+      } else {
+        // Countdown Finished: Grant Reward!
+        clearInterval(adTimerInterval);
+        clearInterval(adProgressInterval);
+
+        if (adTimerPill) adTimerPill.textContent = "Reward Granted!";
+        if (adProgressFill) adProgressFill.style.width = "100%";
+
+        // Enable Skip/Close button
+        if (adSkipBtn) {
+          adSkipBtn.disabled = false;
+          adSkipBtn.classList.remove("disabled");
+          adSkipBtn.textContent = "✓";
+        }
+
+        // Show celebratory splash card
+        if (adRewardSplash) adRewardSplash.style.display = "flex";
+
+        // Unlock episode in storage
+        unlockEpisode(ep.id);
+
+        // Auto-close ad and start video playback after 1.2s celebration
+        setTimeout(() => {
+          completeAdAndPlay(ep.id);
+        }, 1200);
+      }
+    }, 1000);
+  }
+
+  function completeAdAndPlay(epId) {
+    clearInterval(adTimerInterval);
+    clearInterval(adProgressInterval);
+
+    if (adModal) adModal.style.display = "none";
+    showToast(`🎉 Episode ${epId} Unlocked!`);
+    loadEpisode(currentEpisodeIndex);
+  }
+
+  // Handle manual tap on close button after ad is complete
+  if (adSkipBtn) {
+    adSkipBtn.onclick = () => {
+      if (!adSkipBtn.disabled) {
+        const ep = EPISODES[currentEpisodeIndex];
+        completeAdAndPlay(ep.id);
+      }
+    };
   }
 
   // Swipe and Tap Gestures
@@ -442,13 +547,10 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Mock Reward Unlock Handler
+  // Rewarded Ad Unlock Trigger (Section 18)
   if (unlockBtn) {
     unlockBtn.onclick = () => {
-      const ep = EPISODES[currentEpisodeIndex];
-      unlockEpisode(ep.id);
-      showToast(`Episode ${ep.id} Unlocked! 🎉`);
-      loadEpisode(currentEpisodeIndex);
+      startRewardedAdFlow();
     };
   }
 

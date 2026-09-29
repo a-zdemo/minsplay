@@ -9,16 +9,34 @@
     />
     
     <!-- PWA Installation Meta Tags -->
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#0a0a0e" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Minsplay" />
 
     <title>Minsplay - Short Drama Streaming</title>
-    <link rel="stylesheet" href="/css/variables.css" />
-    <link rel="stylesheet" href="/css/components.css" />
-    <link rel="stylesheet" href="/css/pages.css" />
+
+    <!-- Immediate Dark Theme Baseline (Prevents white flash) -->
+    <style>
+      html, body {
+        background-color: #000000;
+        color: #ffffff;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        overflow-x: hidden;
+      }
+      #main-content {
+        min-height: 100vh;
+      }
+    </style>
+
+    <!-- Vite Bundled Stylesheets (Explicit source paths) -->
+    <link rel="stylesheet" href="./public/css/variables.css" />
+    <link rel="stylesheet" href="./public/css/components.css" />
+    <link rel="stylesheet" href="./public/css/pages.css" />
   </head>
   <body>
     <!-- Dynamic SPA Route Outlet -->
@@ -73,6 +91,7 @@
 
     </nav>
 
-    <script type="module" src="/js/app.js"></script>
+    <!-- Vite Bundled Script Entry (Explicit source path) -->
+    <script type="module" src="./public/js/app.js"></script>
   </body>
 </html>

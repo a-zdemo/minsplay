@@ -1,11 +1,20 @@
 import { initRouter } from "./router.js";
 
-// 1. Initialize the Single Page Application Router
-document.addEventListener("DOMContentLoaded", () => {
-  initRouter();
-});
+function startApp() {
+  try {
+    initRouter();
+  } catch (error) {
+    console.error("Minsplay startup error:", error);
+  }
+}
 
-// 2. Register PWA Service Worker for App Installation
+// Ensure startup runs immediately whether DOM is already loaded or still loading
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", startApp);
+} else {
+  startApp();
+}
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker

@@ -17,12 +17,12 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .tab-item { position: relative; background: transparent; border: none; padding: 6px 0; font-size: 0.95rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); white-space: nowrap; cursor: pointer; transition: color 0.15s ease; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
 .tab-item.active { color: #fff; font-weight: 800; font-size: 1rem; }
 .tab-item.active::after { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; border-radius: 3px; background: #ff2e63; }
-/* ======================================== 2. Home Content Body (With Fixed Header Offset) ======================================== */ .home-scroll-body { padding: 106px 14px 12px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
+/* ======================================== 2. Home Content Body ======================================== */ .home-scroll-body { padding: 106px 14px 12px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
 .content-section { display: flex; flex-direction: column; gap: 10px; width: 100%; }
 .section-header { display: flex; justify-content: space-between; align-items: center; }
 .section-heading { margin: 0; font-size: 1.1rem; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
 .section-link-more { font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); cursor: pointer; font-weight: 600; }
-/* Continue Watching Horizontal Shelf */ .continue-watching-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+/* Continue Watching Shelf */ .continue-watching-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .continue-watching-scroll::-webkit-scrollbar { display: none; }
 .continue-card { width: 110px; flex-shrink: 0; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
 .continue-poster { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; background: #181922; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -41,50 +41,19 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .drama-card { display: flex; flex-direction: column; cursor: pointer; -webkit-tap-highlight-color: transparent; min-width: 0; }
 .drama-card:active { opacity: 0.85; }
 .drama-poster-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; background: #15151c; border: 1px solid rgba(255, 255, 255, 0.08); }
-/* Poster Artwork Gradients */ .poster-gradient-art { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; box-sizing: border-box; text-align: center; }
+.poster-gradient-art { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; box-sizing: border-box; text-align: center; }
 .art-symbol { font-size: 1.4rem; opacity: 0.75; }
 .art-code { font-size: 0.62rem; font-weight: 800; color: rgba(255, 255, 255, 0.8); letter-spacing: 0.5px; margin-top: 4px; }
 .art-blue { background: linear-gradient(145deg, #1e3c72, #142340); } .art-red { background: linear-gradient(145deg, #5c1818, #2a0b0b); } .art-gold { background: linear-gradient(145deg, #5c4516, #291e0a); } .art-purple { background: linear-gradient(145deg, #3d1b5c, #1a0b29); } .art-emerald { background: linear-gradient(145deg, #164a30, #0a2115); } .art-pink { background: linear-gradient(145deg, #5c1d38, #290d19); } .art-dark { background: linear-gradient(145deg, #242533, #111218); } .art-crimson { background: linear-gradient(145deg, #4f1124, #240710); } .art-violet { background: linear-gradient(145deg, #2d1b52, #140b26); }
-/* Status Badges */ .poster-badge { position: absolute; top: 5px; right: 5px; font-size: 0.6rem; font-weight: 800; padding: 2px 5px; border-radius: 4px; line-height: 1.1; z-index: 2; }
+.poster-badge { position: absolute; top: 5px; right: 5px; font-size: 0.6rem; font-weight: 800; padding: 2px 5px; border-radius: 4px; line-height: 1.1; z-index: 2; }
 .badge-following { background: rgba(15, 15, 22, 0.88); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
 .badge-new { background: rgba(255, 255, 255, 0.92); color: #111; }
 .badge-hot { background: #ff2e63; color: #fff; }
-/* Play Count Overlay */ .poster-play-count { position: absolute; bottom: 5px; right: 6px; font-size: 0.65rem; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95); display: flex; align-items: center; gap: 2px; background: rgba(0, 0, 0, 0.45); padding: 1px 4px; border-radius: 3px; backdrop-filter: blur(4px); z-index: 2; }
+.poster-play-count { position: absolute; bottom: 5px; right: 6px; font-size: 0.65rem; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95); display: flex; align-items: center; gap: 2px; background: rgba(0, 0, 0, 0.45); padding: 1px 4px; border-radius: 3px; backdrop-filter: blur(4px); z-index: 2; }
 .play-arrow { font-size: 0.58rem; }
 .drama-title { margin: 6px 0 2px; font-size: 0.78rem; font-weight: 700; color: #fff; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; min-height: 2.5em; word-break: break-word; }
 .drama-genre { margin: 0; font-size: 0.68rem; color: rgba(255, 255, 255, 0.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* ======================================== 4. "My List" / History Screen Styles ======================================== */ .mylist-header { position: fixed; top: 0; left: 0; right: 0; z-index: 80; height: 56px; background: rgba(10, 10, 14, 0.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; }
-.mylist-tabs { display: flex; align-items: center; gap: 20px; }
-.mylist-tab { position: relative; background: transparent; border: none; padding: 6px 0; font-size: 1.02rem; font-weight: 700; color: rgba(255, 255, 255, 0.45); cursor: pointer; transition: color 0.15s ease, font-size 0.15s ease; -webkit-tap-highlight-color: transparent; }
-.mylist-tab.active { color: #fff; font-size: 1.15rem; font-weight: 800; }
-.mylist-tab.active::after { content: ""; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 22px; height: 3px; border-radius: 3px; background: #ff2e63; }
-.mylist-manage-btn { background: transparent; border: none; color: rgba(255, 255, 255, 0.7); display: grid; place-items: center; cursor: pointer; padding: 4px; }
-.mylist-body { padding: 68px 14px 14px; display: flex; flex-direction: column; gap: 24px; }
-.mylist-tab-pane { display: none; }
-.mylist-tab-pane.active { display: block; }
-.mylist-drama-list { display: flex; flex-direction: column; gap: 14px; }
-.mylist-card { display: flex; align-items: center; gap: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.mylist-card:active { opacity: 0.82; }
-.mylist-poster-wrap { position: relative; width: 90px; height: 125px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: #15151c; border: 1px solid rgba(255, 255, 255, 0.08); }
-.mylist-card-progress-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255, 255, 255, 0.2); }
-.mylist-card-progress-fill { height: 100%; background: #ff2e63; }
-.mylist-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-.mylist-title { margin: 0; font-size: 0.95rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mylist-genre { margin: 0; font-size: 0.76rem; color: rgba(255, 255, 255, 0.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mylist-ep-info { margin: 2px 0 0; font-size: 0.76rem; color: rgba(255, 255, 255, 0.7); font-weight: 700; }
-.mylist-empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 40px 16px; }
-.empty-icon { font-size: 2.5rem; }
-.empty-text { font-size: 0.88rem; color: rgba(255, 255, 255, 0.5); margin: 0; }
-/* Most Trending Shelf */ .trending-shelf-section { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-.trending-heading { margin: 0; font-size: 1.1rem; font-weight: 800; color: #fff; }
-.trending-horizontal-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 6px; }
-.trending-horizontal-scroll::-webkit-scrollbar { display: none; }
-.trending-card { width: 105px; flex-shrink: 0; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
-.trending-poster-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); }
-.trending-rank { position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; border-radius: 4px; display: grid; place-items: center; font-size: 0.72rem; font-weight: 900; color: #fff; z-index: 2; }
-.rank-1 { background: #ff9800; } .rank-2 { background: #00bcd4; } .rank-3 { background: #2196f3; } .rank-other { background: rgba(0, 0, 0, 0.6); }
-.trending-title { margin: 2px 0 0; font-size: 0.74rem; font-weight: 700; color: #fff; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-/* ======================================== 5. Series Detail Screen Styles ======================================== */ .series-page { padding-bottom: 5rem; background: #000; min-height: 100vh; }
+/* ======================================== 4. Series Detail Screen Styles ======================================== */ .series-page { padding-bottom: 5rem; background: #000; min-height: 100vh; }
 .series-nav { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
 .nav-back-btn { background: transparent; border: none; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; }
 .nav-title { font-size: 1rem; font-weight: 500; color: rgba(255, 255, 255, 0.7); }
@@ -111,7 +80,7 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .status-tag { font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.55rem; border-radius: 4px; }
 .status-free { background: rgba(39, 201, 63, 0.15); color: #27c93f; }
 .status-locked { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); }
-/* ======================================== 6. 100% Immersive Full-Bleed Player ======================================== */ .watch-page { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: #000; overflow: hidden; z-index: 90; }
+/* ======================================== 5. 100% Immersive Full-Bleed Player ======================================== */ .watch-page { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: #000; overflow: hidden; z-index: 90; }
 .watch-stage { position: relative; width: 100%; height: 100%; overflow: hidden; }
 .immersive-video { width: 100%; height: 100%; object-fit: cover; background: #000; }
 .gesture-surface { position: absolute; inset: 0; z-index: 10; cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -146,4 +115,26 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .center-play-indicator.active { opacity: 1; }
 .center-icon-bubble { width: 68px; height: 68px; border-radius: 50%; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; display: grid; place-items: center; }
 .hud-status-pill { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 25; }
-.watch-lock-modal { position: absolute; inset: 0; background: rgba(10, 10, 15, 0.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex;
+/* ======================================== 6. Immersive Fullscreen Episode Lock Modal ======================================== */ .watch-lock-modal { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: rgba(8, 8, 12, 0.94); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); display: flex; align-items: center; justify-content: center; padding: 1.5rem; z-index: 150; box-sizing: border-box; }
+.lock-modal-dialog { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 320px; width: 100%; padding: 26px 20px; background: rgba(22, 22, 30, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 22px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85); animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1); box-sizing: border-box; }
+@keyframes modalPop { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.lock-glow-ring { width: 70px; height: 70px; border-radius: 50%; background: rgba(255, 46, 99, 0.16); border: 1.5px solid rgba(255, 46, 99, 0.45); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(255, 46, 99, 0.35); margin-bottom: 2px; flex-shrink: 0; }
+.lock-big-emoji { font-size: 2.1rem; line-height: 1; display: block; }
+.lock-modal-title { margin: 0; font-size: 1.35rem; font-weight: 800; color: #ffffff; letter-spacing: -0.2px; }
+.lock-modal-desc { margin: 0 0 4px; font-size: 0.86rem; color: rgba(255, 255, 255, 0.65); line-height: 1.45; }
+.lock-modal-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 4px; }
+.btn-unlock-gradient { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; background: linear-gradient(135deg, #ff2e63 0%, #ff5722 100%); color: #ffffff; font-weight: 800; font-size: 0.92rem; padding: 13px 18px; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 18px rgba(255, 46, 99, 0.45); -webkit-tap-highlight-color: transparent; transition: transform 0.1s ease; }
+.btn-unlock-gradient:active { transform: scale(0.96); }
+.btn-ghost-drawer { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.85); padding: 12px 18px; border-radius: 25px; cursor: pointer; font-size: 0.86rem; font-weight: 600; -webkit-tap-highlight-color: transparent; transition: background 0.15s ease, transform 0.1s ease; }
+.btn-ghost-drawer:active { background: rgba(255, 255, 255, 0.16); transform: scale(0.96); }
+/* ======================================== 7. Slide-Up Episode Drawer Sheet ======================================== */ .episode-drawer-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.episode-drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+.episode-drawer-sheet { position: fixed; left: 0; right: 0; bottom: 0; max-height: 70vh; background: #111118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 1.25rem; z-index: 210; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; }
+.episode-drawer-sheet.open { transform: translateY(0); }
+.drawer-header { display: flex; justify-content: space-between; align-items: center; }
+.drawer-heading { margin: 0; font-size: 1.1rem; font-weight: 700; color: #fff; }
+.drawer-subheading { font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); }
+.drawer-close-btn { background: rgba(255, 255, 255, 0.08); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; }
+.drawer-grid { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-bottom: 1rem; }
+.drawer-ep-card { display: flex; flex-direction: column; gap: 4px; padding: 0.85rem 1rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; cursor: pointer; text-align: left; }
+.drawer-ep-card.active { background: rgba(255, 46, 99, 0.

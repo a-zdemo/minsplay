@@ -113,7 +113,6 @@ export function initPlayer(initialEp = 1) {
     });
 
     clearTimeout(hudTimer);
-    // If video is actively playing, fade out overlay after 3 seconds of inactivity
     if (!video.paused) {
       hudTimer = setTimeout(() => {
         if (!video.paused) {
@@ -126,13 +125,11 @@ export function initPlayer(initialEp = 1) {
     }
   }
 
-  function triggerPlayIndicator(isPlaying) {
-    if (!playIndicator) return;
-    if (isPlaying) {
-      playIndicator.classList.remove("active");
-    } else {
-      playIndicator.classList.add("active");
-    }
+  function hideHUD() {
+    clearTimeout(hudTimer);
+    [hudTop, hudRight, hudBottom].forEach((el) => {
+      if (el) el.classList.add("hud-hidden");
+    });
   }
 
   function renderDrawerGrid() {
@@ -180,44 +177,48 @@ export function initPlayer(initialEp = 1) {
     if (epTitle) epTitle.textContent = ep.title;
     if (lockedEpNum) lockedEpNum.textContent = `${ep.id}`;
 
-    // Close drawer if open
     closeDrawer();
 
+    // Locked Episode State
     if (!unlocked) {
       video.pause();
       video.removeAttribute("src");
       video.load();
-      if (lockModal) lockModal.style.display = "flex";
-      triggerPlayIndicator(false);
+
+      // Suppress center play button when locked so it never shows through
+      if (playIndicator) playIndicator.classList.remove("active");
+      hideHUD();
       showStatus("");
+
+      if (lockModal) lockModal.style.display = "flex";
       return;
     }
 
+    // Unlocked Episode State
     if (lockModal) lockModal.style.display = "none";
     showStatus("Buffering stream...");
 
     video.src = ep.src;
     video.load();
 
-    // Check saved resume point
     const saved = getSeriesProgress(SERIES_ID);
     if (saved && saved.episodeId === ep.id && saved.position > 1) {
       video.currentTime = saved.position;
     }
 
-    // Attempt playback
     video
       .play()
       .then(() => {
-        triggerPlayIndicator(true);
+        if (playIndicator) playIndicator.classList.remove("active");
         showHUD();
       })
       .catch(() => {
-        triggerPlayIndicator(false);
+        if (playIndicator) playIndicator.classList.add("active");
         showHUD();
       });
   }
 
+  // Swipe and Tap Gestures
   let touchStartY = 0;
   let touchStartX = 0;
   let touchStartTime = 0;
@@ -230,16 +231,18 @@ export function initPlayer(initialEp = 1) {
     }, { passive: true });
 
     gestureSurface.addEventListener("touchend", (e) => {
+      const ep = EPISODES[currentEpisodeIndex];
+      const isLocked = !isEpisodeUnlocked(ep.id, ep.isFree);
+
       const touchEndY = e.changedTouches[0].screenY;
       const touchEndX = e.changedTouches[0].screenX;
       const diffY = touchStartY - touchEndY;
       const diffX = touchStartX - touchEndX;
       const duration = Date.now() - touchStartTime;
 
-      // Vertical swipe gesture takes priority if vertical movement is dominant (>60px)
+      // Vertical swipe gesture
       if (Math.abs(diffY) > 60 && Math.abs(diffY) > Math.abs(diffX) * 1.2) {
         if (diffY > 0) {
-          // Swiped UP -> Next Episode
           if (currentEpisodeIndex < EPISODES.length - 1) {
             showToast("Advancing to Next Episode");
             loadEpisode(currentEpisodeIndex + 1);
@@ -247,7 +250,6 @@ export function initPlayer(initialEp = 1) {
             showToast("You've reached the latest episode");
           }
         } else {
-          // Swiped DOWN -> Previous Episode
           if (currentEpisodeIndex > 0) {
             showToast("Returning to Previous Episode");
             loadEpisode(currentEpisodeIndex - 1);
@@ -258,8 +260,8 @@ export function initPlayer(initialEp = 1) {
         return;
       }
 
-      // Tap gesture handling (short touch with negligible movement)
-      if (duration < 350 && Math.abs(diffY) < 15 && Math.abs(diffX) < 15) {
+      // Tap handling (only when video is unlocked)
+      if (!isLocked && duration < 350 && Math.abs(diffY) < 15 && Math.abs(diffX) < 15) {
         handleTapToggle();
       }
     }, { passive: true });
@@ -269,18 +271,16 @@ export function initPlayer(initialEp = 1) {
     const isHudHidden = hudBottom && hudBottom.classList.contains("hud-hidden");
 
     if (isHudHidden) {
-      // Restore HUD when screen is touched
       showHUD();
     } else {
-      // Toggle play / pause when HUD is currently visible
       if (video.paused) {
         video.play().then(() => {
-          triggerPlayIndicator(true);
+          if (playIndicator) playIndicator.classList.remove("active");
           showHUD();
         });
       } else {
         video.pause();
-        triggerPlayIndicator(false);
+        if (playIndicator) playIndicator.classList.add("active");
         showHUD();
       }
     }
@@ -289,16 +289,19 @@ export function initPlayer(initialEp = 1) {
   video.oncanplay = () => showStatus("");
   video.onplaying = () => {
     showStatus("");
-    triggerPlayIndicator(true);
+    if (playIndicator) playIndicator.classList.remove("active");
     showHUD();
   };
   video.onpause = () => {
-    triggerPlayIndicator(false);
-    showHUD();
+    const ep = EPISODES[currentEpisodeIndex];
+    if (isEpisodeUnlocked(ep.id, ep.isFree)) {
+      if (playIndicator) playIndicator.classList.add("active");
+      showHUD();
+    }
   };
   video.onerror = () => {
     showStatus("Stream error loading video");
-    triggerPlayIndicator(false);
+    if (playIndicator) playIndicator.classList.remove("active");
   };
 
   let lastSavedSec = 0;
@@ -313,7 +316,6 @@ export function initPlayer(initialEp = 1) {
     if (timeCurrent) timeCurrent.textContent = formatTime(cur);
     if (timeDuration) timeDuration.textContent = formatTime(dur);
 
-    // Save timestamp every 2 seconds
     const curSec = Math.floor(cur);
     if (curSec > 0 && curSec !== lastSavedSec && curSec % 2 === 0) {
       lastSavedSec = curSec;
@@ -322,7 +324,6 @@ export function initPlayer(initialEp = 1) {
     }
   };
 
-  // Scrubber scrubbing
   if (seekSlider) {
     seekSlider.oninput = () => {
       const dur = video.duration || 0;
@@ -333,7 +334,6 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Like button toggle
   if (likeBtn) {
     likeBtn.onclick = (e) => {
       e.stopPropagation();
@@ -348,7 +348,6 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Favorite / Bookmark button toggle
   if (favBtn) {
     favBtn.onclick = (e) => {
       e.stopPropagation();
@@ -360,7 +359,6 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Comments button
   const commentBtn = document.getElementById("btn-action-comment");
   if (commentBtn) {
     commentBtn.onclick = (e) => {
@@ -370,7 +368,6 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Share button
   if (shareBtn) {
     shareBtn.onclick = (e) => {
       e.stopPropagation();
@@ -393,7 +390,6 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Sound toggle button
   if (soundBtn) {
     soundBtn.onclick = (e) => {
       e.stopPropagation();
@@ -403,7 +399,6 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Fullscreen button
   if (fullscreenBtn) {
     fullscreenBtn.onclick = (e) => {
       e.stopPropagation();
@@ -421,7 +416,6 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Drawer open / close handlers
   if (openDrawerBtn) {
     openDrawerBtn.onclick = (e) => {
       e.stopPropagation();
@@ -431,14 +425,13 @@ export function initPlayer(initialEp = 1) {
 
   if (closeDrawerBtn) closeDrawerBtn.onclick = closeDrawer;
   if (drawerBackdrop) drawerBackdrop.onclick = closeDrawer;
+
   if (lockOpenDrawerBtn) {
     lockOpenDrawerBtn.onclick = () => {
-      if (lockModal) lockModal.style.display = "none";
       openDrawer();
     };
   }
 
-  // Drawer episode selection
   if (drawerGrid) {
     drawerGrid.onclick = (e) => {
       const card = e.target.closest("[data-drawer-ep]");
@@ -449,7 +442,7 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Mock Reward Unlock
+  // Mock Reward Unlock Handler
   if (unlockBtn) {
     unlockBtn.onclick = () => {
       const ep = EPISODES[currentEpisodeIndex];
@@ -462,3 +455,5 @@ export function initPlayer(initialEp = 1) {
   const startIdx = Math.max(0, Math.min(initialEp - 1, EPISODES.length - 1));
   loadEpisode(startIdx);
 }
+
+

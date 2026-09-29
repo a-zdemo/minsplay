@@ -1,35 +1,35 @@
-/* Minsplay - DramaBox Stylesheet */
+/* STREAMING_CHUNK:Configuring root layout and global page containers... / / Minsplay - DramaBox Stylesheet */
 /* Root and Global Page Containers */ .home-page, .mylist-page { min-height: 100vh; background-color: #000; color: #fff; padding-bottom: 74px; overflow-x: hidden; }
 /* ========================================
 Pinned Fixed Top Header (Home) ======================================== */ .home-sticky-header { position: fixed; top: 0; left: 0; right: 0; z-index: 80; background: rgba(10, 10, 14, 0.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-.home-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px 6px; }
+/* STREAMING_CHUNK:Styling sticky header controls and search input pill... */ .home-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px 6px; }
 /* Search Bar Pill */ .search-input-pill { flex: 1; display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; min-width: 0; }
 .search-input-pill:active { background: rgba(255, 255, 255, 0.14); }
 .search-icon { color: rgba(255, 255, 255, 0.55); flex-shrink: 0; }
-.search-placeholder { font-size: 0.84rem; color: rgba(255, 255, 255, 0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* STREAMING_CHUNK:Styling header search text and header action icons... */ .search-placeholder { font-size: 0.84rem; color: rgba(255, 255, 255, 0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* VIP & Daily Gift Icons */ .header-action-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .header-icon-btn { position: relative; width: 36px; height: 36px; background: transparent; border: none; cursor: pointer; display: grid; place-items: center; padding: 0; -webkit-tap-highlight-color: transparent; }
 .vip-crown { font-size: 1.45rem; filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.3)); }
 .gift-box { font-size: 1.4rem; }
-.notification-dot { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; background: #ff2e63; border-radius: 50%; border: 1.5px solid #0a0a0e; }
+/* STREAMING_CHUNK:Styling notification dot and horizontal sub-navigation tabs... */ .notification-dot { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; background: #ff2e63; border-radius: 50%; border: 1.5px solid #0a0a0e; }
 /* Horizontal Filter Sub-Nav */ .sub-nav-tabs { display: flex; align-items: center; gap: 18px; overflow-x: auto; padding: 4px 14px 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .sub-nav-tabs::-webkit-scrollbar { display: none; }
 .tab-item { position: relative; background: transparent; border: none; padding: 6px 0; font-size: 0.95rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); white-space: nowrap; cursor: pointer; transition: color 0.15s ease; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
-.tab-item.active { color: #fff; font-weight: 800; font-size: 1rem; }
+/* STREAMING_CHUNK:Styling active tab state and home scroll container... */ .tab-item.active { color: #fff; font-weight: 800; font-size: 1rem; }
 .tab-item.active::after { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; border-radius: 3px; background: #ff2e63; }
 /* ======================================== 2. Home Content Body ======================================== */ .home-scroll-body { padding: 106px 14px 12px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
 .content-section { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-.section-header { display: flex; justify-content: space-between; align-items: center; }
+/* STREAMING_CHUNK:Styling section headers and continue watching horizontal shelf... */ .section-header { display: flex; justify-content: space-between; align-items: center; }
 .section-heading { margin: 0; font-size: 1.1rem; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
 .section-link-more { font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); cursor: pointer; font-weight: 600; }
 /* Continue Watching Shelf */ .continue-watching-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .continue-watching-scroll::-webkit-scrollbar { display: none; }
 .continue-card { width: 110px; flex-shrink: 0; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
-.continue-poster { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; background: #181922; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.1); }
+/* STREAMING_CHUNK:Styling continue watching card posters and progress indicators... */ .continue-poster { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; background: #181922; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.1); }
 .continue-progress-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(255, 255, 255, 0.25); }
 .continue-progress-fill { height: 100%; background: #ff2e63; }
 /* Spotlight Hero Banner */ .spotlight-card { position: relative; border-radius: 14px; overflow: hidden; background: linear-gradient(135deg, #181926, #0e0f17); border: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); }
-.spotlight-banner { padding: 16px; display: flex; flex-direction: column; gap: 6px; background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(255, 46, 99, 0.15) 100%); }
+/* STREAMING_CHUNK:Styling spotlight banner details and play button actions... */ .spotlight-banner { padding: 16px; display: flex; flex-direction: column; gap: 6px; background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(255, 46, 99, 0.15) 100%); }
 .spotlight-badge { font-size: 0.68rem; font-weight: 800; color: #ff2e63; letter-spacing: 0.8px; }
 .spotlight-title { margin: 0; font-size: 1.35rem; font-weight: 800; color: #fff; }
 .spotlight-meta { margin: 0; font-size: 0.78rem; color: rgba(255, 255, 255, 0.6); }
@@ -37,26 +37,26 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .btn-spotlight-play { background: #ff2e63; color: #fff; border: none; border-radius: 20px; padding: 8px 18px; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
 .btn-spotlight-play:active { transform: scale(0.97); }
 .spotlight-views { font-size: 0.76rem; color: rgba(255, 255, 255, 0.65); font-weight: 600; }
-/* ======================================== 3. STRICT 3-Column DramaBox Poster Grid ======================================== */ .drama-grid-3col { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; box-sizing: border-box; }
+/* STREAMING_CHUNK:Configuring 3-column DramaBox catalog poster grid... / / ======================================== 3. STRICT 3-Column DramaBox Poster Grid ======================================== */ .drama-grid-3col { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; box-sizing: border-box; }
 .drama-card { display: flex; flex-direction: column; cursor: pointer; -webkit-tap-highlight-color: transparent; min-width: 0; }
 .drama-card:active { opacity: 0.85; }
 .drama-poster-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; background: #15151c; border: 1px solid rgba(255, 255, 255, 0.08); }
-.poster-gradient-art { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; box-sizing: border-box; text-align: center; }
+/* STREAMING_CHUNK:Styling procedural drama poster art and color themes... */ .poster-gradient-art { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; box-sizing: border-box; text-align: center; }
 .art-symbol { font-size: 1.4rem; opacity: 0.75; }
 .art-code { font-size: 0.62rem; font-weight: 800; color: rgba(255, 255, 255, 0.8); letter-spacing: 0.5px; margin-top: 4px; }
 .art-blue { background: linear-gradient(145deg, #1e3c72, #142340); } .art-red { background: linear-gradient(145deg, #5c1818, #2a0b0b); } .art-gold { background: linear-gradient(145deg, #5c4516, #291e0a); } .art-purple { background: linear-gradient(145deg, #3d1b5c, #1a0b29); } .art-emerald { background: linear-gradient(145deg, #164a30, #0a2115); } .art-pink { background: linear-gradient(145deg, #5c1d38, #290d19); } .art-dark { background: linear-gradient(145deg, #242533, #111218); } .art-crimson { background: linear-gradient(145deg, #4f1124, #240710); } .art-violet { background: linear-gradient(145deg, #2d1b52, #140b26); }
-.poster-badge { position: absolute; top: 5px; right: 5px; font-size: 0.6rem; font-weight: 800; padding: 2px 5px; border-radius: 4px; line-height: 1.1; z-index: 2; }
+/* STREAMING_CHUNK:Styling drama poster badges and play count overlays... */ .poster-badge { position: absolute; top: 5px; right: 5px; font-size: 0.6rem; font-weight: 800; padding: 2px 5px; border-radius: 4px; line-height: 1.1; z-index: 2; }
 .badge-following { background: rgba(15, 15, 22, 0.88); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
 .badge-new { background: rgba(255, 255, 255, 0.92); color: #111; }
 .badge-hot { background: #ff2e63; color: #fff; }
 .poster-play-count { position: absolute; bottom: 5px; right: 6px; font-size: 0.65rem; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95); display: flex; align-items: center; gap: 2px; background: rgba(0, 0, 0, 0.45); padding: 1px 4px; border-radius: 3px; backdrop-filter: blur(4px); z-index: 2; }
 .play-arrow { font-size: 0.58rem; }
-.drama-title { margin: 6px 0 2px; font-size: 0.78rem; font-weight: 700; color: #fff; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; min-height: 2.5em; word-break: break-word; }
+/* STREAMING_CHUNK:Styling drama title typography and series page layout... */ .drama-title { margin: 6px 0 2px; font-size: 0.78rem; font-weight: 700; color: #fff; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; min-height: 2.5em; word-break: break-word; }
 .drama-genre { margin: 0; font-size: 0.68rem; color: rgba(255, 255, 255, 0.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* ======================================== 4. Series Detail Screen Styles ======================================== */ .series-page { padding-bottom: 5rem; background: #000; min-height: 100vh; }
 .series-nav { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
 .nav-back-btn { background: transparent; border: none; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; }
-.nav-title { font-size: 1rem; font-weight: 500; color: rgba(255, 255, 255, 0.7); }
+/* STREAMING_CHUNK:Styling series hero section and episode cards... */ .nav-title { font-size: 1rem; font-weight: 500; color: rgba(255, 255, 255, 0.7); }
 .series-hero { display: flex; gap: 1.25rem; padding: 1.25rem; }
 .series-hero-poster { width: 110px; height: 155px; background: linear-gradient(145deg, #1c1c24, #121217); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.4); font-size: 0.85rem; flex-shrink: 0; }
 .series-hero-meta { display: flex; flex-direction: column; justify-content: center; }
@@ -64,7 +64,7 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .series-title { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem; }
 .series-tags { font-size: 0.82rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 0.25rem; }
 .series-stats { font-size: 0.8rem; color: rgba(255, 255, 255, 0.4); }
-.series-synopsis { font-size: 0.9rem; line-height: 1.5; color: rgba(255, 255, 255, 0.75); padding: 0 1.25rem 1.25rem; }
+/* STREAMING_CHUNK:Styling series synopsis and episode cards container... */ .series-synopsis { font-size: 0.9rem; line-height: 1.5; color: rgba(255, 255, 255, 0.75); padding: 0 1.25rem 1.25rem; }
 .series-cta { padding: 0 1.25rem 1.75rem; }
 .series-cta .btn { width: 100%; padding: 0.85rem; font-size: 1rem; font-weight: 600; background: #ff2e63; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
 .episodes-container { padding: 0 1.25rem; }
@@ -73,25 +73,25 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .episode-list { display: flex; flex-direction: column; gap: 0.75rem; }
 .episode-card { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1rem; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; cursor: pointer; }
 .episode-card:active { background: rgba(255, 255, 255, 0.08); }
-.episode-index { font-size: 1.1rem; font-weight: 700; color: rgba(255, 255, 255, 0.35); min-width: 1.75rem; }
+/* STREAMING_CHUNK:Styling episode indexes and status badges... */ .episode-index { font-size: 1.1rem; font-weight: 700; color: rgba(255, 255, 255, 0.35); min-width: 1.75rem; }
 .episode-info { flex: 1; }
 .episode-title { font-size: 0.92rem; font-weight: 600; color: #fff; margin-bottom: 0.2rem; }
 .episode-duration { font-size: 0.78rem; color: rgba(255, 255, 255, 0.45); }
 .status-tag { font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.55rem; border-radius: 4px; }
 .status-free { background: rgba(39, 201, 63, 0.15); color: #27c93f; }
 .status-locked { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); }
-/* ======================================== 5. 100% Immersive Full-Bleed Player ======================================== */ .watch-page { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: #000; overflow: hidden; z-index: 90; }
+/* STREAMING_CHUNK:Configuring immersive full-bleed video player viewport... / / ======================================== 5. 100% Immersive Full-Bleed Player ======================================== */ .watch-page { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: #000; overflow: hidden; z-index: 90; }
 .watch-stage { position: relative; width: 100%; height: 100%; overflow: hidden; }
 .immersive-video { width: 100%; height: 100%; object-fit: cover; background: #000; }
 .gesture-surface { position: absolute; inset: 0; z-index: 10; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.video-hud { position: absolute; z-index: 20; pointer-events: auto; transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 1; }
+/* STREAMING_CHUNK:Styling player floating HUD headers and circular buttons... */ .video-hud { position: absolute; z-index: 20; pointer-events: auto; transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 1; }
 .video-hud.hud-hidden { opacity: 0 !important; pointer-events: none !important; }
 .hud-top { top: 0; left: 0; right: 0; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, transparent 100%); }
 .hud-circle-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; display: grid; place-items: center; cursor: pointer; }
 .hud-series-info { display: flex; align-items: center; gap: 0.5rem; }
 .hud-series-title { color: #fff; font-weight: 700; font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
 .hud-ep-indicator { background: #ff2e63; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 4px; }
-.hud-right-actions { right: 12px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+/* STREAMING_CHUNK:Styling right-hand floating action pills and active highlights... */ .hud-right-actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 14px; z-index: 25; }
 .action-pill-btn { background: transparent; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 0; color: #fff; outline: none; }
 .action-pill-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(15, 15, 20, 0.65); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.18); display: grid; place-items: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); transition: transform 0.15s ease, background 0.15s ease; }
 .action-pill-btn:active .action-pill-icon { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }
@@ -101,7 +101,7 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .action-pill-btn.active#btn-action-fav .action-pill-icon { background: rgba(255, 193, 7, 0.3); border-color: #ffc107; }
 .action-pill-btn.active#btn-action-fav svg { fill: #ffc107; stroke: #ffc107; }
 .action-pill-episodes .action-pill-icon { background: rgba(255, 46, 99, 0.2); border-color: rgba(255, 46, 99, 0.5); }
-.hud-bottom { bottom: 0; left: 0; right: 0; padding: 1rem 1.25rem 1.5rem; background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 60%, transparent 100%); display: flex; flex-direction: column; gap: 8px; }
+/* STREAMING_CHUNK:Styling bottom HUD scrubber row and play indicator... */ .hud-bottom { bottom: 0; left: 0; right: 0; padding: 1rem 1.25rem 1.5rem; background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 60%, transparent 100%); display: flex; flex-direction: column; gap: 8px; }
 .hud-meta-row { max-width: calc(100% - 70px); }
 .hud-current-title { font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0 0 2px; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9); }
 .hud-genre-tags { font-size: 0.76rem; color: rgba(255, 255, 255, 0.7); margin: 0; }
@@ -115,7 +115,7 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .center-play-indicator.active { opacity: 1; }
 .center-icon-bubble { width: 68px; height: 68px; border-radius: 50%; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; display: grid; place-items: center; }
 .hud-status-pill { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 25; }
-/* ======================================== 6. Immersive Fullscreen Episode Lock Modal ======================================== */ .watch-lock-modal { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: rgba(8, 8, 12, 0.94); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); display: flex; align-items: center; justify-content: center; padding: 1.5rem; z-index: 150; box-sizing: border-box; }
+/* STREAMING_CHUNK:Styling centered glassmorphic episode lock modal... / / ======================================== 6. Immersive Fullscreen Episode Lock Modal ======================================== */ .watch-lock-modal { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: rgba(8, 8, 12, 0.94); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); display: flex; align-items: center; justify-content: center; padding: 1.5rem; z-index: 150; box-sizing: border-box; }
 .lock-modal-dialog { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 320px; width: 100%; padding: 26px 20px; background: rgba(22, 22, 30, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 22px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85); animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1); box-sizing: border-box; }
 @keyframes modalPop { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .lock-glow-ring { width: 70px; height: 70px; border-radius: 50%; background: rgba(255, 46, 99, 0.16); border: 1.5px solid rgba(255, 46, 99, 0.45); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(255, 46, 99, 0.35); margin-bottom: 2px; flex-shrink: 0; }
@@ -127,7 +127,7 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .btn-unlock-gradient:active { transform: scale(0.96); }
 .btn-ghost-drawer { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.85); padding: 12px 18px; border-radius: 25px; cursor: pointer; font-size: 0.86rem; font-weight: 600; -webkit-tap-highlight-color: transparent; transition: background 0.15s ease, transform 0.1s ease; }
 .btn-ghost-drawer:active { background: rgba(255, 255, 255, 0.16); transform: scale(0.96); }
-/* ======================================== 7. Realistic 5-Second Rewarded Ad Overlay (Section 18) ======================================== */ .rewarded-ad-modal { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: #09090e; z-index: 180; display: flex; flex-direction: column; justify-content: space-between; padding: 14px 16px 20px; box-sizing: border-box; animation: adFadeIn 0.25s ease-out; }
+/* STREAMING_CHUNK:Styling rewarded ad overlay top bar and countdown badges... / / ======================================== 7. Realistic 5-Second Rewarded Ad Overlay (Section 18) ======================================== */ .rewarded-ad-modal { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; background: #09090e; z-index: 180; display: flex; flex-direction: column; justify-content: space-between; padding: 14px 16px 20px; box-sizing: border-box; animation: adFadeIn 0.25s ease-out; }
 @keyframes adFadeIn { from { opacity: 0; } to { opacity: 1; } }
 .ad-top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; padding-top: 4px; }
 .ad-badge-group { display: flex; align-items: center; gap: 8px; }
@@ -136,4 +136,40 @@ Pinned Fixed Top Header (Home) ======================================== */ .home
 .ad-skip-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 1rem; display: grid; place-items: center; cursor: pointer; transition: all 0.2s ease; }
 .ad-skip-btn.disabled { opacity: 0.35; cursor: not-allowed; background: rgba(255, 255, 255, 0.04); }
 .ad-skip-btn:not(.disabled) { background: #ff2e63; border-color: #ff2e63; box-shadow: 0 0 12px rgba(255, 46, 99, 0.6); transform: scale(1.05); }
-.ad-creative-container { display: flex; align-items: center; j
+/* STREAMING_CHUNK:Styling ad sponsor creative card and VIP club branding... */ .ad-creative-container { display: flex; align-items: center; justify-content: center; position: relative; flex: 1; width: 100%; }
+.ad-sponsor-card { width: 100%; max-width: 320px; background: linear-gradient(145deg, #181824, #101016); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; padding: 24px 18px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.75); }
+.ad-sponsor-badge { font-size: 0.64rem; font-weight: 800; letter-spacing: 1px; color: rgba(255, 255, 255, 0.45); margin-bottom: 12px; }
+.ad-sponsor-icon-wrap { width: 72px; height: 72px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45); }
+.ad-sponsor-logo { font-size: 2.2rem; line-height: 1; }
+.ad-sponsor-name { margin: 0 0 6px; font-size: 1.3rem; font-weight: 800; color: #fff; }
+.ad-sponsor-tagline { margin: 0 0 18px; font-size: 0.82rem; color: rgba(255, 255, 255, 0.65); line-height: 1.45; }
+.ad-sponsor-cta-wrap { width: 100%; }
+.ad-sponsor-btn { display: inline-block; width: 100%; box-sizing: border-box; background: linear-gradient(135deg, #ff2e63, #ff5722); color: #fff; font-weight: 800; font-size: 0.88rem; padding: 11px 0; border-radius: 22px; box-shadow: 0 4px 14px rgba(255, 46, 99, 0.4); }
+/* STREAMING_CHUNK:Styling reward celebration splash card and progress strip... / / Reward Splash at 0s */ .ad-reward-splash { position: absolute; inset: 0; background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; animation: splashPop 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes splashPop { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.splash-badge { font-size: 0.8rem; font-weight: 800; color: #27c93f; letter-spacing: 0.5px; }
+.splash-title { margin: 0; font-size: 1.45rem; font-weight: 800; color: #ffffff; }
+.splash-subtitle { margin: 0; font-size: 0.86rem; color: rgba(255, 255, 255, 0.6); }
+/* Bottom Progress Strip */ .ad-progress-strip { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+.ad-progress-track { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.15); border-radius: 2px; overflow: hidden; }
+.ad-progress-fill { width: 0%; height: 100%; background: #ff2e63; transition: width 0.1s linear; }
+.ad-reward-notice { font-size: 0.72rem; color: rgba(255, 255, 255, 0.5); font-weight: 600; }
+/* STREAMING_CHUNK:Styling slide-up episode drawer sheet and toast messages... / / ======================================== 8. Slide-Up Episode Drawer Sheet ======================================== */ .episode-drawer-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.episode-drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+.episode-drawer-sheet { position: fixed; left: 0; right: 0; bottom: 0; max-height: 70vh; background: #111118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 1.25rem; z-index: 210; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; }
+.episode-drawer-sheet.open { transform: translateY(0); }
+.drawer-header { display: flex; justify-content: space-between; align-items: center; }
+.drawer-heading { margin: 0; font-size: 1.1rem; font-weight: 700; color: #fff; }
+.drawer-subheading { font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); }
+.drawer-close-btn { background: rgba(255, 255, 255, 0.08); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; }
+.drawer-grid { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-bottom: 1rem; }
+.drawer-ep-card { display: flex; flex-direction: column; gap: 4px; padding: 0.85rem 1rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; cursor: pointer; text-align: left; }
+.drawer-ep-card.active { background: rgba(255, 46, 99, 0.15); border-color: #ff2e63; }
+.drawer-ep-header { display: flex; justify-content: space-between; align-items: center; }
+.drawer-ep-num { font-size: 0.85rem; font-weight: 800; color: #fff; }
+.drawer-ep-badge { font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
+.badge-free { background: rgba(39, 201, 63, 0.15); color: #27c93f; }
+.badge-locked { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.5); }
+.drawer-ep-name { font-size: 0.82rem; color: rgba(255, 255, 255, 0.7); }
+.watch-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-10px); background: rgba(20, 20, 26, 0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 8px 18px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; pointer-events: none; opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease; z-index: 220; white-space: nowrap; }
+.watch-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }

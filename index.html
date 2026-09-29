@@ -8,8 +8,10 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     
-    <!-- PWA Installation Meta Tags -->
+    <!-- PWA Installation & Mascot Favicons -->
     <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon-animated.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <meta name="theme-color" content="#0a0a0e" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -17,7 +19,7 @@
 
     <title>Minsplay - Short Drama Streaming</title>
 
-    <!-- Immediate Dark Theme Baseline (Prevents white flash) -->
+    <!-- Immediate Dark Theme Baseline -->
     <style>
       html, body {
         background-color: #000000;
@@ -33,12 +35,30 @@
       }
     </style>
 
-    <!-- Vite Bundled Stylesheets (Explicit source paths) -->
+    <!-- Bundled Stylesheets -->
     <link rel="stylesheet" href="./public/css/variables.css" />
     <link rel="stylesheet" href="./public/css/components.css" />
     <link rel="stylesheet" href="./public/css/pages.css" />
   </head>
   <body>
+
+    <!-- Floating In-App Install Notification (Features Animated Ant Mascot) -->
+    <aside class="pwa-install-banner" id="pwa-install-banner" style="display: none;">
+      <div class="pwa-banner-left">
+        <div class="pwa-banner-mascot-wrap">
+          <img src="/icons/icon-animated.svg" alt="Minsplay Ant Mascot" class="pwa-banner-mascot" />
+        </div>
+        <div class="pwa-banner-text">
+          <strong>Install Minsplay App</strong>
+          <span>Add to home screen for full immersion</span>
+        </div>
+      </div>
+      <div class="pwa-banner-actions">
+        <button class="btn-pwa-install" id="pwa-install-btn" type="button">Install</button>
+        <button class="btn-pwa-dismiss" id="pwa-dismiss-btn" type="button" aria-label="Dismiss">✕</button>
+      </div>
+    </aside>
+
     <!-- Dynamic SPA Route Outlet -->
     <main id="main-content"></main>
 
@@ -54,7 +74,7 @@
         <span class="nav-label">Home</span>
       </button>
 
-      <!-- 2. For You (Direct Full-Bleed Player) -->
+      <!-- 2. For You -->
       <button class="nav-item" type="button" data-route="/watch" data-episode="1" aria-label="For You">
         <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="5" y="2" width="14" height="20" rx="3"></rect>
@@ -72,7 +92,7 @@
         <span class="nav-label">Member</span>
       </button>
 
-      <!-- 4. My List / History -->
+      <!-- 4. My List -->
       <button class="nav-item" type="button" data-route="/mylist" aria-label="My List">
         <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
@@ -91,7 +111,7 @@
 
     </nav>
 
-    <!-- Vite Bundled Script Entry (Explicit source path) -->
+    <!-- Vite Bundled Script Entry -->
     <script type="module" src="./public/js/app.js"></script>
   </body>
 </html>

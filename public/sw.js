@@ -1,41 +1,49 @@
-const CACHE_NAME = "minsplay-cache-v1";
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = "minsplay-v3";
+const CORE_ASSETS = [
   "/",
-  "/index.html"
+  "/index.html",
+  "/manifest.json",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/icon.svg",
+  "/icons/icon-animated.svg"
 ];
 
-// Install event: Cache core assets for fast startup
+// Install: Cache shell assets and icons
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))
   );
   self.skipWaiting();
 });
 
-// Activate event: Clean up old caches
+// Activate: Purge obsolete cache stores
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) return caches.delete(key);
         })
-      );
-    })
+      )
+    )
   );
   self.clients.claim();
 });
 
-// Fetch event: Network first, fallback to cache for offline resilience
+// Fetch: SPA Navigation fallback prevents "Not Found" on reload
 self.addEventListener("fetch", (event) => {
+  const req = event.request;
+
+  if (req.mode === "navigate") {
+    event.respondWith(
+      fetch(req).catch(() => caches.match("/index.html"))
+    );
+    return;
+  }
+
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
+    caches.match(req).then((cached) => cached || fetch(req))
   );
 });
 

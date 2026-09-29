@@ -8,8 +8,24 @@
 .series-card-info { padding: var(--space-3); }
 .series-card-title { margin: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .series-card-meta { margin: 4px 0 0; color: var(--color-text-secondary); font-size: 12px; }
-/* ======================================== Clean DramaBox Bottom Navigation ======================================== */
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 56px; background: rgba(10, 10, 14, 0.96); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-around; align-items: center; z-index: 100; padding: 0; margin: 0; box-sizing: border-box; }
-.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: rgba(255, 255, 255, 0.45); font-size: 0.72rem; font-weight: 600; height: 100%; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; cursor: pointer; padding: 0 !important; margin: 0 !important; -webkit-tap-highlight-color: transparent; }
-.nav-item.active { color: #ff2e63; }
-.bottom-nav-icon { font-size: 19px; line-height: 1; margin-bottom: 2px; }
+/* ======================================== Authentic DramaBox Bottom Navigation ======================================== */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 56px; background: rgba(10, 10, 14, 0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-around; z-index: 100; padding: 0; margin: 0; box-sizing: border-box; }
+.bottom-nav button, .bottom-nav .nav-item { all: unset; box-sizing: border-box; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 100%; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; color: rgba(255, 255, 255, 0.45); cursor: pointer; padding: 0 !important; margin: 0 !important; -webkit-tap-highlight-color: transparent; transition: color 0.15s ease, transform 0.1s ease; }
+.bottom-nav .nav-item:active { transform: scale(0.92); }
+.nav-icon { width: 22px; height: 22px; stroke: currentColor; flex-shrink: 0; }
+.nav-label { font-size: 0.65rem; font-weight: 600; line-height: 1; letter-spacing: -0.1px; }
+.bottom-nav .nav-item.active { color: #ff2e63 !important; }
+.bottom-nav .nav-item.active .nav-icon { stroke: #ff2e63 !important; }
+/* ======================================== In-App PWA Install Notification Bar ======================================== */
+.pwa-install-banner { position: fixed; top: 10px; left: 12px; right: 12px; z-index: 200; background: rgba(20, 20, 28, 0.96); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255, 46, 99, 0.4); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75); border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; animation: slideDownBanner 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes slideDownBanner { from { transform: translateY(-40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.pwa-banner-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+/* Ant Mascot Frame */ .pwa-banner-mascot-wrap { width: 42px; height: 42px; border-radius: 50%; background: #ffffff; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+.pwa-banner-mascot { width: 100%; height: 100%; object-fit: contain; }
+.pwa-banner-text { display: flex; flex-direction: column; min-width: 0; }
+.pwa-banner-text strong { font-size: 0.82rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pwa-banner-text span { font-size: 0.68rem; color: rgba(255, 255, 255, 0.65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pwa-banner-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.btn-pwa-install { background: #ff2e63; color: #fff; border: none; border-radius: 18px; padding: 7px 15px; font-size: 0.78rem; font-weight: 800; cursor: pointer; -webkit-tap-highlight-color: transparent; box-shadow: 0 3px 10px rgba(255, 46, 99, 0.4); }
+.btn-pwa-install:active { transform: scale(0.95); }
+.btn-pwa-dismiss { background: transparent; border: none; color: rgba(255, 255, 255, 0.5); font-size: 1.1rem; cursor: pointer; padding: 4px; display: grid; place-items: center; }

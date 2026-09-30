@@ -4,7 +4,9 @@ import watchHtml from "../pages/watch.html?raw";
 import mylistHtml from "../pages/mylist.html?raw";
 import memberHtml from "../pages/member.html?raw";
 import profileHtml from "../pages/profile.html?raw";
+import foryouHtml from "../pages/foryou.html?raw";
 import { initPlayer } from "./player.js";
+import { initForYouFeed, destroyForYouFeed } from "./foryou.js";
 import {
   getAllProgress,
   clearAllProgress,
@@ -24,6 +26,7 @@ const RECENT_SEARCHES_KEY = "minsplay_recent_searches";
 
 const routes = {
   "/": homeHtml,
+  "/foryou": foryouHtml,
   "/series": seriesHtml,
   "/watch": watchHtml,
   "/mylist": mylistHtml,
@@ -466,9 +469,6 @@ function initSearchOverlayEngine() {
   }
 }
 
-/* ==========================================================================
-   VIP Member Screen Controller (Section 16 - In-App Toast)
-   ========================================================================== */
 function initMemberScreen() {
   const plansContainer = document.getElementById("vip-plans-container");
   const coinBtn = document.getElementById("btn-activate-vip-coins");
@@ -552,9 +552,6 @@ function initMemberScreen() {
   }
 }
 
-/* ==========================================================================
-   User Profile & Settings Controller (Section 17 - In-App Toast)
-   ========================================================================== */
 function initProfileScreen() {
   const coinBal = document.getElementById("profile-coin-balance");
   const streakCount = document.getElementById("profile-streak-count");
@@ -799,6 +796,11 @@ async function renderRoute(path) {
   const mainContent = document.getElementById("main-content");
   if (!mainContent) return;
 
+  // Clean up previous For You feed videos if leaving /foryou
+  if (path !== "/foryou") {
+    destroyForYouFeed();
+  }
+
   const html = routes[path];
   if (!html) {
     mainContent.innerHTML = `
@@ -812,6 +814,7 @@ async function renderRoute(path) {
 
   const bottomNav = document.getElementById("bottom-nav");
   if (bottomNav) {
+    // Player on /watch is 100% full-screen without bottom nav; all other tabs show nav
     bottomNav.style.display = path === "/watch" ? "none" : "flex";
   }
 
@@ -821,6 +824,8 @@ async function renderRoute(path) {
 
   if (path === "/watch") {
     initPlayer(currentActiveSeriesId, pendingEpisode);
+  } else if (path === "/foryou") {
+    initForYouFeed();
   } else if (path === "/series") {
     renderSeriesDetail(currentActiveSeriesId);
   } else if (path === "/") {

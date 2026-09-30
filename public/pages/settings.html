@@ -1,0 +1,91 @@
+<section class="db-subpage" id="settings-page-root">
+  <div class="db-subpage-body">
+    
+    <header class="db-subpage-header">
+      <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
+      <h2 class="db-subpage-title">Settings</h2>
+      <div class="db-header-spacer"></div>
+    </header>
+
+    <div class="db-settings-list">
+      <article class="db-settings-row" data-route="/member">
+        <span class="db-settings-label">Manage Membership</span>
+        <span class="db-chevron">›</span>
+      </article>
+
+      <article class="db-settings-row" id="btn-settings-appearance">
+        <span class="db-settings-label">Appearance</span>
+        <div class="db-settings-right">
+          <span class="db-settings-val">Dark Theme</span>
+          <span class="db-chevron">›</span>
+        </div>
+      </article>
+
+      <article class="db-settings-row" id="btn-settings-clear-cache">
+        <span class="db-settings-label">Clear Cache</span>
+        <div class="db-settings-right">
+          <span class="db-settings-val" id="settings-cache-size">24.5MB</span>
+          <span class="db-trash-icon">🗑️</span>
+        </div>
+      </article>
+
+      <article class="db-settings-row" id="btn-settings-clear-history">
+        <span class="db-settings-label" style="color: #ff5252;">Clear Watch History</span>
+        <span class="db-chevron">›</span>
+      </article>
+
+      <div class="db-settings-row toggle-row">
+        <span class="db-settings-label">Auto-Play Next Episode</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="setting-autoplay-next" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="db-settings-row toggle-row">
+        <span class="db-settings-label">Vertical Swipe Gestures</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="setting-swipe-gestures" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="db-settings-row toggle-row">
+        <span class="db-settings-label">Download with mobile data allowed</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="setting-mobile-data" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <article class="db-settings-row">
+        <span class="db-settings-label">About</span>
+        <div class="db-settings-right">
+          <span class="db-settings-val">2.4.0 Standalone</span>
+          <span class="db-chevron">›</span>
+        </div>
+      </article>
+
+      <div class="db-settings-row toggle-row">
+        <span class="db-settings-label">Personalized Recommendations</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="setting-recommendations" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="db-settings-row toggle-row">
+        <span class="db-settings-label">Do not sell or share my personal information</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="setting-privacy" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="db-logout-wrap">
+      <button class="db-logout-btn" id="btn-guest-reset" type="button">Log out</button>
+    </div>
+
+  </div>
+</section>

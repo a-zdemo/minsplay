@@ -1096,3 +1096,146 @@
   font-size: 0.68rem;
   color: rgba(255, 255, 255, 0.3);
 }
+
+/* ==========================================================================
+   DramaBox Subpages: My Inbox & Settings
+   ========================================================================== */
+.db-subpage {
+  min-height: 100vh;
+  background: #000000;
+  color: #ffffff;
+}
+
+.db-subpage-body {
+  padding: 12px 16px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.db-subpage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.db-back-btn {
+  all: unset;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0 8px 4px 0;
+}
+
+.db-subpage-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.db-header-spacer { width: 28px; }
+
+/* My Inbox Rows */
+.db-inbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.db-inbox-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.db-inbox-row:active { opacity: 0.75; }
+
+.db-inbox-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.db-inbox-icon-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.db-inbox-icon-circle.purple { background: linear-gradient(135deg, #d880f0, #c457ea); }
+.db-inbox-icon-circle.blue { background: linear-gradient(135deg, #64b5f6, #2196f3); }
+.db-inbox-emoji { font-size: 1.45rem; }
+
+.db-inbox-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.db-inbox-title { font-size: 1rem; font-weight: 800; color: #ffffff; }
+.db-inbox-subtitle { font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); }
+
+/* Settings Rows */
+.db-settings-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.db-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.db-settings-row.toggle-row { cursor: default; }
+
+.db-settings-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.db-settings-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.db-settings-val {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.db-trash-icon { font-size: 0.95rem; }
+
+/* Log Out Pill Button */
+.db-logout-wrap {
+  margin-top: 24px;
+}
+
+.db-logout-btn {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: #1a1a24;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 14px 0;
+  border-radius: 25px;
+  cursor: pointer;
+}
+.db-logout-btn:active { background: #252533; color: #ffffff; }

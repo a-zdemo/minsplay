@@ -1,7 +1,7 @@
 <section class="profile-page" id="profile-page-root">
   <div class="db-profile-scroll-body">
     
-    <!-- Top Ambient User Header (Unboxed, DramaBox Pattern) -->
+    <!-- Top Ambient User Header (Unboxed) -->
     <header class="db-profile-header">
       <div class="db-user-left">
         <div class="db-avatar-wrap" id="profile-avatar-badge">
@@ -25,9 +25,10 @@
         </div>
       </div>
 
+      <!-- Top Right Actions -->
       <div class="db-top-actions">
-        <button class="db-icon-btn" type="button" aria-label="Notifications" data-route="/mylist">🔔</button>
-        <button class="db-icon-btn" type="button" aria-label="Settings" id="btn-profile-gear">⚙️</button>
+        <button class="db-icon-btn" type="button" aria-label="Notifications" data-route="/inbox">🔔</button>
+        <button class="db-icon-btn" type="button" aria-label="Settings" data-route="/settings">⚙️</button>
       </div>
     </header>
 
@@ -98,56 +99,7 @@
       </article>
     </section>
 
-    <!-- Playback Preferences & Data Management -->
-    <section class="db-menu-group db-settings-group">
-      <div class="db-menu-row db-setting-item">
-        <div class="db-setting-meta">
-          <span class="db-row-title">Auto-Play Next Episode</span>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="setting-autoplay-next" checked />
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-
-      <div class="db-menu-row db-setting-item">
-        <div class="db-setting-meta">
-          <span class="db-row-title">Stream Quality</span>
-        </div>
-        <select class="settings-select" id="setting-video-quality">
-          <option value="auto">Auto (Adaptive)</option>
-          <option value="1080p">1080p Full HD</option>
-          <option value="720p">720p HD</option>
-          <option value="saver">Data Saver</option>
-        </select>
-      </div>
-
-      <div class="db-menu-row db-setting-item">
-        <div class="db-setting-meta">
-          <span class="db-row-title">Vertical Swipe Gestures</span>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="setting-swipe-gestures" checked />
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-
-      <article class="db-menu-row" id="btn-clear-history">
-        <span class="db-row-title" style="color: #ff5252;">Clear Watch History</span>
-        <div class="db-row-right">
-          <span class="db-chevron">🗑️</span>
-        </div>
-      </article>
-
-      <article class="db-menu-row" id="btn-reset-cache">
-        <span class="db-row-title">Clear App Cache</span>
-        <div class="db-row-right">
-          <span class="db-chevron">↻</span>
-        </div>
-      </article>
-    </section>
-
-    <!-- Standalone App Info -->
+    <!-- Standalone App Info Footer -->
     <footer class="db-profile-footer">
       <p class="db-version-pill">Minsplay Standalone • Build 2026</p>
     </footer>

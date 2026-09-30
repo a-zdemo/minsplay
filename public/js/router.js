@@ -5,6 +5,8 @@ import mylistHtml from "../pages/mylist.html?raw";
 import memberHtml from "../pages/member.html?raw";
 import profileHtml from "../pages/profile.html?raw";
 import foryouHtml from "../pages/foryou.html?raw";
+import inboxHtml from "../pages/inbox.html?raw";
+import settingsHtml from "../pages/settings.html?raw";
 import { initPlayer } from "./player.js";
 import { initForYouFeed, destroyForYouFeed } from "./foryou.js";
 import {
@@ -32,6 +34,8 @@ const routes = {
   "/mylist": mylistHtml,
   "/member": memberHtml,
   "/profile": profileHtml,
+  "/inbox": inboxHtml,
+  "/settings": settingsHtml,
 };
 
 let currentActiveSeriesId = "the-beginning";
@@ -557,46 +561,27 @@ function initProfileScreen() {
   const streakCount = document.getElementById("profile-streak-count");
   const tierBadge = document.getElementById("profile-tier-badge");
   const crownBadge = document.getElementById("profile-vip-crown");
-  const avatarFrame = document.getElementById("profile-avatar-badge");
   const historyCount = document.getElementById("profile-history-count");
   const vipSummary = document.getElementById("profile-vip-summary");
   const checkinBtn = document.getElementById("btn-profile-checkin");
-
-  const autoplayToggle = document.getElementById("setting-autoplay-next");
-  const qualitySelect = document.getElementById("setting-video-quality");
-  const swipeToggle = document.getElementById("setting-swipe-gestures");
-  const clearHistoryBtn = document.getElementById("btn-clear-history");
-  const resetCacheBtn = document.getElementById("btn-reset-cache");
 
   function syncProfile() {
     const coins = getUserCoins();
     const checkin = getCheckinData();
     const vip = getVipData();
     const progressList = getAllProgress();
-    const settings = getUserSettings();
 
     if (coinBal) coinBal.textContent = coins.toString();
-    if (streakCount) streakCount.textContent = `Day ${checkin.streak || 1}`;
+    if (streakCount) streakCount.textContent = `Day ${checkin.streak || 1} 🔥`;
 
     if (tierBadge) {
-      if (vip.isVip) {
-        tierBadge.textContent = "VIP MEMBER 👑";
-        tierBadge.classList.add("vip");
-      } else {
-        tierBadge.textContent = "FREE MEMBER";
-        tierBadge.classList.remove("vip");
-      }
+      tierBadge.textContent = vip.isVip ? "VIP" : "FREE";
+      tierBadge.style.display = "inline-block";
     }
 
     if (crownBadge) crownBadge.style.display = vip.isVip ? "block" : "none";
-    if (avatarFrame) avatarFrame.classList.toggle("vip-frame", vip.isVip);
-
-    if (historyCount) historyCount.textContent = `${progressList.length} Series In Progress`;
-    if (vipSummary) vipSummary.textContent = vip.isVip ? `${vip.daysLeft} days remaining` : "Explore VIP benefits";
-
-    if (autoplayToggle) autoplayToggle.checked = settings.autoplayNext;
-    if (qualitySelect) qualitySelect.value = settings.videoQuality;
-    if (swipeToggle) swipeToggle.checked = settings.swipeGestures;
+    if (historyCount) historyCount.textContent = `${progressList.length} In Progress`;
+    if (vipSummary) vipSummary.textContent = vip.isVip ? `VIP Active (${vip.daysLeft}d)` : "Unlock VIP Pass";
   }
 
   syncProfile();
@@ -612,6 +597,30 @@ function initProfileScreen() {
       }
     };
   }
+}
+
+function initInboxScreen() {
+  const activityBtn = document.getElementById("btn-inbox-activity");
+  const interactionsBtn = document.getElementById("btn-inbox-interactions");
+
+  if (interactionsBtn) {
+    interactionsBtn.onclick = () => {
+      showAppToast("No new interactions yet 🔔");
+    };
+  }
+}
+
+function initSettingsScreen() {
+  const clearCacheBtn = document.getElementById("btn-settings-clear-cache");
+  const clearHistoryBtn = document.getElementById("btn-settings-clear-history");
+  const cacheSizeEl = document.getElementById("settings-cache-size");
+  const guestResetBtn = document.getElementById("btn-guest-reset");
+  const autoplayToggle = document.getElementById("setting-autoplay-next");
+  const swipeToggle = document.getElementById("setting-swipe-gestures");
+  const settings = getUserSettings();
+
+  if (autoplayToggle) autoplayToggle.checked = settings.autoplayNext;
+  if (swipeToggle) swipeToggle.checked = settings.swipeGestures;
 
   if (autoplayToggle) {
     autoplayToggle.onchange = () => {
@@ -619,12 +628,7 @@ function initProfileScreen() {
       showAppToast(`Auto-Play: ${autoplayToggle.checked ? "Enabled" : "Disabled"}`);
     };
   }
-  if (qualitySelect) {
-    qualitySelect.onchange = () => {
-      saveUserSetting("videoQuality", qualitySelect.value);
-      showAppToast(`Quality: ${qualitySelect.value.toUpperCase()}`);
-    };
-  }
+
   if (swipeToggle) {
     swipeToggle.onchange = () => {
       saveUserSetting("swipeGestures", swipeToggle.checked);
@@ -632,22 +636,27 @@ function initProfileScreen() {
     };
   }
 
-  if (clearHistoryBtn) {
-    clearHistoryBtn.onclick = () => {
-      clearAllProgress();
-      showAppToast("🗑️ Watch history cleared successfully");
-      syncProfile();
+  if (clearCacheBtn) {
+    clearCacheBtn.onclick = () => {
+      if ("caches" in window) {
+        caches.keys().then((names) => names.forEach((name) => caches.delete(name)));
+      }
+      if (cacheSizeEl) cacheSizeEl.textContent = "0.0MB";
+      showAppToast("App cache cleared 🗑️");
     };
   }
 
-  if (resetCacheBtn) {
-    resetCacheBtn.onclick = () => {
-      if ("caches" in window) {
-        caches.keys().then((names) => {
-          names.forEach((name) => caches.delete(name));
-        });
-      }
-      showAppToast("↻ App cache purged successfully");
+  if (clearHistoryBtn) {
+    clearHistoryBtn.onclick = () => {
+      clearAllProgress();
+      showAppToast("Watch history cleared 🗑️");
+    };
+  }
+
+  if (guestResetBtn) {
+    guestResetBtn.onclick = () => {
+      showAppToast("Guest session refreshed ✓");
+      setTimeout(() => navigateTo("/"), 400);
     };
   }
 }
@@ -796,7 +805,6 @@ async function renderRoute(path) {
   const mainContent = document.getElementById("main-content");
   if (!mainContent) return;
 
-  // Clean up previous For You feed videos if leaving /foryou
   if (path !== "/foryou") {
     destroyForYouFeed();
   }
@@ -814,8 +822,8 @@ async function renderRoute(path) {
 
   const bottomNav = document.getElementById("bottom-nav");
   if (bottomNav) {
-    // Player on /watch is 100% full-screen without bottom nav; all other tabs show nav
-    bottomNav.style.display = path === "/watch" ? "none" : "flex";
+    // Hide bottom navigation on full player, settings, and inbox for full immersion
+    bottomNav.style.display = (path === "/watch" || path === "/inbox" || path === "/settings") ? "none" : "flex";
   }
 
   mainContent.innerHTML = html;
@@ -839,6 +847,10 @@ async function renderRoute(path) {
     initMemberScreen();
   } else if (path === "/profile") {
     initProfileScreen();
+  } else if (path === "/inbox") {
+    initInboxScreen();
+  } else if (path === "/settings") {
+    initSettingsScreen();
   }
 }
 

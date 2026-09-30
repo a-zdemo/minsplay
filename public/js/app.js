@@ -1,12 +1,14 @@
 import { initRouter } from "./router.js";
 import { initPWA } from "./pwa.js";
 import { initCommentsSystem } from "./comments.js";
+import { initInboxSubViews } from "./inbox.js";
 
 function startApp() {
   try {
     initRouter();
     initPWA();
     initCommentsSystem();
+    initInboxSubViews();
   } catch (error) {
     console.error("Minsplay startup error:", error);
   }

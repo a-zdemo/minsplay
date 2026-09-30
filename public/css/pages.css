@@ -1284,3 +1284,99 @@
   transform: scale(0.92) !important;
   opacity: 0.7 !important;
 }
+
+/* ==========================================================================
+   DramaBox "My Activity" & "Interactions" Sub-Views (Pics 1 & 2)
+   ========================================================================== */
+.db-inbox-view-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.db-tab-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 10px;
+}
+
+.db-pill-btn {
+  all: unset;
+  background: #181822;
+  color: #888896;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.db-pill-btn.active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+}
+
+.db-activity-feed {
+  min-height: 52vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.db-empty-state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.db-tray-icon-wrap {
+  width: 100px;
+  height: 80px;
+  display: grid;
+  place-items: center;
+  opacity: 0.85;
+}
+
+.db-empty-desc {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #6c6c78;
+  letter-spacing: -0.1px;
+}
+
+/* User's own posted comments card in My Activity */
+.db-user-comment-card {
+  width: 100%;
+  box-sizing: border-box;
+  background: #14141c;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.db-user-comment-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+.db-user-comment-body {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #ffffff;
+  line-height: 1.35;
+}

@@ -1,40 +1,109 @@
 <section class="db-subpage" id="inbox-page-root">
   <div class="db-subpage-body">
     
-    <header class="db-subpage-header">
-      <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
-      <h2 class="db-subpage-title">My Inbox</h2>
-      <div class="db-header-spacer"></div>
-    </header>
+    <!-- VIEW 1: Main Inbox Menu -->
+    <div class="db-inbox-view-pane active" id="view-inbox-main">
+      <header class="db-subpage-header">
+        <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
+        <h2 class="db-subpage-title">My Inbox</h2>
+        <div class="db-header-spacer"></div>
+      </header>
 
-    <div class="db-inbox-list">
-      <!-- Row 1: My Activity -->
-      <article class="db-inbox-row" id="btn-inbox-activity" data-route="/mylist">
-        <div class="db-inbox-left">
-          <div class="db-inbox-icon-circle purple">
-            <span class="db-inbox-emoji">💬</span>
+      <div class="db-inbox-list">
+        <!-- Row 1: My Activity (Opens Pic 1) -->
+        <article class="db-inbox-row" id="btn-inbox-activity" type="button">
+          <div class="db-inbox-left">
+            <div class="db-inbox-icon-circle purple">
+              <span class="db-inbox-emoji">💬</span>
+            </div>
+            <div class="db-inbox-meta">
+              <strong class="db-inbox-title">My Activity</strong>
+              <span class="db-inbox-subtitle">My Comments & Reactions</span>
+            </div>
           </div>
-          <div class="db-inbox-meta">
-            <strong class="db-inbox-title">My Activity</strong>
-            <span class="db-inbox-subtitle">My Comments & Reactions</span>
-          </div>
-        </div>
-        <span class="db-chevron">›</span>
-      </article>
+          <span class="db-chevron">›</span>
+        </article>
 
-      <!-- Row 2: Interactions -->
-      <article class="db-inbox-row" id="btn-inbox-interactions">
-        <div class="db-inbox-left">
-          <div class="db-inbox-icon-circle blue">
-            <span class="db-inbox-emoji">🔔</span>
+        <!-- Row 2: Interactions (Opens Pic 2) -->
+        <article class="db-inbox-row" id="btn-inbox-interactions" type="button">
+          <div class="db-inbox-left">
+            <div class="db-inbox-icon-circle blue">
+              <span class="db-inbox-emoji">🔔</span>
+            </div>
+            <div class="db-inbox-meta">
+              <strong class="db-inbox-title">Interactions</strong>
+              <span class="db-inbox-subtitle">Replies and reactions to my comments</span>
+            </div>
           </div>
-          <div class="db-inbox-meta">
-            <strong class="db-inbox-title">Interactions</strong>
-            <span class="db-inbox-subtitle">Replies and reactions to my comments</span>
+          <span class="db-chevron">›</span>
+        </article>
+      </div>
+    </div>
+
+    <!-- VIEW 2: My Activity Sub-Page (Pic 1) -->
+    <div class="db-inbox-view-pane" id="view-inbox-activity" style="display: none;">
+      <header class="db-subpage-header">
+        <button class="db-back-btn db-inbox-sub-back" type="button" aria-label="Back">‹</button>
+        <h2 class="db-subpage-title">My Activity</h2>
+        <div class="db-header-spacer"></div>
+      </header>
+
+      <!-- Segmented Tabs (DramaBox Pattern) -->
+      <div class="db-tab-pills-row" id="activity-tabs-row">
+        <button class="db-pill-btn active" type="button" data-tab="comments">Comments</button>
+        <button class="db-pill-btn" type="button" data-tab="ratings">Ratings</button>
+        <button class="db-pill-btn" type="button" data-tab="bullet">Bullet Comments</button>
+      </div>
+
+      <!-- Empty State / Activity Feed -->
+      <div class="db-activity-feed" id="activity-feed-container">
+        <div class="db-empty-state-box">
+          <div class="db-tray-icon-wrap">
+            <svg width="90" height="74" viewBox="0 0 96 76" fill="none">
+              <path d="M42 16L43.2 19.8L47 21L43.2 22.2L42 26L40.8 22.2L37 21L40.8 19.8L42 16Z" fill="#52525e" opacity="0.6"/>
+              <path d="M72 30L72.8 32.2L75 33L72.8 33.8L72 36L71.2 33.8L69 33L71.2 32.2L72 30Z" fill="#52525e" opacity="0.6"/>
+              <circle cx="56" cy="22" r="13" fill="#32323e"/>
+              <polygon points="53,16 63,22 53,28" fill="#202028"/>
+              <path d="M46 22L48 27L53 28L49 32L50 37L46 34L42 37L43 32L39 28L44 27Z" fill="#2c2c36"/>
+              <path d="M26 38L32 24H68L74 38H26Z" fill="#1e1e26"/>
+              <path d="M20 38H80L75 64H25L20 38Z" fill="#2a2a36" stroke="#3a3a48" stroke-width="1.5"/>
+              <rect x="42" y="47" width="16" height="4" rx="2" fill="#16161e"/>
+            </svg>
           </div>
+          <p class="db-empty-desc">You haven't posted anything yet.</p>
         </div>
-        <span class="db-chevron">›</span>
-      </article>
+      </div>
+    </div>
+
+    <!-- VIEW 3: Interactions Sub-Page (Pic 2) -->
+    <div class="db-inbox-view-pane" id="view-inbox-interactions" style="display: none;">
+      <header class="db-subpage-header">
+        <button class="db-back-btn db-inbox-sub-back" type="button" aria-label="Back">‹</button>
+        <h2 class="db-subpage-title">Interactions</h2>
+        <div class="db-header-spacer"></div>
+      </header>
+
+      <!-- Segmented Tabs -->
+      <div class="db-tab-pills-row" id="interactions-tabs-row">
+        <button class="db-pill-btn active" type="button" data-tab="comments">Comments</button>
+        <button class="db-pill-btn" type="button" data-tab="ratings">Ratings</button>
+      </div>
+
+      <!-- Empty State -->
+      <div class="db-activity-feed">
+        <div class="db-empty-state-box">
+          <div class="db-tray-icon-wrap">
+            <svg width="90" height="74" viewBox="0 0 96 76" fill="none">
+              <path d="M42 16L43.2 19.8L47 21L43.2 22.2L42 26L40.8 22.2L37 21L40.8 19.8L42 16Z" fill="#52525e" opacity="0.6"/>
+              <circle cx="56" cy="22" r="13" fill="#32323e"/>
+              <polygon points="53,16 63,22 53,28" fill="#202028"/>
+              <path d="M20 38H80L75 64H25L20 38Z" fill="#2a2a36" stroke="#3a3a48" stroke-width="1.5"/>
+              <rect x="42" y="47" width="16" height="4" rx="2" fill="#16161e"/>
+            </svg>
+          </div>
+          <p class="db-empty-desc">No replies or reactions yet.</p>
+        </div>
+      </div>
     </div>
 
   </div>

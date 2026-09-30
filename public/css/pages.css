@@ -1560,3 +1560,283 @@
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.45);
 }
+
+/* ==========================================================================
+   DramaBox Rewards, Events & Gifts Subpages (Pics 2, 3, 4)
+   ========================================================================== */
+.db-rewards-header { border-bottom: none; }
+.db-rewards-nav-tabs { display: flex; align-items: center; gap: 20px; }
+.db-rewards-nav-tab {
+  all: unset;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  padding-bottom: 4px;
+}
+.db-rewards-nav-tab.active {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-bottom: 2px solid #ffffff;
+}
+
+.db-rewards-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px;
+}
+.db-rewards-strip-left { display: flex; align-items: center; gap: 8px; font-size: 0.92rem; font-weight: 700; }
+.db-lightning-pill {
+  background: rgba(255, 46, 99, 0.15);
+  color: #ff2e63;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+.db-rules-pill {
+  all: unset;
+  background: #181822;
+  color: rgba(255, 255, 255, 0.65);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.db-points-cards-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.db-points-card {
+  background: #14141c;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.db-points-icon-bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+}
+.db-points-icon-bubble.purple { background: linear-gradient(135deg, #d880f0, #9c27b0); }
+.db-points-icon-bubble.pink { background: linear-gradient(135deg, #ff4081, #f50057); }
+.db-points-card-title { font-size: 0.88rem; font-weight: 700; color: #ffffff; }
+
+.db-locked-notice-card {
+  background: #14141c;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.db-lock-symbol { font-size: 1.25rem; color: #ffc107; }
+.db-lock-copy strong { font-size: 0.85rem; color: #ffffff; display: block; margin-bottom: 2px; }
+.db-lock-copy p { margin: 0; font-size: 0.74rem; color: rgba(255, 255, 255, 0.45); }
+
+.db-redeem-section { display: flex; flex-direction: column; gap: 8px; }
+.db-block-heading { margin: 0; font-size: 0.95rem; font-weight: 800; color: #ffffff; }
+.db-section-header-row { display: flex; align-items: center; justify-content: space-between; }
+.db-sub-link { font-size: 0.76rem; color: rgba(255, 255, 255, 0.45); }
+.db-redeem-subtext { margin: 0; font-size: 0.76rem; color: rgba(255, 255, 255, 0.55); }
+.db-redeem-subtext strong { color: #ffffff; }
+
+.db-redeem-cards-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.db-redeem-card {
+  background: #14141c;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+}
+.db-redeem-card-banner {
+  background: linear-gradient(135deg, #ff2e63 0%, #ff5722 100%);
+  border-radius: 8px;
+  padding: 18px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.db-brand-tag { position: absolute; top: 4px; right: 6px; font-size: 0.58rem; font-weight: 900; color: rgba(255, 255, 255, 0.75); }
+.db-banner-val { font-size: 1.15rem; font-weight: 900; color: #ffffff; }
+.db-redeem-card-title { font-size: 0.76rem; font-weight: 700; color: #ffffff; margin-top: 4px; }
+.db-redeem-cost { font-size: 0.78rem; font-weight: 800; color: #ff2e63; }
+
+.db-perks-compact { background: #14141c; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; }
+.db-perk-compact-row { display: flex; align-items: center; gap: 12px; font-size: 0.8rem; }
+.db-perk-compact-row strong { color: #ffffff; display: block; font-size: 0.82rem; }
+.db-perk-compact-row p { margin: 0; font-size: 0.72rem; color: rgba(255, 255, 255, 0.45); }
+
+/* ==========================================================================
+   History Multi-Select & Download Storage Styles (Pics 5, 6, 7, 8)
+   ========================================================================== */
+.db-header-action-icon {
+  all: unset;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 4px;
+}
+.db-header-cancel-btn {
+  all: unset;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.db-history-feed { display: flex; flex-direction: column; gap: 12px; padding-bottom: 80px; }
+.db-history-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #14141c;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.db-history-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  color: #ffffff;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.db-history-radio.selected {
+  background: #ff2e63;
+  border-color: #ff2e63;
+}
+
+.db-history-thumb {
+  width: 58px;
+  height: 78px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+.db-history-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.db-history-title { margin: 0; font-size: 0.88rem; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.db-history-genre { margin: 0; font-size: 0.72rem; color: rgba(255, 255, 255, 0.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.db-history-ep-text { margin: 0; font-size: 0.72rem; color: rgba(255, 255, 255, 0.65); }
+
+.db-history-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #111118;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 16px;
+  z-index: 50;
+}
+
+.db-remove-btn {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ff2e63;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0.4;
+}
+.db-remove-btn.active { opacity: 1; }
+
+/* Gifts Subpage (Pic 4) */
+.db-gifts-banner {
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(135deg, #181924, #2d2335);
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.db-gifts-logo { font-size: 1.25rem; font-weight: 900; color: #ffffff; }
+
+.db-redeem-box {
+  background: #14141c;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.db-redeem-user-header { display: flex; align-items: center; gap: 10px; }
+.db-avatar-circle { width: 40px; height: 40px; border-radius: 50%; background: #3c3228; color: #ffffff; display: grid; place-items: center; font-weight: 800; }
+.db-redeem-username { font-size: 0.9rem; color: #ffffff; display: block; }
+.db-redeem-userid { font-size: 0.74rem; color: rgba(255, 255, 255, 0.45); }
+
+.db-redeem-input {
+  all: unset;
+  background: #1f1f2a;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: #ffffff;
+}
+.db-redeem-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+
+.db-redeem-submit-btn {
+  all: unset;
+  text-align: center;
+  background: #b81b4c;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 12px 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.db-gifts-tips { display: flex; flex-direction: column; gap: 8px; padding: 4px; }
+.db-tips-heading { margin: 0; font-size: 0.88rem; font-weight: 800; color: #ffffff; }
+.db-tips-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 0.74rem; color: rgba(255, 255, 255, 0.55); line-height: 1.4; }
+
+/* Download Subpage (Pic 8) */
+.db-download-body { display: flex; flex-direction: column; gap: 12px; padding-bottom: 70px; }
+.db-download-heading { font-size: 0.92rem; font-weight: 700; color: #ffffff; }
+.db-download-card { background: #14141c; border-radius: 12px; padding: 12px; display: flex; gap: 12px; }
+.db-download-thumb { width: 68px; height: 92px; border-radius: 8px; position: relative; display: grid; place-items: center; flex-shrink: 0; }
+.db-download-ep-badge { position: absolute; bottom: 4px; left: 4px; right: 4px; font-size: 0.58rem; font-weight: 700; color: #fff; background: rgba(0,0,0,0.65); border-radius: 4px; text-align: center; padding: 1px 0; }
+.db-download-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.db-download-title { font-size: 0.88rem; font-weight: 800; color: #ffffff; }
+.db-download-desc { margin: 0; font-size: 0.74rem; color: rgba(255, 255, 255, 0.45); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.35; }
+.db-download-size { font-size: 0.72rem; color: rgba(255, 255, 255, 0.6); margin-top: auto; }
+
+.db-storage-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: #111118;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.5);
+  z-index: 50;
+}

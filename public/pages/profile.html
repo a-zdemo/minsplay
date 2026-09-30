@@ -1,7 +1,7 @@
 <section class="profile-page" id="profile-page-root">
   <div class="db-profile-scroll-body">
     
-    <!-- Top Ambient User Header (Unboxed, DramaBox Pattern) -->
+    <!-- Top Ambient User Header -->
     <header class="db-profile-header">
       <div class="db-user-left">
         <div class="db-avatar-wrap" id="profile-avatar-badge">
@@ -11,9 +11,7 @@
             class="db-avatar-img"
             onerror="this.onerror=null; this.src='/icons/icon-192.png';"
           />
-          <span class="profile-vip-crown" id="profile-vip-crown" style="display: none;">👑</span>
         </div>
-        
         <div class="db-user-meta">
           <h2 class="db-username">Minsplay Viewer</h2>
           <div class="db-user-subline">
@@ -24,7 +22,6 @@
         </div>
       </div>
 
-      <!-- Top Right Actions: Minimal DramaBox SVG Outline Icons -->
       <div class="db-top-actions">
         <button class="db-icon-btn" type="button" aria-label="Notifications" data-route="/inbox">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,78 +38,67 @@
       </div>
     </header>
 
-    <!-- Full-Width DramaBox VIP Card (Pink-to-Coral Gradient) -->
+    <!-- Full-Width VIP Card (Pic 1) -->
     <section class="db-vip-banner-card" data-route="/member">
-      <span class="db-vip-discount-tag">Save 30%</span>
+      <span class="db-vip-discount-tag">49% off</span>
       <div class="db-vip-top-row">
         <div class="db-vip-copy">
-          <h3 class="db-vip-heading" id="profile-vip-summary">Unlock VIP Pass</h3>
+          <h3 class="db-vip-heading" id="profile-vip-summary">Membership has expired</h3>
           <p class="db-vip-subtext">Enjoy these exclusive benefits:</p>
         </div>
         <button class="db-vip-action-btn" type="button" data-route="/member">
-          Upgrade 👑
+          Restart
         </button>
       </div>
 
       <div class="db-vip-benefits-grid">
-        <div class="db-benefit-col">
-          <span class="db-benefit-symbol">🎬</span>
-          <span class="db-benefit-label">9+ Series</span>
-        </div>
-        <div class="db-benefit-col">
-          <span class="db-benefit-symbol">⚡</span>
-          <span class="db-benefit-label">Daily Coins</span>
-        </div>
-        <div class="db-benefit-col">
-          <span class="db-benefit-symbol">🚫</span>
-          <span class="db-benefit-label">Zero Ads</span>
-        </div>
-        <div class="db-benefit-col">
-          <span class="db-benefit-symbol">HD</span>
-          <span class="db-benefit-label">1080p Quality</span>
-        </div>
+        <div class="db-benefit-col"><span class="db-benefit-symbol">🎬</span><span class="db-benefit-label">16K+ series</span></div>
+        <div class="db-benefit-col"><span class="db-benefit-symbol">⚡</span><span class="db-benefit-label">Daily points</span></div>
+        <div class="db-benefit-col"><span class="db-benefit-symbol">⬇</span><span class="db-benefit-label">Download</span></div>
+        <div class="db-benefit-col"><span class="db-benefit-symbol">HD</span><span class="db-benefit-label">1080p quality</span></div>
       </div>
     </section>
 
-    <!-- Main Navigation Shelf (DramaBox Grouped Menu) -->
+    <!-- Authentic DramaBox Menu Shelf (Pic 1) -->
     <section class="db-menu-group">
-      <!-- Row 1: My Wallet (Opens DramaBox Wallet Screen) -->
+      <article class="db-menu-row" data-route="/member">
+        <span class="db-row-title">Top Up</span>
+        <span class="db-chevron">›</span>
+      </article>
+
       <article class="db-menu-row" data-route="/wallet">
         <span class="db-row-title">My Wallet</span>
         <div class="db-row-right">
-          <span class="db-coin-indicator">🪙 <strong id="profile-coin-balance">50</strong></span>
+          <span class="db-coin-indicator">🪙 <strong id="profile-coin-balance">20</strong></span>
           <span class="db-chevron">›</span>
         </div>
       </article>
 
-      <article class="db-menu-row" id="btn-profile-checkin">
-        <span class="db-row-title">Daily Gift Rewards</span>
-        <div class="db-row-right">
-          <span class="db-streak-indicator" id="profile-streak-count">Day 1 🔥</span>
-          <span class="db-chevron">›</span>
-        </div>
+      <article class="db-menu-row" data-route="/rewards">
+        <span class="db-row-title">Earn Rewards</span>
+        <span class="db-chevron">›</span>
       </article>
 
-      <article class="db-menu-row" data-route="/mylist">
-        <span class="db-row-title">Watch History</span>
-        <div class="db-row-right">
-          <span class="db-history-counter" id="profile-history-count">3 In Progress</span>
-          <span class="db-chevron">›</span>
-        </div>
+      <article class="db-menu-row" data-route="/events">
+        <span class="db-row-title">Event Center</span>
+        <span class="db-chevron">›</span>
       </article>
 
-      <article class="db-menu-row" data-route="/member">
-        <span class="db-row-title">VIP Pass & Perks</span>
-        <div class="db-row-right">
-          <span class="db-chevron">›</span>
-        </div>
+      <article class="db-menu-row" data-route="/gifts">
+        <span class="db-row-title">Gifts</span>
+        <span class="db-chevron">›</span>
+      </article>
+
+      <article class="db-menu-row" data-route="/history">
+        <span class="db-row-title">History</span>
+        <span class="db-chevron">›</span>
+      </article>
+
+      <article class="db-menu-row" data-route="/download">
+        <span class="db-row-title">Download</span>
+        <span class="db-chevron">›</span>
       </article>
     </section>
-
-    <!-- Standalone App Info Footer -->
-    <footer class="db-profile-footer">
-      <p class="db-version-pill">Minsplay Standalone • Build 2026</p>
-    </footer>
 
   </div>
 </section>

@@ -1,0 +1,35 @@
+<section class="db-subpage" id="history-page-root">
+  <div class="db-subpage-body">
+    
+    <!-- Dynamic Header: Normal View vs Selection Mode -->
+    <header class="db-subpage-header" id="history-header-normal">
+      <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
+      <h2 class="db-subpage-title">History</h2>
+      <button class="db-header-action-icon" id="btn-history-edit-mode" type="button" aria-label="Edit">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <header class="db-subpage-header" id="history-header-edit" style="display: none;">
+      <div class="db-header-spacer"></div>
+      <h2 class="db-subpage-title">Choose</h2>
+      <button class="db-header-cancel-btn" id="btn-history-cancel" type="button">Cancel</button>
+    </header>
+
+    <!-- Watch History Cards Feed -->
+    <div class="db-history-feed" id="history-feed-container">
+      <!-- Injected dynamically by profile-subpages.js -->
+    </div>
+
+    <!-- Sticky Bottom Remove Bar (Pic 7) -->
+    <div class="db-history-bottom-bar" id="history-remove-bar" style="display: none;">
+      <button class="db-remove-btn" id="btn-history-remove" type="button" disabled>
+        <span>🗑</span> Remove
+      </button>
+    </div>
+
+  </div>
+</section>

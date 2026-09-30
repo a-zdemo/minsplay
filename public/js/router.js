@@ -3,10 +3,12 @@ import seriesHtml from "../pages/series.html?raw";
 import watchHtml from "../pages/watch.html?raw";
 import mylistHtml from "../pages/mylist.html?raw";
 import { initPlayer } from "./player.js";
-import { getAllProgress, isEpisodeUnlocked } from "./storage.js";
-import { getSeriesById } from "./series-data.js";
+import { getAllProgress, isEpisodeUnlocked, getUserCoins, getCheckinData, claimDailyReward } from "./storage.js";
+import { DRAMA_CATALOG, getSeriesById } from "./series-data.js";
 
-// Member & Profile VIP Placeholders matching DramaBox dark aesthetic
+const RECENT_SEARCHES_KEY = "minsplay_recent_searches";
+
+// Member & Profile VIP Screens
 const memberHtml = `
   <section class="page-container" style="padding: 2.5rem 1.25rem 5rem; text-align: center;">
     <div style="font-size: 3rem; margin-bottom: 0.5rem;">👑</div>
@@ -86,6 +88,40 @@ export async function navigateTo(path, { seriesId, episode = 1 } = {}) {
   await renderRoute(path);
 }
 
+function createDramaCardMarkup(drama, rankNumber = null) {
+  let rankBadgeHtml = "";
+  if (rankNumber !== null) {
+    let rankClass = "rank-pill-other";
+    if (rankNumber === 1) rankClass = "rank-pill-1";
+    else if (rankNumber === 2) rankClass = "rank-pill-2";
+    else if (rankNumber === 3) rankClass = "rank-pill-3";
+    rankBadgeHtml = `<span class="poster-rank-badge ${rankClass}">${rankNumber}</span>`;
+  }
+
+  let statusBadgeHtml = "";
+  if (drama.badge && rankNumber === null) {
+    statusBadgeHtml = `<span class="poster-badge ${drama.badgeClass}">${drama.badge}</span>`;
+  }
+
+  return `
+    <article class="drama-card" data-route="/series" data-series="${drama.id}">
+      <div class="drama-poster-wrap">
+        <div class="poster-gradient-art ${drama.artClass}">
+          <span class="art-symbol">${drama.artSymbol}</span>
+          <span class="art-code">${drama.artCode}</span>
+        </div>
+        ${rankBadgeHtml}
+        ${statusBadgeHtml}
+        <div class="poster-play-count">
+          <span class="play-arrow">▶</span> ${drama.plays}
+        </div>
+      </div>
+      <h3 class="drama-title">${drama.title}</h3>
+      <p class="drama-genre">${drama.genre}</p>
+    </article>
+  `;
+}
+
 function updateContinueWatching() {
   const section = document.getElementById("continue-watching-section");
   const container = document.getElementById("continue-watching-list");
@@ -116,16 +152,419 @@ function updateContinueWatching() {
     .join("");
 }
 
-function initHomeInteractions() {
+/* ==========================================================================
+   Daily Gift 7-Day Streak & Coin System (Section 19)
+   ========================================================================== */
+function initDailyGiftSystem() {
+  const giftBtn = document.getElementById("btn-gift-modal");
+  const giftModal = document.getElementById("daily-gift-modal");
+  const closeBtn = document.getElementById("btn-close-gift-modal");
+  const claimBtn = document.getElementById("btn-claim-daily-reward");
+  const gridContainer = document.getElementById("streak-grid-7days");
+  const notifDot = document.getElementById("gift-notification-dot");
+  const coinPill = document.getElementById("header-coin-pill");
+  const coinCount = document.getElementById("header-coin-count");
+
+  // Sync header coin balance
+  function syncCoinDisplay() {
+    if (coinCount) {
+      coinCount.textContent = getUserCoins().toString();
+    }
+    const checkin = getCheckinData();
+    if (notifDot) {
+      notifDot.style.display = checkin.claimedToday ? "none" : "block";
+    }
+  }
+
+  syncCoinDisplay();
+
+  // Listen for global coin balance changes
+  window.addEventListener("coinsUpdated", () => syncCoinDisplay());
+
+  function renderStreakGrid() {
+    if (!gridContainer) return;
+    const { streak, claimedToday } = getCheckinData();
+    const rewards = [20, 30, 40, 50, 60, 80, 100];
+    const activeIndex = claimedToday ? -1 : streak % 7;
+
+    let html = "";
+    // Days 1 through 6
+    for (let day = 1; day <= 6; day++) {
+      const isClaimed = day <= (claimedToday ? streak : streak);
+      const isToday = !claimedToday && day === streak + 1;
+      let stateClass = "";
+      let checkIcon = "🪙";
+
+      if (isClaimed) {
+        stateClass = "claimed";
+        checkIcon = "✓";
+      } else if (isToday) {
+        stateClass = "active-today";
+      }
+
+      html += `
+        <div class="streak-card ${stateClass}">
+          <span class="streak-day-label">Day ${day}</span>
+          <span class="streak-icon-wrap">${checkIcon}</span>
+          <span class="streak-coin-val">+${rewards[day - 1]}</span>
+        </div>
+      `;
+    }
+
+    // Day 7 Super Bonus
+    const isDay7Claimed = streak >= 7;
+    const isDay7Today = !claimedToday && streak === 6;
+    html += `
+      <div class="streak-card super-day ${isDay7Claimed ? "claimed" : ""} ${isDay7Today ? "active-today" : ""}">
+        <div class="super-day-left">
+          <span style="font-size: 1.8rem;">🏆</span>
+          <div>
+            <span class="streak-day-label" style="color: #ffc107;">Day 7 Super Chest</span>
+            <div style="font-size: 0.74rem; color: rgba(255,255,255,0.7);">Mega reward package</div>
+          </div>
+        </div>
+        <span class="streak-coin-val" style="font-size: 0.95rem; font-weight: 900;">+100 Coins</span>
+      </div>
+    `;
+
+    gridContainer.innerHTML = html;
+
+    if (claimBtn) {
+      if (claimedToday) {
+        claimBtn.disabled = true;
+        claimBtn.textContent = "Claimed Today ✓";
+      } else {
+        claimBtn.disabled = false;
+        claimBtn.textContent = "Claim Today's Reward 🎁";
+      }
+    }
+  }
+
+  function openGiftModal() {
+    if (!giftModal) return;
+    renderStreakGrid();
+    giftModal.style.display = "flex";
+  }
+
+  function closeGiftModal() {
+    if (!giftModal) return;
+    giftModal.style.display = "none";
+  }
+
+  if (giftBtn) giftBtn.onclick = openGiftModal;
+  if (coinPill) coinPill.onclick = openGiftModal;
+  if (closeBtn) closeBtn.onclick = closeGiftModal;
+
+  if (giftModal) {
+    giftModal.onclick = (e) => {
+      if (e.target === giftModal) closeGiftModal();
+    };
+  }
+
+  if (claimBtn) {
+    claimBtn.onclick = () => {
+      const res = claimDailyReward();
+      if (res.success) {
+        syncCoinDisplay();
+        renderStreakGrid();
+      }
+    };
+  }
+}
+
+/**
+ * Filter & Tab Logic for Home Screen (Section 15)
+ */
+function initHomeFilterSystem() {
   const subNav = document.getElementById("home-sub-nav");
-  if (!subNav) return;
+  const chipsBar = document.getElementById("category-chips-bar");
+  const grid = document.getElementById("home-drama-grid");
+  const heading = document.getElementById("grid-section-heading");
+  const countBadge = document.getElementById("grid-count-badge");
+  const spotlightCard = document.getElementById("home-spotlight-card");
+  const homeScrollBody = document.getElementById("home-scroll-body");
+
+  if (!grid || !subNav) return;
+
+  function renderGrid(dramas, isRanked = false) {
+    grid.innerHTML = dramas.map((d, idx) => createDramaCardMarkup(d, isRanked ? idx + 1 : null)).join("");
+    if (countBadge) countBadge.textContent = `${dramas.length} Titles`;
+  }
+
+  renderGrid(DRAMA_CATALOG);
 
   subNav.addEventListener("click", (e) => {
     const tabBtn = e.target.closest(".tab-item");
     if (!tabBtn) return;
+
     subNav.querySelectorAll(".tab-item").forEach((btn) => btn.classList.remove("active"));
     tabBtn.classList.add("active");
+
+    const tab = tabBtn.getAttribute("data-tab");
+
+    if (chipsBar) {
+      const isCategories = tab === "categories";
+      chipsBar.style.display = isCategories ? "flex" : "none";
+      if (homeScrollBody) {
+        homeScrollBody.classList.toggle("with-chips", isCategories);
+      }
+    }
+
+    if (spotlightCard) {
+      spotlightCard.style.display = tab === "popular" ? "block" : "none";
+    }
+
+    switch (tab) {
+      case "popular":
+        if (heading) heading.textContent = "Popular Series";
+        renderGrid(DRAMA_CATALOG);
+        break;
+
+      case "new":
+        if (heading) heading.textContent = "New Releases";
+        const newDramas = DRAMA_CATALOG.filter((d) => d.badge === "New" || d.id === "bastard-hit-daughter" || d.id === "fake-husband");
+        renderGrid(newDramas);
+        break;
+
+      case "rankings":
+        if (heading) heading.textContent = "Top Rankings";
+        const ranked = [...DRAMA_CATALOG].sort((a, b) => {
+          const valA = a.plays.includes("M") ? parseFloat(a.plays) * 1000000 : parseFloat(a.plays) * 1000;
+          const valB = b.plays.includes("M") ? parseFloat(b.plays) * 1000000 : parseFloat(b.plays) * 1000;
+          return valB - valA;
+        });
+        renderGrid(ranked, true);
+        break;
+
+      case "categories":
+        if (heading) heading.textContent = "Category Catalog";
+        renderGrid(DRAMA_CATALOG);
+        break;
+
+      case "anime":
+        if (heading) heading.textContent = "Action & Fantasy Dramas";
+        const animeDramas = DRAMA_CATALOG.filter(
+          (d) => d.genre.includes("Revenge") || d.genre.includes("Identity") || d.tags.includes("Martial") || d.id.includes("dragon")
+        );
+        renderGrid(animeDramas);
+        break;
+
+      case "vip":
+        if (heading) heading.textContent = "VIP Exclusives";
+        const vipDramas = DRAMA_CATALOG.filter((d) => d.badge === "Hot" || d.plays.includes("M"));
+        renderGrid(vipDramas);
+        break;
+
+      case "original":
+        if (heading) heading.textContent = "Original+ Series";
+        const originals = DRAMA_CATALOG.filter((d) => d.artCode === "ORIGINAL" || d.badge === "Following");
+        renderGrid(originals);
+        break;
+
+      default:
+        renderGrid(DRAMA_CATALOG);
+    }
   });
+
+  if (chipsBar) {
+    chipsBar.addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip-item");
+      if (!chip) return;
+
+      chipsBar.querySelectorAll(".chip-item").forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+
+      const genre = chip.getAttribute("data-genre");
+      if (genre === "all") {
+        if (heading) heading.textContent = "All Categories";
+        renderGrid(DRAMA_CATALOG);
+      } else {
+        if (heading) heading.textContent = `${genre} Dramas`;
+        const filtered = DRAMA_CATALOG.filter((d) => d.genre.toLowerCase().includes(genre.toLowerCase()) || d.tags.toLowerCase().includes(genre.toLowerCase()));
+        renderGrid(filtered);
+      }
+    });
+  }
+}
+
+/**
+ * Instant Fuzzy Search Overlay Controller (Section 15)
+ */
+function initSearchOverlayEngine() {
+  const searchPill = document.getElementById("home-search-pill");
+  const overlay = document.getElementById("search-overlay");
+  const input = document.getElementById("search-query-input");
+  const clearBtn = document.getElementById("search-clear-btn");
+  const cancelBtn = document.getElementById("search-cancel-btn");
+  const hotShelf = document.getElementById("hot-search-shelf");
+  const recentShelf = document.getElementById("recent-search-shelf");
+  const recentTagsList = document.getElementById("recent-tags-list");
+  const resultsBlock = document.getElementById("search-results-block");
+  const resultsGrid = document.getElementById("search-results-grid");
+  const resultsTitle = document.getElementById("results-count-title");
+  const emptyState = document.getElementById("search-empty-state");
+  const emptyDesc = document.getElementById("search-empty-desc");
+  const clearRecentBtn = document.getElementById("btn-clear-recent");
+
+  if (!searchPill || !overlay || !input) return;
+
+  function getRecentSearches() {
+    try {
+      return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
+    } catch {
+      return [];
+    }
+  }
+
+  function saveRecentSearch(term) {
+    const trimmed = term.trim();
+    if (!trimmed) return;
+    let recents = getRecentSearches().filter((t) => t.toLowerCase() !== trimmed.toLowerCase());
+    recents.unshift(trimmed);
+    if (recents.length > 8) recents = recents.slice(0, 8);
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recents));
+    renderRecentSearches();
+  }
+
+  function renderRecentSearches() {
+    const recents = getRecentSearches();
+    if (!recentShelf || !recentTagsList) return;
+
+    if (recents.length === 0) {
+      recentShelf.style.display = "none";
+      return;
+    }
+
+    recentShelf.style.display = "flex";
+    recentTagsList.innerHTML = recents
+      .map(
+        (term) => `
+        <button class="search-tag-chip recent-chip" type="button" data-search-term="${term}">
+          <span>${term}</span>
+          <span class="recent-chip-remove" data-remove-term="${term}">✕</span>
+        </button>
+      `
+      )
+      .join("");
+  }
+
+  function executeSearch(query) {
+    const q = query.trim().toLowerCase();
+
+    if (!q) {
+      if (clearBtn) clearBtn.style.display = "none";
+      if (resultsBlock) resultsBlock.style.display = "none";
+      if (emptyState) emptyState.style.display = "none";
+      if (hotShelf) hotShelf.style.display = "flex";
+      renderRecentSearches();
+      return;
+    }
+
+    if (clearBtn) clearBtn.style.display = "block";
+    if (hotShelf) hotShelf.style.display = "none";
+    if (recentShelf) recentShelf.style.display = "none";
+
+    const matched = DRAMA_CATALOG.filter((drama) => {
+      return (
+        drama.title.toLowerCase().includes(q) ||
+        drama.shortTitle.toLowerCase().includes(q) ||
+        drama.synopsis.toLowerCase().includes(q) ||
+        drama.genre.toLowerCase().includes(q) ||
+        drama.tags.toLowerCase().includes(q)
+      );
+    });
+
+    if (matched.length > 0) {
+      if (emptyState) emptyState.style.display = "none";
+      if (resultsBlock) resultsBlock.style.display = "flex";
+      if (resultsTitle) resultsTitle.textContent = `Found ${matched.length} Drama${matched.length > 1 ? "s" : ""}`;
+      if (resultsGrid) {
+        resultsGrid.innerHTML = matched.map((d) => createDramaCardMarkup(d)).join("");
+      }
+    } else {
+      if (resultsBlock) resultsBlock.style.display = "none";
+      if (emptyState) {
+        emptyState.style.display = "flex";
+        if (emptyDesc) emptyDesc.textContent = `No dramas found for "${query}". Try searching "Dragon", "Revenge", or "Romance".`;
+      }
+    }
+  }
+
+  function openSearchOverlay() {
+    overlay.style.display = "flex";
+    renderRecentSearches();
+    setTimeout(() => input.focus(), 100);
+  }
+
+  function closeSearchOverlay() {
+    overlay.style.display = "none";
+    input.value = "";
+    executeSearch("");
+  }
+
+  searchPill.onclick = openSearchOverlay;
+  if (cancelBtn) cancelBtn.onclick = closeSearchOverlay;
+
+  if (clearBtn) {
+    clearBtn.onclick = () => {
+      input.value = "";
+      input.focus();
+      executeSearch("");
+    };
+  }
+
+  input.addEventListener("input", (e) => {
+    executeSearch(e.target.value);
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveRecentSearch(input.value);
+      input.blur();
+    }
+  });
+
+  const hotTagsList = document.getElementById("hot-tags-list");
+  if (hotTagsList) {
+    hotTagsList.addEventListener("click", (e) => {
+      const chip = e.target.closest("[data-tag]");
+      if (chip) {
+        const tag = chip.getAttribute("data-tag");
+        input.value = tag;
+        saveRecentSearch(tag);
+        executeSearch(tag);
+      }
+    });
+  }
+
+  if (recentTagsList) {
+    recentTagsList.addEventListener("click", (e) => {
+      const removeBtn = e.target.closest("[data-remove-term]");
+      if (removeBtn) {
+        e.stopPropagation();
+        const term = removeBtn.getAttribute("data-remove-term");
+        let recents = getRecentSearches().filter((t) => t !== term);
+        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recents));
+        renderRecentSearches();
+        return;
+      }
+
+      const chip = e.target.closest("[data-search-term]");
+      if (chip) {
+        const term = chip.getAttribute("data-search-term");
+        input.value = term;
+        executeSearch(term);
+      }
+    });
+  }
+
+  if (clearRecentBtn) {
+    clearRecentBtn.onclick = () => {
+      localStorage.removeItem(RECENT_SEARCHES_KEY);
+      renderRecentSearches();
+    };
+  }
 }
 
 function renderSeriesDetail(seriesId) {
@@ -262,7 +701,6 @@ function updateBottomNavActive(path) {
   const navItems = document.querySelectorAll(".bottom-nav .nav-item");
   navItems.forEach((btn) => {
     const route = btn.getAttribute("data-route");
-    // Only highlight if route directly matches path
     if (route === path) {
       btn.classList.add("active");
     } else {
@@ -288,7 +726,6 @@ async function renderRoute(path) {
 
   const bottomNav = document.getElementById("bottom-nav");
   if (bottomNav) {
-    // Hide bottom nav on full-bleed player
     bottomNav.style.display = path === "/watch" ? "none" : "flex";
   }
 
@@ -303,7 +740,9 @@ async function renderRoute(path) {
     renderSeriesDetail(currentActiveSeriesId);
   } else if (path === "/") {
     updateContinueWatching();
-    initHomeInteractions();
+    initHomeFilterSystem();
+    initSearchOverlayEngine();
+    initDailyGiftSystem();
   } else if (path === "/mylist") {
     initMyListScreen();
   }
@@ -313,6 +752,8 @@ export function initRouter() {
   document.addEventListener("click", (e) => {
     const routeTrigger = e.target.closest("[data-route]");
     if (routeTrigger) {
+      if (routeTrigger.id === "home-search-pill") return;
+
       e.preventDefault();
       const targetRoute = routeTrigger.getAttribute("data-route");
       const epAttr = routeTrigger.getAttribute("data-episode");

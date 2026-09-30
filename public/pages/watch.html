@@ -1,124 +1,138 @@
-<section class="watch-page" id="watch-page-root">
-  <div class="watch-container">
+<section class="watch-page fullbleed-player" id="watch-page-root">
+  
+  <!-- Full-Bleed 100dvh Video Stage -->
+  <div class="video-stage" id="video-stage">
+    <video
+      id="minsplay-video"
+      class="video-player fullbleed-video"
+      playsinline
+      webkit-playsinline
+      preload="auto"
+      src=""
+    ></video>
 
-    <!-- Top Floating Navigation (Auto-dimming HUD) -->
-    <header class="watch-nav" id="hud-top">
-      <button class="watch-back-btn" id="watch-back-btn" type="button" data-route="/series" aria-label="Back">
-        ‹
-      </button>
-      <div class="watch-meta">
-        <span class="hud-series-title">The Beginning</span>
-        <span class="watch-ep-badge" id="watch-ep-badge">Ep 1</span>
-      </div>
-      <div class="watch-top-actions">
-        <!-- Closed Captions (CC) Language Selector Trigger -->
-        <button class="btn-hud-icon btn-cc-toggle active" id="btn-cc-toggle" type="button" aria-label="Subtitles">
-          CC
-        </button>
-        <button class="btn-hud-icon" id="btn-sound-toggle" type="button" aria-label="Toggle Sound">
-          🔊
-        </button>
-      </div>
-    </header>
-
-    <!-- Video Stage / Viewport -->
-    <div class="video-stage" id="video-stage">
-      <video
-        id="minsplay-video"
-        class="video-player"
-        playsinline
-        webkit-playsinline
-        preload="auto"
-        src=""
-      ></video>
-
-      <!-- Subtitle Cue Rendering Overlay (Lower Third) -->
-      <div class="subtitles-overlay" id="subtitles-overlay" pointer-events="none">
-        <span class="subtitles-cue" id="subtitles-cue" style="display: none;"></span>
-      </div>
-
-      <div id="hud-status-pill" class="video-status-badge"></div>
-
-      <!-- Touch Tap Surface for Play/Pause and HUD Toggle -->
-      <div class="video-touch-overlay" id="gesture-surface">
-        <button class="video-play-toggle" id="center-play-indicator" type="button" aria-label="Play or Pause">
-          ▶
-        </button>
-      </div>
-
-      <!-- Custom Bottom Scrubber Bar -->
-      <div class="video-custom-controls" id="hud-bottom">
-        <input type="range" id="video-seek" class="video-seek-slider" min="0" max="100" value="0" step="0.1" aria-label="Seek" />
-        <div class="video-controls-row">
-          <span class="video-time" id="hud-time-current">0:00</span>
-          <span class="hud-current-ep-title" id="watch-current-title">Episode 1</span>
-          <span class="video-time" id="hud-time-duration">0:10</span>
-        </div>
-      </div>
-
-      <!-- Centered Episode Lock Gate Modal -->
-      <aside class="watch-lock-modal" id="watch-lock-modal" style="display: none;">
-        <div class="lock-modal-dialog">
-          <div class="lock-glow-ring"><span class="lock-big-emoji">🔒</span></div>
-          <h3 class="lock-modal-title">Episode Locked</h3>
-          <p class="lock-modal-desc">Unlock Episode <span id="locked-ep-number">3</span> to continue:</p>
-          <div class="lock-modal-actions">
-            <button class="btn-unlock-coins" id="btn-unlock-coins" type="button">
-              <span>🪙 Unlock (30 Coins)</span>
-              <span class="lock-coin-tag" id="lock-modal-coin-balance">50 Avail</span>
-            </button>
-            <button class="btn-unlock-gradient" id="btn-unlock-mock" type="button">
-              🎁 Watch 5s Ad to Unlock Free
-            </button>
-            <button class="btn-ghost-drawer" id="btn-lock-open-drawer" type="button">
-              Choose Another Episode
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- 5-Second Rewarded Ad Overlay -->
-      <aside class="rewarded-ad-modal" id="rewarded-ad-modal" style="display: none;">
-        <div class="ad-stage-overlay">
-          <div class="ad-top-bar">
-            <span class="ad-sponsor-tag">Sponsored Ad</span>
-            <div class="ad-timer-pill" id="ad-timer-pill">Reward in 5s</div>
-            <button class="ad-skip-btn disabled" id="ad-skip-btn" type="button" disabled>✕</button>
-          </div>
-          <div class="ad-content-box">
-            <div class="ad-sponsor-logo">🎬 Minsplay VIP</div>
-            <h4 class="ad-headline">Unlock Unlimited Short Dramas</h4>
-            <p class="ad-copy">Binge all 9 exclusive series with zero commercial breaks.</p>
-          </div>
-          <div class="ad-progress-track"><div class="ad-progress-fill" id="ad-progress-fill"></div></div>
-          <div class="ad-reward-splash" id="ad-reward-splash" style="display: none;">
-            <span class="reward-sparkle">✨</span>
-            <strong>Reward Granted! Unlocking Episode...</strong>
-          </div>
-        </div>
-      </aside>
+    <!-- Subtitle Cue Rendering Overlay (Lower Third) -->
+    <div class="subtitles-overlay" id="subtitles-overlay">
+      <span class="subtitles-cue" id="subtitles-cue" style="display: none;"></span>
     </div>
 
-    <!-- Quick Episode Switcher Strip -->
-    <div class="watch-details-sheet">
-      <div class="watch-title-row">
-        <div>
-          <h2 class="watch-sheet-drama-title hud-series-title">The Beginning</h2>
-          <p class="hud-genre-tags">Urban • Suspense • Counterattack</p>
-        </div>
-        <button class="btn-drawer-trigger" id="btn-open-drawer" type="button">
-          ☰ <span id="episodes-drawer-label">5 Eps</span>
-        </button>
-      </div>
-      <div class="watch-episode-strip">
-        <span class="strip-label">Episodes:</span>
-        <div class="strip-buttons" id="drawer-episode-grid"></div>
-      </div>
-    </div>
+    <div id="hud-status-pill" class="video-status-badge"></div>
 
+    <!-- Tap Surface for Play/Pause and HUD Toggle -->
+    <div class="video-touch-overlay" id="gesture-surface">
+      <button class="video-play-toggle" id="center-play-indicator" type="button" aria-label="Play/Pause">▶</button>
+    </div>
   </div>
 
-  <!-- Multi-Language Subtitles Selection Drawer (Section 26) -->
+  <!-- Top Floating Auto-Dimming HUD -->
+  <header class="watch-hud-top" id="hud-top">
+    <button class="watch-back-btn" id="watch-back-btn" type="button" data-route="/series" aria-label="Back">‹</button>
+    <div class="watch-hud-meta">
+      <span class="hud-series-title">The Beginning</span>
+      <span class="watch-ep-badge" id="watch-ep-badge">Ep 1</span>
+    </div>
+    <div class="watch-top-actions">
+      <button class="btn-hud-icon btn-cc-toggle active" id="btn-cc-toggle" type="button" aria-label="Subtitles">CC</button>
+      <button class="btn-hud-icon" id="btn-sound-toggle" type="button" aria-label="Sound">🔊</button>
+    </div>
+  </header>
+
+  <!-- Right Floating Action Rail (DramaBox Pattern) -->
+  <aside class="watch-hud-right" id="hud-right">
+    <button class="rail-action-btn" id="btn-action-like" type="button">
+      <span class="rail-btn-icon">♥</span>
+      <span class="rail-btn-label" id="like-counter">14.2K</span>
+    </button>
+    <button class="rail-action-btn" id="btn-action-fav" type="button">
+      <span class="rail-btn-icon">★</span>
+      <span class="rail-btn-label" id="fav-label">Collect</span>
+    </button>
+    <button class="rail-action-btn" id="btn-action-comment" type="button">
+      <span class="rail-btn-icon">💬</span>
+      <span class="rail-btn-label">348</span>
+    </button>
+    <button class="rail-action-btn" id="btn-action-share" type="button">
+      <span class="rail-btn-icon">↗</span>
+      <span class="rail-btn-label">Share</span>
+    </button>
+    <button class="rail-action-btn" id="btn-open-drawer" type="button">
+      <span class="rail-btn-icon">☰</span>
+      <span class="rail-btn-label" id="episodes-drawer-label">5 Eps</span>
+    </button>
+  </aside>
+
+  <!-- Bottom Floating HUD (Auto-Dimming Scrubber & Titles) -->
+  <footer class="watch-hud-bottom" id="hud-bottom">
+    <div class="hud-bottom-info">
+      <h2 class="hud-bottom-title hud-series-title">The Beginning</h2>
+      <p class="hud-bottom-sub" id="watch-current-title">Episode 1</p>
+    </div>
+    <input type="range" id="video-seek" class="video-seek-slider" min="0" max="100" value="0" step="0.1" aria-label="Seek" />
+    <div class="video-controls-row">
+      <span class="video-time" id="hud-time-current">0:00</span>
+      <span class="hud-genre-tags">Urban • Suspense</span>
+      <span class="video-time" id="hud-time-duration">0:10</span>
+    </div>
+  </footer>
+
+  <!-- Centered Episode Lock Gate Modal -->
+  <aside class="watch-lock-modal" id="watch-lock-modal" style="display: none;">
+    <div class="lock-modal-dialog">
+      <div class="lock-glow-ring"><span class="lock-big-emoji">🔒</span></div>
+      <h3 class="lock-modal-title">Episode Locked</h3>
+      <p class="lock-modal-desc">Unlock Episode <span id="locked-ep-number">3</span> to continue:</p>
+      <div class="lock-modal-actions">
+        <button class="btn-unlock-coins" id="btn-unlock-coins" type="button">
+          <span>🪙 Unlock (30 Coins)</span>
+          <span class="lock-coin-tag" id="lock-modal-coin-balance">50 Avail</span>
+        </button>
+        <button class="btn-unlock-gradient" id="btn-unlock-mock" type="button">
+          🎁 Watch 5s Ad to Unlock Free
+        </button>
+        <button class="btn-ghost-drawer" id="btn-lock-open-drawer" type="button">
+          Choose Another Episode
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 5-Second Rewarded Ad Overlay -->
+  <aside class="rewarded-ad-modal" id="rewarded-ad-modal" style="display: none;">
+    <div class="ad-stage-overlay">
+      <div class="ad-top-bar">
+        <span class="ad-sponsor-tag">Sponsored Ad</span>
+        <div class="ad-timer-pill" id="ad-timer-pill">Reward in 5s</div>
+        <button class="ad-skip-btn disabled" id="ad-skip-btn" type="button" disabled>✕</button>
+      </div>
+      <div class="ad-content-box">
+        <div class="ad-sponsor-logo">🎬 Minsplay VIP</div>
+        <h4 class="ad-headline">Unlock Unlimited Short Dramas</h4>
+        <p class="ad-copy">Binge all 9 exclusive series with zero commercial breaks.</p>
+      </div>
+      <div class="ad-progress-track"><div class="ad-progress-fill" id="ad-progress-fill"></div></div>
+      <div class="ad-reward-splash" id="ad-reward-splash" style="display: none;">
+        <span class="reward-sparkle">✨</span>
+        <strong>Reward Granted! Unlocking Episode...</strong>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Episode Drawer Sheet -->
+  <aside class="drawer-backdrop" id="drawer-backdrop">
+    <div class="drawer-sheet" id="drawer-sheet">
+      <div class="drawer-drag-pill"></div>
+      <header class="drawer-header">
+        <div>
+          <h3 class="drawer-heading hud-series-title">The Beginning</h3>
+          <p class="drawer-subheading">Select Episode</p>
+        </div>
+        <button class="drawer-close-btn" id="drawer-close-btn" type="button">✕</button>
+      </header>
+      <div class="drawer-ep-grid" id="drawer-episode-grid"></div>
+    </div>
+  </aside>
+
+  <!-- Subtitles Selection Drawer -->
   <aside class="subtitles-modal-backdrop" id="subtitles-modal-backdrop" style="display: none;">
     <div class="subtitles-sheet">
       <div class="subtitles-drag-pill"></div>
@@ -146,4 +160,5 @@
       </div>
     </div>
   </aside>
+
 </section>

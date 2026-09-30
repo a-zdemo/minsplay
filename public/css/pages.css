@@ -2315,3 +2315,31 @@
   gap: 10px;
   padding: 6px 0;
 }
+
+/* ==========================================================================
+   Target 4: Playback Speed Selector Pill Styles
+   ========================================================================== */
+.btn-speed-toggle {
+  all: unset;
+  display: grid;
+  place-items: center;
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: all 0.15s ease;
+}
+.btn-speed-toggle:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.18);
+}
+.btn-speed-toggle.boosted {
+  background: rgba(255, 193, 7, 0.18);
+  border-color: #ffc107;
+  color: #ffc107;
+}

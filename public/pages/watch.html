@@ -1,4 +1,3 @@
-<!-- STREAMING_CHUNK:Rendering full-bleed watch page structure... -->
 <section class="watch-page fullbleed-player" id="watch-page-root">
   
   <!-- 100dvh Video Stage -->
@@ -33,6 +32,8 @@
       <span class="watch-ep-badge" id="watch-ep-badge">Ep 1</span>
     </div>
     <div class="watch-top-actions">
+      <!-- Target 4: Playback Speed Pill Button -->
+      <button class="btn-speed-toggle" id="btn-speed-toggle" type="button" aria-label="Playback Speed">1.0x</button>
       <button class="btn-cc-toggle active" id="btn-cc-toggle" type="button" aria-label="Subtitles">CC</button>
       <button class="hud-circle-btn" id="btn-sound-toggle" type="button" aria-label="Sound">🔊</button>
     </div>
@@ -119,7 +120,7 @@
     </div>
   </aside>
 
-  <!-- Episode Drawer Sheet (Explicitly Hidden by Default) -->
+  <!-- Episode Drawer Sheet -->
   <aside class="drawer-modal-backdrop" id="drawer-backdrop" style="display: none;">
     <div class="drawer-sheet-box" id="drawer-sheet">
       <div class="drawer-drag-pill"></div>

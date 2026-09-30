@@ -1,7 +1,17 @@
-/* STREAMING_CHUNK:Importing dependencies and configuring player state... */
-import { saveProgress, getSeriesProgress, isEpisodeUnlocked, unlockEpisode, getUserCoins, spendCoins } from "./storage.js";
+import {
+  saveProgress,
+  getSeriesProgress,
+  isEpisodeUnlocked,
+  unlockEpisode,
+  getUserCoins,
+  spendCoins,
+  getUserSettings
+} from "./storage.js";
 import { getSeriesById } from "./series-data.js";
 import { showAppToast } from "./router.js";
+
+const SPEED_LEVELS = [1.0, 1.25, 1.5, 2.0];
+let currentSpeed = parseFloat(localStorage.getItem("minsplay_playback_speed") || "1.0");
 
 let currentSeries = null;
 let currentEpisodes = [];
@@ -21,7 +31,6 @@ function formatTime(seconds) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-/* STREAMING_CHUNK:Initializing player DOM references and series titles... */
 export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   currentSeries = getSeriesById(seriesId);
   currentEpisodes = currentSeries.episodes;
@@ -60,6 +69,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   const lockOpenDrawerBtn = document.getElementById("btn-lock-open-drawer");
   const drawerLabel = document.getElementById("episodes-drawer-label");
 
+  const speedBtn = document.getElementById("btn-speed-toggle");
   const likeBtn = document.getElementById("btn-action-like");
   const likeCounter = document.getElementById("like-counter");
   const favBtn = document.getElementById("btn-action-fav");
@@ -74,7 +84,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     backBtn.setAttribute("data-series", currentSeries.id);
   }
 
-  // Synchronize series title across all HUD headers and drawers
   const seriesName = currentSeries.shortTitle || currentSeries.title;
   document.querySelectorAll(".hud-series-title").forEach((el) => {
     el.textContent = seriesName;
@@ -88,7 +97,13 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     statusPill.style.display = msg ? "block" : "none";
   }
 
-  /* STREAMING_CHUNK:Configuring HUD auto-dimming transitions... */
+  function syncSpeedButton() {
+    if (!speedBtn) return;
+    speedBtn.textContent = `${currentSpeed}x`;
+    speedBtn.classList.toggle("boosted", currentSpeed > 1.0);
+  }
+  syncSpeedButton();
+
   function showHUD() {
     [hudTop, hudRight, hudBottom].forEach((el) => {
       if (el) el.classList.remove("hud-hidden");
@@ -112,7 +127,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  /* STREAMING_CHUNK:Configuring episode drawer rendering... */
   function renderDrawerGrid() {
     if (!drawerGrid) return;
     drawerGrid.innerHTML = currentEpisodes.map((ep, idx) => {
@@ -142,7 +156,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   function syncCoinBalanceInModal() {
     if (lockModalCoinBalance) lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
   }
-  /* STREAMING_CHUNK:Configuring episode loading and state switches... */
   function loadEpisode(index) {
     currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
     const ep = currentEpisodes[currentEpisodeIndex];
@@ -150,7 +163,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
 
     const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
 
-    // Sync titles on every episode change
     const seriesName = currentSeries.shortTitle || currentSeries.title;
     document.querySelectorAll(".hud-series-title").forEach((el) => {
       el.textContent = seriesName;
@@ -180,12 +192,16 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     video.src = ep.src;
     video.load();
 
+    // Preserve chosen playback rate across episode changes
+    video.playbackRate = currentSpeed;
+
     const saved = getSeriesProgress(currentSeries.id);
     if (saved && saved.episodeId === ep.id && saved.position > 1) {
       video.currentTime = saved.position;
     }
 
     video.play().then(() => {
+      video.playbackRate = currentSpeed;
       if (playIndicator) playIndicator.classList.remove("active");
       showHUD();
     }).catch(() => {
@@ -194,7 +210,75 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  /* STREAMING_CHUNK:Attaching resilient swipe-to-play-next gestures... */
+  // Target 4: Playback Speed Toggle Control
+  if (speedBtn) {
+    speedBtn.onclick = (e) => {
+      e.stopPropagation();
+      const currentIdx = SPEED_LEVELS.indexOf(currentSpeed);
+      const nextIdx = (currentIdx + 1) % SPEED_LEVELS.length;
+      currentSpeed = SPEED_LEVELS[nextIdx];
+      localStorage.setItem("minsplay_playback_speed", currentSpeed.toString());
+
+      if (video) video.playbackRate = currentSpeed;
+      syncSpeedButton();
+      showAppToast(`⚡ Speed: ${currentSpeed}x`);
+      showHUD();
+    };
+  }
+
+  // Target 4: Automated Binge & Auto-Unlock Engine
+  video.onended = () => {
+    handleEpisodeEnded();
+  };
+
+  function handleEpisodeEnded() {
+    const settings = getUserSettings();
+
+    // Check if autoplay next is disabled in settings
+    if (settings.autoplayNext === false) {
+      if (playIndicator) playIndicator.classList.add("active");
+      showHUD();
+      return;
+    }
+
+    // Check if at the end of the series
+    if (currentEpisodeIndex >= currentEpisodes.length - 1) {
+      showAppToast("🎬 Series Completed! Great binge.");
+      if (playIndicator) playIndicator.classList.add("active");
+      showHUD();
+      return;
+    }
+
+    const nextIndex = currentEpisodeIndex + 1;
+    const nextEp = currentEpisodes[nextIndex];
+    const isNextUnlocked = isEpisodeUnlocked(currentSeries.id, nextEp.id, nextEp.isFree);
+
+    if (isNextUnlocked) {
+      showAppToast(`▶ Auto-advancing to Episode ${nextEp.id}...`);
+      setTimeout(() => loadEpisode(nextIndex), 500);
+      return;
+    }
+
+    // Next episode is locked - check automatic coin unlock setting
+    const autoUnlockEnabled = settings.autoUnlockNext !== false;
+    const userCoins = getUserCoins();
+    const unlockCost = 30;
+
+    if (autoUnlockEnabled && userCoins >= unlockCost) {
+      spendCoins(unlockCost);
+      unlockEpisode(currentSeries.id, nextEp.id);
+      showAppToast(`🪙 Auto-unlocked Ep ${nextEp.id} (-30 Coins)`);
+      setTimeout(() => loadEpisode(nextIndex), 750);
+    } else if (autoUnlockEnabled && userCoins < unlockCost) {
+      showAppToast(`Ep ${nextEp.id} locked! Need ${unlockCost} coins.`);
+      loadEpisode(nextIndex); // triggers lock modal
+    } else {
+      // Auto unlock toggle is disabled
+      loadEpisode(nextIndex); // triggers lock modal
+    }
+  }
+
+  // Touch Swipe Engine
   let touchStartY = 0;
   let touchStartX = 0;
   let touchStartTime = 0;
@@ -216,15 +300,12 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     const diffX = touchStartX - touchEndX;
     const duration = Date.now() - touchStartTime;
 
-    // Do not trigger swipe when interacting with buttons, scrubbers, or open drawers
     if (e.target.closest("button, input, .drawer-sheet-box, .subtitles-sheet, .lock-modal-dialog")) {
       return;
     }
 
-    // Vertical swipe detected (> 40px threshold)
     if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX) * 1.1) {
       if (diffY > 0) {
-        // Swipe UP -> Next Episode
         if (currentEpisodeIndex < currentEpisodes.length - 1) {
           showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
           loadEpisode(currentEpisodeIndex + 1);
@@ -232,7 +313,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
           showAppToast("🎬 You've reached the latest episode!");
         }
       } else {
-        // Swipe DOWN -> Previous Episode
         if (currentEpisodeIndex > 0) {
           showAppToast(`◀ Previous: Episode ${currentEpisodes[currentEpisodeIndex - 1].id}`);
           loadEpisode(currentEpisodeIndex - 1);
@@ -243,7 +323,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       return;
     }
 
-    // Short tap (< 300ms) toggles play/pause and HUD visibility
     if (duration < 300 && Math.abs(diffY) < 12 && Math.abs(diffX) < 12) {
       handleTapToggle();
     }
@@ -267,7 +346,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     }
   }
 
-  /* STREAMING_CHUNK:Wiring actions, scrubber, and coin unlocks... */
   if (unlockCoinsBtn) {
     unlockCoinsBtn.onclick = () => {
       const ep = currentEpisodes[currentEpisodeIndex];

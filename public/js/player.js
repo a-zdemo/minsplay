@@ -190,7 +190,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     document.querySelectorAll(".hud-series-title").forEach((el) => {
       el.textContent = seriesName;
     });
-    if (epBadge) epBadge.textContent = `Ep ${ep.id}`;
+    if (epBadge) epBadge.textContent = `Episode ${ep.id}`;
     if (epTitle) epTitle.textContent = ep.title;
     if (lockedEpNum) lockedEpNum.textContent = `${ep.id}`;
 

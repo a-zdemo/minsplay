@@ -1,3 +1,4 @@
+<!-- STREAMING_CHUNK:Structuring clean top HUD and fullbleed video stage... -->
 <section class="watch-page fullbleed-player" id="watch-page-root">
   
   <!-- 100dvh Video Stage -->
@@ -24,16 +25,20 @@
     </div>
   </div>
 
-  <!-- Top Floating Auto-Dimming HUD -->
+  <!-- Top Floating Auto-Dimming HUD: Clean & Uncluttered -->
   <header class="watch-hud-top" id="hud-top">
-    <button class="hud-circle-btn" id="watch-back-btn" type="button" data-route="/series" aria-label="Back">‹</button>
-    <div class="watch-hud-meta">
-      <span class="hud-series-title">The Beginning</span>
-      <span class="watch-ep-badge" id="watch-ep-badge">Ep 1</span>
+    <div class="watch-hud-left">
+      <button class="hud-circle-btn" id="watch-back-btn" type="button" data-route="/series" aria-label="Back">‹</button>
+      <div class="watch-hud-meta">
+        <span class="hud-series-title">Protecting My Daughter</span>
+        <span class="watch-ep-subline" id="watch-ep-badge">Episode 1</span>
+      </div>
     </div>
+
+    <!-- Unified 3-Button Controls (Speed, CC, Sound) -->
     <div class="watch-top-actions">
-      <button class="btn-speed-toggle" id="btn-speed-toggle" type="button" aria-label="Playback Speed">1.0x</button>
-      <button class="btn-cc-toggle active" id="btn-cc-toggle" type="button" aria-label="Subtitles">CC</button>
+      <button class="hud-pill-btn btn-speed-toggle" id="btn-speed-toggle" type="button" aria-label="Playback Speed">1.0x</button>
+      <button class="hud-pill-btn btn-cc-toggle active" id="btn-cc-toggle" type="button" aria-label="Subtitles">CC</button>
       <button class="hud-circle-btn" id="btn-sound-toggle" type="button" aria-label="Sound">🔊</button>
     </div>
   </header>
@@ -65,7 +70,7 @@
   <!-- Bottom Floating HUD (Titles & Scrubber) -->
   <footer class="watch-hud-bottom" id="hud-bottom">
     <div class="hud-bottom-info">
-      <h2 class="hud-bottom-title hud-series-title">The Beginning</h2>
+      <h2 class="hud-bottom-title hud-series-title">Protecting My Daughter</h2>
       <p class="hud-bottom-sub" id="watch-current-title">Episode 1</p>
     </div>
     <div class="hud-scrubber-row">
@@ -125,7 +130,7 @@
       <div class="drawer-drag-pill"></div>
       <header class="drawer-header">
         <div>
-          <h3 class="drawer-heading hud-series-title">The Beginning</h3>
+          <h3 class="drawer-heading hud-series-title">Protecting My Daughter</h3>
           <p class="drawer-subheading">Select Episode</p>
         </div>
         <button class="drawer-close-btn" id="drawer-close-btn" type="button">✕</button>

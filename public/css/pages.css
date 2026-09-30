@@ -2537,3 +2537,103 @@
 .drawer-dl-btn.disabled .dl-btn-label {
   color: rgba(255, 255, 255, 0.4) !important;
 }
+
+/* STREAMING_CHUNK:Decluttering top player HUD and harmonizing controls... */
+.watch-hud-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  height: 56px !important;
+  padding: 8px 14px !important;
+}
+
+.watch-hud-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.watch-hud-meta {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+.watch-hud-top .hud-series-title {
+  font-size: 0.92rem !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.2 !important;
+}
+
+.watch-ep-subline {
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+
+/* Unified 3-Button Control Cluster */
+.watch-top-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+.hud-pill-btn {
+  all: unset !important;
+  box-sizing: border-box !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  border-radius: 16px !important;
+  background: rgba(20, 20, 28, 0.65) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 0.74rem !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transition: all 0.15s ease !important;
+}
+
+.hud-pill-btn:active {
+  transform: scale(0.92) !important;
+}
+
+/* Speed Boosted State */
+.btn-speed-toggle.boosted {
+  background: rgba(255, 193, 7, 0.15) !important;
+  border-color: #ffc107 !important;
+  color: #ffc107 !important;
+}
+
+/* CC Subtitles Active / Inactive States */
+.btn-cc-toggle.active {
+  background: rgba(255, 46, 99, 0.16) !important;
+  border-color: #ff2e63 !important;
+  color: #ff2e63 !important;
+}
+
+/* Circle Button Uniformity */
+.watch-hud-top .hud-circle-btn {
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 0.95rem !important;
+  background: rgba(20, 20, 28, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+}

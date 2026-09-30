@@ -1,4 +1,4 @@
-import { saveProgress, getSeriesProgress, isEpisodeUnlocked, unlockEpisode } from "./storage.js";
+import { saveProgress, getSeriesProgress, isEpisodeUnlocked, unlockEpisode, getUserCoins, spendCoins } from "./storage.js";
 import { getSeriesById } from "./series-data.js";
 
 let currentSeries = null;
@@ -30,6 +30,8 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   const lockModal = document.getElementById("watch-lock-modal");
   const lockedEpNum = document.getElementById("locked-ep-number");
   const unlockBtn = document.getElementById("btn-unlock-mock");
+  const unlockCoinsBtn = document.getElementById("btn-unlock-coins");
+  const lockModalCoinBalance = document.getElementById("lock-modal-coin-balance");
   const statusPill = document.getElementById("hud-status-pill");
 
   // Rewarded Ad Elements (Section 18)
@@ -74,26 +76,22 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
 
   if (!video) return;
 
-  // Set Back Button to return to this specific drama's detail screen
   if (backBtn) {
     backBtn.setAttribute("data-route", "/series");
     backBtn.setAttribute("data-series", currentSeries.id);
   }
 
-  // Update Top HUD Series Title
   const hudSeriesTitle = document.querySelector(".hud-series-title");
   if (hudSeriesTitle) {
     hudSeriesTitle.textContent = currentSeries.shortTitle || currentSeries.title;
   }
 
-  // Update Drawer Subheading & Drawer Count
   const drawerHeading = document.querySelector(".drawer-heading");
   const drawerSubheading = document.querySelector(".drawer-subheading");
   if (drawerHeading) drawerHeading.textContent = currentSeries.shortTitle || currentSeries.title;
   if (drawerSubheading) drawerSubheading.textContent = `Select Episode (${currentEpisodes.length} Episodes Total)`;
   if (drawerLabel) drawerLabel.textContent = `${currentEpisodes.length} Eps`;
 
-  // Update Genre Tags under Title
   const hudGenreTags = document.querySelector(".hud-genre-tags");
   if (hudGenreTags) {
     hudGenreTags.textContent = currentSeries.tags;
@@ -171,6 +169,12 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     if (drawerSheet) drawerSheet.classList.remove("open");
   }
 
+  function syncCoinBalanceInModal() {
+    if (lockModalCoinBalance) {
+      lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
+    }
+  }
+
   function loadEpisode(index) {
     currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
     const ep = currentEpisodes[currentEpisodeIndex];
@@ -194,6 +198,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       hideHUD();
       showStatus("");
 
+      syncCoinBalanceInModal();
       if (lockModal) lockModal.style.display = "flex";
       return;
     }
@@ -221,6 +226,26 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
         if (playIndicator) playIndicator.classList.add("active");
         showHUD();
       });
+  }
+
+  // ========================================
+  // Coin Instant Unlock Action (Section 19)
+  // ========================================
+  if (unlockCoinsBtn) {
+    unlockCoinsBtn.onclick = () => {
+      const ep = currentEpisodes[currentEpisodeIndex];
+      const unlockCost = 30;
+      const currentCoins = getUserCoins();
+
+      if (currentCoins >= unlockCost) {
+        spendCoins(unlockCost);
+        unlockEpisode(currentSeries.id, ep.id);
+        showToast(`🪙 -30 Coins! Ep ${ep.id} Unlocked.`);
+        loadEpisode(currentEpisodeIndex);
+      } else {
+        showToast(`Need ${unlockCost} coins! Balance: ${currentCoins} 🪙`);
+      }
+    };
   }
 
   // ========================================
@@ -280,7 +305,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
 
         if (adRewardSplash) adRewardSplash.style.display = "flex";
 
-        // Unlock scoped to this series and episode
         unlockEpisode(currentSeries.id, ep.id);
 
         setTimeout(() => {
@@ -308,7 +332,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     };
   }
 
-  // Swipe and Tap Gestures
+  // Touch Swipe & Tap Gestures
   let touchStartY = 0;
   let touchStartX = 0;
   let touchStartTime = 0;

@@ -132,13 +132,24 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  // Target 5: Drawer grid with quick-download action
+  // Enhanced Episode Drawer Grid with High-Contrast Download Pills
   function renderDrawerGrid() {
     if (!drawerGrid) return;
     drawerGrid.innerHTML = currentEpisodes.map((ep, idx) => {
       const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
       const isActive = idx === currentEpisodeIndex;
       const downloaded = isEpisodeDownloaded(currentSeries.id, ep.id);
+
+      let dlLabel = "⬇ Download";
+      let dlClass = "";
+      if (!unlocked) {
+        dlLabel = "🔒 Locked";
+        dlClass = "disabled";
+      } else if (downloaded) {
+        dlLabel = "✓ Saved";
+        dlClass = "downloaded";
+      }
+
       return `
         <div class="drawer-ep-card-wrap">
           <button class="drawer-ep-card ${isActive ? 'active' : ''} ${!unlocked ? 'locked' : ''}" data-drawer-ep="${idx + 1}" type="button">
@@ -148,8 +159,8 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
               ${unlocked ? (ep.isFree ? 'FREE' : 'UNLOCKED') : '🔒 LOCK'}
             </span>
           </button>
-          <button class="drawer-dl-btn ${downloaded ? 'downloaded' : ''} ${!unlocked ? 'disabled' : ''}" data-dl-ep="${ep.id}" type="button" aria-label="Download Ep ${ep.id}" title="${downloaded ? 'Downloaded' : 'Download for offline'}">
-            ${downloaded ? '✓' : '⬇'}
+          <button class="drawer-dl-btn ${dlClass}" data-dl-ep="${ep.id}" type="button" aria-label="Download Ep ${ep.id}">
+            <span class="dl-btn-label">${dlLabel}</span>
           </button>
         </div>
       `;
@@ -168,7 +179,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   function syncCoinBalanceInModal() {
     if (lockModalCoinBalance) lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
   }
-  // Target 5: Offline Cache Video Interception
+  // Offline Cache Video Playback Interception
   function loadEpisode(index) {
     currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
     const ep = currentEpisodes[currentEpisodeIndex];
@@ -201,13 +212,13 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     if (lockModal) lockModal.style.display = "none";
     if (adModal) adModal.style.display = "none";
 
-    // Check if downloaded in offline cache storage
+    // Play from offline Cache API blob if downloaded
     if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
       showStatus("Loading offline cache...");
       getCachedVideoBlobUrl(ep.src).then((blobUrl) => {
         if (blobUrl) {
           video.src = blobUrl;
-          showAppToast("⚡ Playing from offline storage");
+          showAppToast(`⚡ Playing Ep ${ep.id} from offline storage`);
         } else {
           video.src = ep.src;
         }
@@ -242,7 +253,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  // Playback Speed Toggle
+  // Speed Selector Toggle
   if (speedBtn) {
     speedBtn.onclick = (e) => {
       e.stopPropagation();
@@ -258,7 +269,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     };
   }
 
-  // Automated Binge & Auto-Unlock Engine
+  // Automated Binge & Auto-Coin Unlock
   video.onended = () => {
     handleEpisodeEnded();
   };
@@ -306,7 +317,56 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     }
   }
 
-  // Touch Gesture Listeners
+  // Drawer Download Click Handler with Live State Transitions
+  if (drawerGrid) {
+    drawerGrid.onclick = (e) => {
+      const dlBtn = e.target.closest(".drawer-dl-btn");
+      if (dlBtn) {
+        e.stopPropagation();
+        const epId = parseInt(dlBtn.getAttribute("data-dl-ep"), 10);
+        const ep = currentEpisodes.find((x) => x.id === epId);
+        if (!ep) return;
+
+        const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
+        if (!unlocked) {
+          showAppToast(`🔒 Unlock Ep ${ep.id} first to download`);
+          return;
+        }
+
+        if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
+          showAppToast(`✓ Episode ${ep.id} is already in offline storage`);
+          return;
+        }
+
+        const label = dlBtn.querySelector(".dl-btn-label");
+        if (label) label.textContent = "⏳ Saving...";
+        dlBtn.classList.add("downloading");
+        showAppToast(`⬇ Downloading Ep ${ep.id} for offline...`);
+
+        downloadEpisode(currentSeries, ep).then((res) => {
+          if (res.success) {
+            if (label) label.textContent = "✓ Saved";
+            dlBtn.classList.remove("downloading");
+            dlBtn.classList.add("downloaded");
+            showAppToast(`🎉 Ep ${ep.id} saved (${res.sizeStr})! Available offline.`);
+          } else {
+            if (label) label.textContent = "⬇ Download";
+            dlBtn.classList.remove("downloading");
+            showAppToast(`Download failed: ${res.error || "Network error"}`);
+          }
+        });
+        return;
+      }
+
+      const card = e.target.closest("[data-drawer-ep]");
+      if (card) {
+        const epNum = parseInt(card.getAttribute("data-drawer-ep"), 10);
+        loadEpisode(epNum - 1);
+      }
+    };
+  }
+
+  // Swipe Gestures
   let touchStartY = 0;
   let touchStartX = 0;
   let touchStartTime = 0;
@@ -372,51 +432,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
         showHUD();
       }
     }
-  }
-
-  // Target 5: Download Action Handler in Episode Drawer
-  if (drawerGrid) {
-    drawerGrid.onclick = (e) => {
-      const dlBtn = e.target.closest(".drawer-dl-btn");
-      if (dlBtn) {
-        e.stopPropagation();
-        const epId = parseInt(dlBtn.getAttribute("data-dl-ep"), 10);
-        const ep = currentEpisodes.find((x) => x.id === epId);
-        if (!ep) return;
-
-        const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
-        if (!unlocked) {
-          showAppToast(`🔒 Unlock Ep ${ep.id} first to download`);
-          return;
-        }
-
-        if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
-          showAppToast(`✓ Episode ${ep.id} already downloaded`);
-          return;
-        }
-
-        dlBtn.textContent = "⏳";
-        showAppToast(`⬇ Downloading Ep ${ep.id} for offline...`);
-
-        downloadEpisode(currentSeries, ep).then((res) => {
-          if (res.success) {
-            dlBtn.textContent = "✓";
-            dlBtn.classList.add("downloaded");
-            showAppToast(`🎉 Ep ${ep.id} downloaded (${res.sizeStr})! Available offline.`);
-          } else {
-            dlBtn.textContent = "⬇";
-            showAppToast(`Download failed: ${res.error || "Network error"}`);
-          }
-        });
-        return;
-      }
-
-      const card = e.target.closest("[data-drawer-ep]");
-      if (card) {
-        const epNum = parseInt(card.getAttribute("data-drawer-ep"), 10);
-        loadEpisode(epNum - 1);
-      }
-    };
   }
 
   if (unlockCoinsBtn) {

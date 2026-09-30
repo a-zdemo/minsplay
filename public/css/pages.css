@@ -2400,3 +2400,71 @@
 .db-dl-delete-btn:active {
   color: #ff2e63;
 }
+
+/* ==========================================================================
+   High-Contrast Episode Drawer Download Pill Buttons
+   ========================================================================== */
+.drawer-ep-card-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.drawer-dl-btn {
+  all: unset !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 30px !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 46, 99, 0.45) !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transition: all 0.15s ease !important;
+}
+
+.drawer-dl-btn:active {
+  transform: scale(0.95) !important;
+  background: rgba(255, 46, 99, 0.35) !important;
+}
+
+.drawer-dl-btn .dl-btn-label {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.2px !important;
+  color: #ffffff !important;
+}
+
+/* Downloaded / Saved State */
+.drawer-dl-btn.downloaded {
+  background: rgba(39, 201, 63, 0.18) !important;
+  border-color: #27c93f !important;
+}
+.drawer-dl-btn.downloaded .dl-btn-label {
+  color: #27c93f !important;
+}
+
+/* In-Progress Downloading State */
+.drawer-dl-btn.downloading {
+  background: rgba(255, 193, 7, 0.18) !important;
+  border-color: #ffc107 !important;
+}
+.drawer-dl-btn.downloading .dl-btn-label {
+  color: #ffc107 !important;
+}
+
+/* Locked Episode State */
+.drawer-dl-btn.disabled {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  cursor: not-allowed !important;
+  opacity: 0.45 !important;
+}
+.drawer-dl-btn.disabled .dl-btn-label {
+  color: rgba(255, 255, 255, 0.4) !important;
+}

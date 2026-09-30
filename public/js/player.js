@@ -132,7 +132,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  // Enhanced Episode Drawer Grid with High-Contrast Download Pills
+  // Drawer Grid with pure text-only buttons (NO ARROWS)
   function renderDrawerGrid() {
     if (!drawerGrid) return;
     drawerGrid.innerHTML = currentEpisodes.map((ep, idx) => {
@@ -140,13 +140,13 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       const isActive = idx === currentEpisodeIndex;
       const downloaded = isEpisodeDownloaded(currentSeries.id, ep.id);
 
-      let dlLabel = "⬇ Download";
+      let dlLabel = "Download";
       let dlClass = "";
       if (!unlocked) {
-        dlLabel = "🔒 Locked";
+        dlLabel = "Locked";
         dlClass = "disabled";
       } else if (downloaded) {
-        dlLabel = "✓ Saved";
+        dlLabel = "Saved";
         dlClass = "downloaded";
       }
 
@@ -156,7 +156,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
             <span class="drawer-ep-num">EP ${ep.id}</span>
             <span class="drawer-ep-name">${ep.title}</span>
             <span class="drawer-ep-badge ${unlocked ? 'badge-free' : 'badge-locked'}">
-              ${unlocked ? (ep.isFree ? 'FREE' : 'UNLOCKED') : '🔒 LOCK'}
+              ${unlocked ? (ep.isFree ? 'FREE' : 'UNLOCKED') : 'LOCK'}
             </span>
           </button>
           <button class="drawer-dl-btn ${dlClass}" data-dl-ep="${ep.id}" type="button" aria-label="Download Ep ${ep.id}">
@@ -179,7 +179,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   function syncCoinBalanceInModal() {
     if (lockModalCoinBalance) lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
   }
-  // Offline Cache Video Playback Interception
   function loadEpisode(index) {
     currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
     const ep = currentEpisodes[currentEpisodeIndex];
@@ -212,7 +211,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     if (lockModal) lockModal.style.display = "none";
     if (adModal) adModal.style.display = "none";
 
-    // Play from offline Cache API blob if downloaded
+    // Play from offline Cache API blob if available
     if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
       showStatus("Loading offline cache...");
       getCachedVideoBlobUrl(ep.src).then((blobUrl) => {
@@ -253,7 +252,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  // Speed Selector Toggle
+  // Playback Speed Selector Toggle
   if (speedBtn) {
     speedBtn.onclick = (e) => {
       e.stopPropagation();
@@ -317,7 +316,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     }
   }
 
-  // Drawer Download Click Handler with Live State Transitions
+  // Pure Text Download Click Handler with Live State Feedback
   if (drawerGrid) {
     drawerGrid.onclick = (e) => {
       const dlBtn = e.target.closest(".drawer-dl-btn");
@@ -334,23 +333,23 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
         }
 
         if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
-          showAppToast(`✓ Episode ${ep.id} is already in offline storage`);
+          showAppToast(`Episode ${ep.id} is already saved offline`);
           return;
         }
 
         const label = dlBtn.querySelector(".dl-btn-label");
-        if (label) label.textContent = "⏳ Saving...";
+        if (label) label.textContent = "Saving...";
         dlBtn.classList.add("downloading");
-        showAppToast(`⬇ Downloading Ep ${ep.id} for offline...`);
+        showAppToast(`Downloading Ep ${ep.id} for offline...`);
 
         downloadEpisode(currentSeries, ep).then((res) => {
           if (res.success) {
-            if (label) label.textContent = "✓ Saved";
+            if (label) label.textContent = "Saved";
             dlBtn.classList.remove("downloading");
             dlBtn.classList.add("downloaded");
             showAppToast(`🎉 Ep ${ep.id} saved (${res.sizeStr})! Available offline.`);
           } else {
-            if (label) label.textContent = "⬇ Download";
+            if (label) label.textContent = "Download";
             dlBtn.classList.remove("downloading");
             showAppToast(`Download failed: ${res.error || "Network error"}`);
           }

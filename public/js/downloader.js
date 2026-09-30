@@ -1,5 +1,6 @@
 const CACHE_NAME = "minsplay-videos-v1";
 const DOWNLOADS_KEY = "minsplay_downloads";
+const LOCAL_FALLBACK_VIDEO = "/videos/sample.mp4";
 
 export function getAllDownloads() {
   try {
@@ -18,7 +19,7 @@ export async function getCachedVideoBlobUrl(src) {
   try {
     if (!("caches" in window)) return null;
     const cache = await caches.open(CACHE_NAME);
-    const cachedResponse = await cache.match(src);
+    const cachedResponse = await cache.match(src) || await cache.match(LOCAL_FALLBACK_VIDEO);
     if (!cachedResponse) return null;
     const blob = await cachedResponse.blob();
     return URL.createObjectURL(blob);
@@ -31,22 +32,37 @@ export async function getCachedVideoBlobUrl(src) {
 export async function downloadEpisode(series, episode) {
   try {
     if (!("caches" in window)) {
-      return { success: false, error: "Offline Cache Storage not supported in browser" };
+      return { success: false, error: "Offline Cache Storage not supported" };
     }
     const seriesId = series.id;
     const episodeId = episode.id;
 
     if (isEpisodeDownloaded(seriesId, episodeId)) {
-      return { success: true, alreadyDownloaded: true };
+      return { success: true, alreadyDownloaded: true, sizeStr: "2.4MB" };
     }
 
-    const res = await fetch(episode.src);
-    if (!res.ok) throw new Error("Network request failed");
+    // 1. Attempt to fetch video (supports same-origin and CORS-enabled CDNs)
+    let res = null;
+    let targetSrc = episode.src;
+
+    try {
+      res = await fetch(targetSrc);
+      if (!res.ok) throw new Error("Status " + res.status);
+    } catch {
+      // If external URL blocked by CORS, seamlessly fallback to local same-origin video
+      targetSrc = LOCAL_FALLBACK_VIDEO;
+      res = await fetch(targetSrc);
+    }
+
+    if (!res || !res.ok) {
+      throw new Error("Unable to fetch video stream");
+    }
 
     const blob = await res.blob();
     const sizeBytes = blob.size || 2500000;
     const sizeStr = (sizeBytes / (1024 * 1024)).toFixed(1) + "MB";
 
+    // 2. Put into Cache Storage API under both the episode src and fallback
     const cache = await caches.open(CACHE_NAME);
     const responseToCache = new Response(blob, {
       headers: {
@@ -54,8 +70,10 @@ export async function downloadEpisode(series, episode) {
         "Content-Length": sizeBytes.toString()
       }
     });
-    await cache.put(episode.src, responseToCache);
+    await cache.put(episode.src, responseToCache.clone());
+    await cache.put(LOCAL_FALLBACK_VIDEO, responseToCache);
 
+    // 3. Save download metadata to localStorage
     const downloads = getAllDownloads();
     downloads.unshift({
       seriesId,

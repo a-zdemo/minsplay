@@ -4,6 +4,7 @@ import { initCommentsSystem } from "./comments.js";
 import { initInboxSubViews } from "./inbox.js";
 import { initWalletSubViews } from "./wallet.js";
 import { initProfileSubpages } from "./profile-subpages.js";
+import { initSubtitlesSystem } from "./subtitles.js";
 
 function startApp() {
   try {
@@ -13,6 +14,7 @@ function startApp() {
     initInboxSubViews();
     initWalletSubViews();
     initProfileSubpages();
+    initSubtitlesSystem();
   } catch (error) {
     console.error("Minsplay startup error:", error);
   }

@@ -1239,3 +1239,48 @@
   cursor: pointer;
 }
 .db-logout-btn:active { background: #252533; color: #ffffff; }
+
+/* ==========================================================================
+   Clean DramaBox Header Refinement (No FREE tag, No text wrapping, SVG buttons)
+   ========================================================================== */
+.db-user-subline {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 0.78rem !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+  white-space: nowrap !important;
+}
+
+.db-id-text, .db-following-text {
+  white-space: nowrap !important;
+}
+
+.db-top-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.db-icon-btn {
+  all: unset !important;
+  width: 36px !important;
+  height: 36px !important;
+  display: grid !important;
+  place-items: center !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  background: transparent !important;
+  border: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.db-icon-btn svg {
+  stroke: #ffffff !important;
+  stroke-width: 2 !important;
+}
+
+.db-icon-btn:active {
+  transform: scale(0.92) !important;
+  opacity: 0.7 !important;
+}

@@ -1,0 +1,55 @@
+<section class="db-subpage" id="wallet-page-root">
+  <div class="db-subpage-body">
+    
+    <!-- Top Navigation Header -->
+    <header class="db-subpage-header">
+      <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
+      <h2 class="db-subpage-title">My Wallet</h2>
+      <div class="db-header-spacer"></div>
+    </header>
+
+    <!-- Dual Balance Counter (DramaBox Pattern) -->
+    <div class="db-wallet-balances">
+      <div class="db-wallet-col">
+        <span class="db-wallet-label">Coins</span>
+        <strong class="db-wallet-val" id="wallet-purchased-coins">0</strong>
+      </div>
+      <div class="db-wallet-col">
+        <span class="db-wallet-label">Reward Coins</span>
+        <strong class="db-wallet-val" id="wallet-reward-coins">20</strong>
+      </div>
+    </div>
+
+    <!-- Gradient Top Up Button -->
+    <button class="db-wallet-topup-btn" id="btn-wallet-topup" type="button" data-route="/member">
+      Top Up
+    </button>
+
+    <!-- Records & Auto-Unlock Settings List -->
+    <div class="db-settings-list db-wallet-list">
+      <article class="db-settings-row" id="btn-wallet-trans">
+        <span class="db-settings-label">Transaction History</span>
+        <span class="db-chevron">›</span>
+      </article>
+
+      <article class="db-settings-row" id="btn-wallet-rewards">
+        <span class="db-settings-label">Reward Coins</span>
+        <span class="db-chevron">›</span>
+      </article>
+
+      <article class="db-settings-row" id="btn-wallet-consumption">
+        <span class="db-settings-label">Consumption Records</span>
+        <span class="db-chevron">›</span>
+      </article>
+
+      <div class="db-settings-row toggle-row">
+        <span class="db-settings-label">Unlock next episode automatically</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="setting-auto-unlock" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+  </div>
+</section>

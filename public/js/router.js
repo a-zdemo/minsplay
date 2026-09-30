@@ -7,6 +7,7 @@ import profileHtml from "../pages/profile.html?raw";
 import foryouHtml from "../pages/foryou.html?raw";
 import inboxHtml from "../pages/inbox.html?raw";
 import settingsHtml from "../pages/settings.html?raw";
+import walletHtml from "../pages/wallet.html?raw";
 import { initPlayer } from "./player.js";
 import { initForYouFeed, destroyForYouFeed } from "./foryou.js";
 import {
@@ -36,6 +37,7 @@ const routes = {
   "/profile": profileHtml,
   "/inbox": inboxHtml,
   "/settings": settingsHtml,
+  "/wallet": walletHtml,
 };
 
 let currentActiveSeriesId = "the-beginning";
@@ -559,7 +561,6 @@ function initMemberScreen() {
 function initProfileScreen() {
   const coinBal = document.getElementById("profile-coin-balance");
   const streakCount = document.getElementById("profile-streak-count");
-  const tierBadge = document.getElementById("profile-tier-badge");
   const crownBadge = document.getElementById("profile-vip-crown");
   const historyCount = document.getElementById("profile-history-count");
   const vipSummary = document.getElementById("profile-vip-summary");
@@ -573,12 +574,6 @@ function initProfileScreen() {
 
     if (coinBal) coinBal.textContent = coins.toString();
     if (streakCount) streakCount.textContent = `Day ${checkin.streak || 1} 🔥`;
-
-    if (tierBadge) {
-      tierBadge.textContent = vip.isVip ? "VIP" : "FREE";
-      tierBadge.style.display = "inline-block";
-    }
-
     if (crownBadge) crownBadge.style.display = vip.isVip ? "block" : "none";
     if (historyCount) historyCount.textContent = `${progressList.length} In Progress`;
     if (vipSummary) vipSummary.textContent = vip.isVip ? `VIP Active (${vip.daysLeft}d)` : "Unlock VIP Pass";
@@ -600,14 +595,7 @@ function initProfileScreen() {
 }
 
 function initInboxScreen() {
-  const activityBtn = document.getElementById("btn-inbox-activity");
-  const interactionsBtn = document.getElementById("btn-inbox-interactions");
-
-  if (interactionsBtn) {
-    interactionsBtn.onclick = () => {
-      showAppToast("No new interactions yet 🔔");
-    };
-  }
+  // Inbox subviews are managed by initInboxSubViews() in inbox.js
 }
 
 function initSettingsScreen() {
@@ -628,14 +616,12 @@ function initSettingsScreen() {
       showAppToast(`Auto-Play: ${autoplayToggle.checked ? "Enabled" : "Disabled"}`);
     };
   }
-
   if (swipeToggle) {
     swipeToggle.onchange = () => {
       saveUserSetting("swipeGestures", swipeToggle.checked);
       showAppToast(`Swipe Gestures: ${swipeToggle.checked ? "Enabled" : "Disabled"}`);
     };
   }
-
   if (clearCacheBtn) {
     clearCacheBtn.onclick = () => {
       if ("caches" in window) {
@@ -645,20 +631,44 @@ function initSettingsScreen() {
       showAppToast("App cache cleared 🗑️");
     };
   }
-
   if (clearHistoryBtn) {
     clearHistoryBtn.onclick = () => {
       clearAllProgress();
       showAppToast("Watch history cleared 🗑️");
     };
   }
-
   if (guestResetBtn) {
     guestResetBtn.onclick = () => {
       showAppToast("Guest session refreshed ✓");
       setTimeout(() => navigateTo("/"), 400);
     };
   }
+}
+
+function initWalletScreen() {
+  const rewardCoinsEl = document.getElementById("wallet-reward-coins");
+  const purchasedCoinsEl = document.getElementById("wallet-purchased-coins");
+  const autoUnlockToggle = document.getElementById("setting-auto-unlock");
+  const transRow = document.getElementById("btn-wallet-trans");
+  const rewardsRow = document.getElementById("btn-wallet-rewards");
+  const consumptionRow = document.getElementById("btn-wallet-consumption");
+
+  const coins = getUserCoins();
+  if (rewardCoinsEl) rewardCoinsEl.textContent = coins.toString();
+  if (purchasedCoinsEl) purchasedCoinsEl.textContent = "0";
+
+  const settings = getUserSettings();
+  if (autoUnlockToggle) {
+    autoUnlockToggle.checked = settings.autoUnlockNext !== false;
+    autoUnlockToggle.onchange = () => {
+      saveUserSetting("autoUnlockNext", autoUnlockToggle.checked);
+      showAppToast(`Auto-unlock: ${autoUnlockToggle.checked ? "Enabled" : "Disabled"}`);
+    };
+  }
+
+  if (transRow) transRow.onclick = () => showAppToast("No top-up transactions yet");
+  if (rewardsRow) rewardsRow.onclick = () => showAppToast(`Current reward balance: ${coins} 🪙`);
+  if (consumptionRow) consumptionRow.onclick = () => showAppToast("No coin consumption records");
 }
 
 function renderSeriesDetail(seriesId) {
@@ -822,8 +832,8 @@ async function renderRoute(path) {
 
   const bottomNav = document.getElementById("bottom-nav");
   if (bottomNav) {
-    // Hide bottom navigation on full player, settings, and inbox for full immersion
-    bottomNav.style.display = (path === "/watch" || path === "/inbox" || path === "/settings") ? "none" : "flex";
+    // Hide bottom navigation on full player, settings, inbox, and wallet for full immersion
+    bottomNav.style.display = (path === "/watch" || path === "/inbox" || path === "/settings" || path === "/wallet") ? "none" : "flex";
   }
 
   mainContent.innerHTML = html;
@@ -851,6 +861,8 @@ async function renderRoute(path) {
     initInboxScreen();
   } else if (path === "/settings") {
     initSettingsScreen();
+  } else if (path === "/wallet") {
+    initWalletScreen();
   }
 }
 

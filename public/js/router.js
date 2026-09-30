@@ -6,11 +6,58 @@ import { initPlayer } from "./player.js";
 import { getAllProgress, isEpisodeUnlocked } from "./storage.js";
 import { getSeriesById } from "./series-data.js";
 
+// Member & Profile VIP Placeholders matching DramaBox dark aesthetic
+const memberHtml = `
+  <section class="page-container" style="padding: 2.5rem 1.25rem 5rem; text-align: center;">
+    <div style="font-size: 3rem; margin-bottom: 0.5rem;">👑</div>
+    <h1 style="font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">VIP Membership</h1>
+    <p style="font-size: 0.88rem; color: rgba(255,255,255,0.65); line-height: 1.5; max-width: 300px; margin: 0 auto 1.5rem;">
+      Enjoy full access to all drama series, ad-free streaming, and instant 4K releases.
+    </p>
+    <div style="background: linear-gradient(145deg, #181824, #101016); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; max-width: 320px; margin: 0 auto 1.5rem; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-weight: 700; color: #fff;">Annual Pass</span>
+        <span style="background: #ff2e63; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px;">BEST VALUE</span>
+      </div>
+      <p style="margin: 0; font-size: 0.8rem; color: rgba(255,255,255,0.5);">Instant unlock for 500+ short drama episodes</p>
+    </div>
+    <button class="btn btn-primary" type="button" data-route="/" style="max-width: 320px; width: 100%;">
+      Explore Popular Dramas
+    </button>
+  </section>
+`;
+
+const profileHtml = `
+  <section class="page-container" style="padding: 2.5rem 1.25rem 5rem;">
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 2rem;">
+      <div style="width: 60px; height: 60px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <img src="/icons/icon-animated.svg" alt="Minsplay Ant Mascot" style="width: 100%; height: 100%; object-fit: contain;" />
+      </div>
+      <div>
+        <h2 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0 0 4px;">Minsplay Viewer</h2>
+        <span style="background: rgba(255,46,99,0.2); color: #ff2e63; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(255,46,99,0.4);">Member ID #84920</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div class="episode-card" data-route="/mylist" style="justify-content: space-between;">
+        <span style="font-weight: 600; color: #fff;">My Watch History</span>
+        <span style="color: rgba(255,255,255,0.4);">›</span>
+      </div>
+      <div class="episode-card" data-route="/" style="justify-content: space-between;">
+        <span style="font-weight: 600; color: #fff;">Account Preferences</span>
+        <span style="color: rgba(255,255,255,0.4);">›</span>
+      </div>
+    </div>
+  </section>
+`;
+
 const routes = {
   "/": homeHtml,
   "/series": seriesHtml,
   "/watch": watchHtml,
   "/mylist": mylistHtml,
+  "/member": memberHtml,
+  "/profile": profileHtml,
 };
 
 let currentActiveSeriesId = "the-beginning";
@@ -20,7 +67,6 @@ export async function navigateTo(path, { seriesId, episode = 1 } = {}) {
   if (seriesId) currentActiveSeriesId = seriesId;
   pendingEpisode = episode;
 
-  // Construct URL with query parameters for direct link sharing & refresh preservation
   let targetUrl = path;
   const params = new URLSearchParams();
   if (currentActiveSeriesId && currentActiveSeriesId !== "the-beginning") {
@@ -216,6 +262,7 @@ function updateBottomNavActive(path) {
   const navItems = document.querySelectorAll(".bottom-nav .nav-item");
   navItems.forEach((btn) => {
     const route = btn.getAttribute("data-route");
+    // Only highlight if route directly matches path
     if (route === path) {
       btn.classList.add("active");
     } else {
@@ -241,6 +288,7 @@ async function renderRoute(path) {
 
   const bottomNav = document.getElementById("bottom-nav");
   if (bottomNav) {
+    // Hide bottom nav on full-bleed player
     bottomNav.style.display = path === "/watch" ? "none" : "flex";
   }
 
@@ -288,7 +336,6 @@ export function initRouter() {
     renderRoute(routes[currentPath] ? currentPath : "/");
   });
 
-  // Initial load: parse URL parameters if opening directly or refreshing
   const initialPath = window.location.pathname || "/";
   const urlParams = new URLSearchParams(window.location.search);
   const initialSeries = urlParams.get("id") || "the-beginning";

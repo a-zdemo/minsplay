@@ -1,53 +1,176 @@
 <section class="db-subpage" id="wallet-page-root">
   <div class="db-subpage-body">
     
-    <!-- Top Navigation Header -->
-    <header class="db-subpage-header">
-      <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
-      <h2 class="db-subpage-title">My Wallet</h2>
-      <div class="db-header-spacer"></div>
-    </header>
+    <!-- VIEW 1: Main Wallet Dashboard -->
+    <div class="db-wallet-view-pane active" id="view-wallet-main">
+      <header class="db-subpage-header">
+        <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
+        <h2 class="db-subpage-title">My Wallet</h2>
+        <div class="db-header-spacer"></div>
+      </header>
 
-    <!-- Dual Balance Counter (DramaBox Pattern) -->
-    <div class="db-wallet-balances">
-      <div class="db-wallet-col">
-        <span class="db-wallet-label">Coins</span>
-        <strong class="db-wallet-val" id="wallet-purchased-coins">0</strong>
+      <!-- Dual Balance Display -->
+      <div class="db-wallet-balances">
+        <div class="db-wallet-col">
+          <span class="db-wallet-label">Coins</span>
+          <strong class="db-wallet-val" id="wallet-purchased-coins">0</strong>
+        </div>
+        <div class="db-wallet-col">
+          <span class="db-wallet-label">Reward Coins</span>
+          <strong class="db-wallet-val" id="wallet-reward-coins">50</strong>
+        </div>
       </div>
-      <div class="db-wallet-col">
-        <span class="db-wallet-label">Reward Coins</span>
-        <strong class="db-wallet-val" id="wallet-reward-coins">20</strong>
+
+      <!-- Top Up Button -->
+      <button class="db-wallet-topup-btn" id="btn-wallet-topup" type="button" data-route="/member">
+        Top Up
+      </button>
+
+      <!-- Records Navigation List -->
+      <div class="db-settings-list db-wallet-list">
+        <article class="db-settings-row" id="btn-wallet-trans" type="button">
+          <span class="db-settings-label">Transaction History</span>
+          <span class="db-chevron">›</span>
+        </article>
+
+        <article class="db-settings-row" id="btn-wallet-rewards" type="button">
+          <span class="db-settings-label">Reward Coins</span>
+          <span class="db-chevron">›</span>
+        </article>
+
+        <article class="db-settings-row" id="btn-wallet-consumption" type="button">
+          <span class="db-settings-label">Consumption Records</span>
+          <span class="db-chevron">›</span>
+        </article>
+
+        <div class="db-settings-row toggle-row">
+          <span class="db-settings-label">Unlock next episode automatically</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="setting-auto-unlock" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
       </div>
     </div>
 
-    <!-- Gradient Top Up Button -->
-    <button class="db-wallet-topup-btn" id="btn-wallet-topup" type="button" data-route="/member">
-      Top Up
-    </button>
+    <!-- VIEW 2: Transaction History (Pic 1) -->
+    <div class="db-wallet-view-pane" id="view-wallet-trans" style="display: none;">
+      <header class="db-subpage-header">
+        <button class="db-back-btn db-wallet-sub-back" type="button" aria-label="Back">‹</button>
+        <h2 class="db-subpage-title">Transaction History</h2>
+        <div class="db-header-spacer"></div>
+      </header>
 
-    <!-- Records & Auto-Unlock Settings List -->
-    <div class="db-settings-list db-wallet-list">
-      <article class="db-settings-row" id="btn-wallet-trans">
-        <span class="db-settings-label">Transaction History</span>
-        <span class="db-chevron">›</span>
-      </article>
+      <div class="db-records-list" id="trans-records-list">
+        <article class="db-record-card">
+          <div class="db-record-left">
+            <strong class="db-record-title">Membership (Weekly VIP)</strong>
+            <span class="db-record-date">9/26/26</span>
+          </div>
+          <span class="db-record-amount">-$2.99</span>
+        </article>
+      </div>
+    </div>
 
-      <article class="db-settings-row" id="btn-wallet-rewards">
-        <span class="db-settings-label">Reward Coins</span>
-        <span class="db-chevron">›</span>
-      </article>
+    <!-- VIEW 3: Reward Coins (Pic 2) -->
+    <div class="db-wallet-view-pane" id="view-wallet-rewards" style="display: none;">
+      <header class="db-subpage-header">
+        <button class="db-back-btn db-wallet-sub-back" type="button" aria-label="Back">‹</button>
+        <h2 class="db-subpage-title">Reward Coins</h2>
+        <div class="db-header-spacer"></div>
+      </header>
 
-      <article class="db-settings-row" id="btn-wallet-consumption">
-        <span class="db-settings-label">Consumption Records</span>
-        <span class="db-chevron">›</span>
-      </article>
+      <div class="db-records-list" id="reward-coins-list">
+        <article class="db-record-card">
+          <div class="db-reward-item-left">
+            <span class="db-reward-coin-badge">🪙</span>
+            <div>
+              <strong class="db-reward-coin-val">20 Reward Coins</strong>
+              <span class="db-record-date">9/26/26-10/27/26</span>
+            </div>
+          </div>
+          <span class="db-record-source">Check in</span>
+        </article>
 
-      <div class="db-settings-row toggle-row">
-        <span class="db-settings-label">Unlock next episode automatically</span>
-        <label class="toggle-switch">
-          <input type="checkbox" id="setting-auto-unlock" checked />
-          <span class="toggle-slider"></span>
-        </label>
+        <article class="db-record-card">
+          <div class="db-reward-item-left">
+            <span class="db-reward-coin-badge">🪙</span>
+            <div>
+              <strong class="db-reward-coin-val">30 Reward Coins</strong>
+              <span class="db-record-date">9/26/26-10/27/26</span>
+            </div>
+          </div>
+          <span class="db-record-source">Watch check-in Ads</span>
+        </article>
+
+        <article class="db-record-card">
+          <div class="db-reward-item-left">
+            <span class="db-reward-coin-badge">🪙</span>
+            <div>
+              <strong class="db-reward-coin-val">20 Reward Coins</strong>
+              <span class="db-record-date">9/26/26-10/27/26</span>
+            </div>
+          </div>
+          <span class="db-record-source">Watch for 15 mins</span>
+        </article>
+
+        <article class="db-record-card">
+          <div class="db-reward-item-left">
+            <span class="db-reward-coin-badge">🪙</span>
+            <div>
+              <strong class="db-reward-coin-val">10 Reward Coins</strong>
+              <span class="db-record-date">9/26/26-10/27/26</span>
+            </div>
+          </div>
+          <span class="db-record-source">Shared with a friend</span>
+        </article>
+      </div>
+    </div>
+
+    <!-- VIEW 4: Consumption Records (Pic 3) -->
+    <div class="db-wallet-view-pane" id="view-wallet-consumption" style="display: none;">
+      <header class="db-subpage-header">
+        <button class="db-back-btn db-wallet-sub-back" type="button" aria-label="Back">‹</button>
+        <h2 class="db-subpage-title">Consumption Records</h2>
+        <div class="db-header-spacer"></div>
+      </header>
+
+      <!-- Spent / Expired Underline Tabs (DramaBox Pattern) -->
+      <div class="db-underline-tabs-row" id="consumption-tabs-row">
+        <button class="db-underline-tab active" type="button" data-tab="spent">Spent</button>
+        <button class="db-underline-tab" type="button" data-tab="expired">Expired</button>
+      </div>
+
+      <!-- Spent Feed -->
+      <div class="db-records-list" id="consumption-spent-feed">
+        <article class="db-consumption-card">
+          <div class="db-consumption-thumb art-blue">
+            <span>▶</span>
+          </div>
+          <div class="db-consumption-meta">
+            <strong class="db-consumption-ep">Episode 3</strong>
+            <p class="db-consumption-title">The Beginning: An Outsider's Ascent</p>
+            <span class="db-record-date">9/26/26 7:20:08 PM</span>
+          </div>
+          <span class="db-consumption-cost">-30 Coins</span>
+        </article>
+
+        <article class="db-consumption-card">
+          <div class="db-consumption-thumb art-gold">
+            <span>👑</span>
+          </div>
+          <div class="db-consumption-meta">
+            <strong class="db-consumption-ep">Episode 4</strong>
+            <p class="db-consumption-title">Definitely Not The Dragon God</p>
+            <span class="db-record-date">9/26/26 7:14:28 PM</span>
+          </div>
+          <span class="db-consumption-cost ad">AD</span>
+        </article>
+      </div>
+
+      <!-- Expired Feed -->
+      <div class="db-records-list" id="consumption-expired-feed" style="display: none;">
+        <div class="db-empty-desc" style="text-align: center; padding: 40px 0;">No expired coin records.</div>
       </div>
     </div>
 

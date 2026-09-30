@@ -1439,3 +1439,124 @@
 .db-wallet-list {
   margin-top: 6px;
 }
+
+/* ==========================================================================
+   DramaBox Wallet Sub-Views: Transactions, Rewards & Consumption (Pics 1, 2, 3)
+   ========================================================================== */
+.db-wallet-view-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.db-records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.db-record-card {
+  background: #14141c;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.db-record-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.db-record-title { font-size: 0.92rem; font-weight: 700; color: #ffffff; }
+.db-record-date { font-size: 0.74rem; color: rgba(255, 255, 255, 0.4); }
+.db-record-amount { font-size: 0.95rem; font-weight: 700; color: rgba(255, 255, 255, 0.85); }
+
+/* Reward Coins Rows (Pic 2) */
+.db-reward-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.db-reward-coin-badge { font-size: 1.4rem; }
+.db-reward-coin-val { font-size: 0.9rem; font-weight: 700; color: #ffffff; display: block; margin-bottom: 3px; }
+.db-record-source { font-size: 0.84rem; color: rgba(255, 255, 255, 0.55); font-weight: 500; }
+
+/* Consumption Underline Tabs (Pic 3) */
+.db-underline-tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 4px 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.db-underline-tab {
+  all: unset;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding-bottom: 6px;
+  position: relative;
+}
+.db-underline-tab.active {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+.db-underline-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 2px;
+}
+
+/* Consumption Records Cards (Pic 3) */
+.db-consumption-card {
+  background: #14141c;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.db-consumption-thumb {
+  width: 48px;
+  height: 64px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.db-consumption-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.db-consumption-ep { font-size: 0.92rem; font-weight: 800; color: #ffffff; }
+.db-consumption-title {
+  margin: 0;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.db-consumption-cost {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.85);
+  flex-shrink: 0;
+}
+.db-consumption-cost.ad {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.45);
+}

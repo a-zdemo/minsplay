@@ -2,6 +2,7 @@ import { initRouter } from "./router.js";
 import { initPWA } from "./pwa.js";
 import { initCommentsSystem } from "./comments.js";
 import { initInboxSubViews } from "./inbox.js";
+import { initWalletSubViews } from "./wallet.js";
 
 function startApp() {
   try {
@@ -9,6 +10,7 @@ function startApp() {
     initPWA();
     initCommentsSystem();
     initInboxSubViews();
+    initWalletSubViews();
   } catch (error) {
     console.error("Minsplay startup error:", error);
   }

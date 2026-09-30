@@ -9,6 +9,11 @@ import {
 } from "./storage.js";
 import { getSeriesById } from "./series-data.js";
 import { showAppToast } from "./router.js";
+import {
+  isEpisodeDownloaded,
+  downloadEpisode,
+  getCachedVideoBlobUrl
+} from "./downloader.js";
 
 const SPEED_LEVELS = [1.0, 1.25, 1.5, 2.0];
 let currentSpeed = parseFloat(localStorage.getItem("minsplay_playback_speed") || "1.0");
@@ -127,19 +132,26 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
+  // Target 5: Drawer grid with quick-download action
   function renderDrawerGrid() {
     if (!drawerGrid) return;
     drawerGrid.innerHTML = currentEpisodes.map((ep, idx) => {
       const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
       const isActive = idx === currentEpisodeIndex;
+      const downloaded = isEpisodeDownloaded(currentSeries.id, ep.id);
       return `
-        <button class="drawer-ep-card ${isActive ? 'active' : ''} ${!unlocked ? 'locked' : ''}" data-drawer-ep="${idx + 1}" type="button">
-          <span class="drawer-ep-num">EP ${ep.id}</span>
-          <span class="drawer-ep-name">${ep.title}</span>
-          <span class="drawer-ep-badge ${unlocked ? 'badge-free' : 'badge-locked'}">
-            ${unlocked ? (ep.isFree ? 'FREE' : 'UNLOCKED') : '🔒 LOCK'}
-          </span>
-        </button>
+        <div class="drawer-ep-card-wrap">
+          <button class="drawer-ep-card ${isActive ? 'active' : ''} ${!unlocked ? 'locked' : ''}" data-drawer-ep="${idx + 1}" type="button">
+            <span class="drawer-ep-num">EP ${ep.id}</span>
+            <span class="drawer-ep-name">${ep.title}</span>
+            <span class="drawer-ep-badge ${unlocked ? 'badge-free' : 'badge-locked'}">
+              ${unlocked ? (ep.isFree ? 'FREE' : 'UNLOCKED') : '🔒 LOCK'}
+            </span>
+          </button>
+          <button class="drawer-dl-btn ${downloaded ? 'downloaded' : ''} ${!unlocked ? 'disabled' : ''}" data-dl-ep="${ep.id}" type="button" aria-label="Download Ep ${ep.id}" title="${downloaded ? 'Downloaded' : 'Download for offline'}">
+            ${downloaded ? '✓' : '⬇'}
+          </button>
+        </div>
       `;
     }).join("");
   }
@@ -156,6 +168,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   function syncCoinBalanceInModal() {
     if (lockModalCoinBalance) lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
   }
+  // Target 5: Offline Cache Video Interception
   function loadEpisode(index) {
     currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
     const ep = currentEpisodes[currentEpisodeIndex];
@@ -187,12 +200,31 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
 
     if (lockModal) lockModal.style.display = "none";
     if (adModal) adModal.style.display = "none";
-    showStatus("Buffering stream...");
 
-    video.src = ep.src;
+    // Check if downloaded in offline cache storage
+    if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
+      showStatus("Loading offline cache...");
+      getCachedVideoBlobUrl(ep.src).then((blobUrl) => {
+        if (blobUrl) {
+          video.src = blobUrl;
+          showAppToast("⚡ Playing from offline storage");
+        } else {
+          video.src = ep.src;
+        }
+        startPlaybackStream(ep);
+      }).catch(() => {
+        video.src = ep.src;
+        startPlaybackStream(ep);
+      });
+    } else {
+      showStatus("Buffering stream...");
+      video.src = ep.src;
+      startPlaybackStream(ep);
+    }
+  }
+
+  function startPlaybackStream(ep) {
     video.load();
-
-    // Preserve chosen playback rate across episode changes
     video.playbackRate = currentSpeed;
 
     const saved = getSeriesProgress(currentSeries.id);
@@ -210,7 +242,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  // Target 4: Playback Speed Toggle Control
+  // Playback Speed Toggle
   if (speedBtn) {
     speedBtn.onclick = (e) => {
       e.stopPropagation();
@@ -226,7 +258,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     };
   }
 
-  // Target 4: Automated Binge & Auto-Unlock Engine
+  // Automated Binge & Auto-Unlock Engine
   video.onended = () => {
     handleEpisodeEnded();
   };
@@ -234,14 +266,12 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   function handleEpisodeEnded() {
     const settings = getUserSettings();
 
-    // Check if autoplay next is disabled in settings
     if (settings.autoplayNext === false) {
       if (playIndicator) playIndicator.classList.add("active");
       showHUD();
       return;
     }
 
-    // Check if at the end of the series
     if (currentEpisodeIndex >= currentEpisodes.length - 1) {
       showAppToast("🎬 Series Completed! Great binge.");
       if (playIndicator) playIndicator.classList.add("active");
@@ -259,7 +289,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       return;
     }
 
-    // Next episode is locked - check automatic coin unlock setting
     const autoUnlockEnabled = settings.autoUnlockNext !== false;
     const userCoins = getUserCoins();
     const unlockCost = 30;
@@ -271,14 +300,13 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       setTimeout(() => loadEpisode(nextIndex), 750);
     } else if (autoUnlockEnabled && userCoins < unlockCost) {
       showAppToast(`Ep ${nextEp.id} locked! Need ${unlockCost} coins.`);
-      loadEpisode(nextIndex); // triggers lock modal
+      loadEpisode(nextIndex);
     } else {
-      // Auto unlock toggle is disabled
-      loadEpisode(nextIndex); // triggers lock modal
+      loadEpisode(nextIndex);
     }
   }
 
-  // Touch Swipe Engine
+  // Touch Gesture Listeners
   let touchStartY = 0;
   let touchStartX = 0;
   let touchStartTime = 0;
@@ -344,6 +372,51 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
         showHUD();
       }
     }
+  }
+
+  // Target 5: Download Action Handler in Episode Drawer
+  if (drawerGrid) {
+    drawerGrid.onclick = (e) => {
+      const dlBtn = e.target.closest(".drawer-dl-btn");
+      if (dlBtn) {
+        e.stopPropagation();
+        const epId = parseInt(dlBtn.getAttribute("data-dl-ep"), 10);
+        const ep = currentEpisodes.find((x) => x.id === epId);
+        if (!ep) return;
+
+        const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
+        if (!unlocked) {
+          showAppToast(`🔒 Unlock Ep ${ep.id} first to download`);
+          return;
+        }
+
+        if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
+          showAppToast(`✓ Episode ${ep.id} already downloaded`);
+          return;
+        }
+
+        dlBtn.textContent = "⏳";
+        showAppToast(`⬇ Downloading Ep ${ep.id} for offline...`);
+
+        downloadEpisode(currentSeries, ep).then((res) => {
+          if (res.success) {
+            dlBtn.textContent = "✓";
+            dlBtn.classList.add("downloaded");
+            showAppToast(`🎉 Ep ${ep.id} downloaded (${res.sizeStr})! Available offline.`);
+          } else {
+            dlBtn.textContent = "⬇";
+            showAppToast(`Download failed: ${res.error || "Network error"}`);
+          }
+        });
+        return;
+      }
+
+      const card = e.target.closest("[data-drawer-ep]");
+      if (card) {
+        const epNum = parseInt(card.getAttribute("data-drawer-ep"), 10);
+        loadEpisode(epNum - 1);
+      }
+    };
   }
 
   if (unlockCoinsBtn) {
@@ -520,16 +593,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   if (closeDrawerBtn) closeDrawerBtn.onclick = closeDrawer;
   if (drawerBackdrop) drawerBackdrop.onclick = (e) => { if (e.target === drawerBackdrop) closeDrawer(); };
   if (lockOpenDrawerBtn) lockOpenDrawerBtn.onclick = () => openDrawer();
-
-  if (drawerGrid) {
-    drawerGrid.onclick = (e) => {
-      const card = e.target.closest("[data-drawer-ep]");
-      if (card) {
-        const epNum = parseInt(card.getAttribute("data-drawer-ep"), 10);
-        loadEpisode(epNum - 1);
-      }
-    };
-  }
 
   const startIdx = Math.max(0, Math.min(initialEp - 1, currentEpisodes.length - 1));
   loadEpisode(startIdx);

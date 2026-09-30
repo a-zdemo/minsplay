@@ -2343,3 +2343,60 @@
   border-color: #ffc107;
   color: #ffc107;
 }
+
+/* ==========================================================================
+   Target 5: Offline Video Download & Cache API Styles
+   ========================================================================== */
+.drawer-ep-card-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.drawer-dl-btn {
+  all: unset;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 0;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.drawer-dl-btn:active { transform: scale(0.94); background: rgba(255, 255, 255, 0.18); }
+.drawer-dl-btn.downloaded {
+  background: rgba(39, 201, 63, 0.18);
+  border-color: #27c93f;
+  color: #27c93f;
+}
+.drawer-dl-btn.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.db-download-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.db-download-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+.db-dl-delete-btn {
+  all: unset;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.db-dl-delete-btn:active {
+  color: #ff2e63;
+}

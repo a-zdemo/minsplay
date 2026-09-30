@@ -3,28 +3,34 @@
     <header class="db-subpage-header">
       <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
       <h2 class="db-subpage-title">Download</h2>
-      <div class="db-header-spacer"></div>
+      <button class="db-header-action-icon" id="btn-download-clear-all" type="button" aria-label="Clear All Downloads" title="Clear all downloads">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+      </button>
     </header>
 
     <div class="db-download-body">
-      <span class="db-download-heading">Download completed</span>
-      <article class="db-download-card">
-        <div class="db-download-thumb art-gold">
-          <span class="db-download-ep-badge">5 Episodes</span>
-          <span class="art-symbol">👑</span>
-        </div>
-        <div class="db-download-meta">
-          <strong class="db-download-title">Definitely Not The Dragon God</strong>
-          <p class="db-download-desc">Aris has spent his life as an academy's lowest servant, cursed with blood that makes him a target...</p>
-          <span class="db-download-size">476.96MB</span>
-        </div>
-      </article>
+      <span class="db-download-heading" id="download-heading-count">Download completed</span>
+      <div class="db-download-feed" id="download-feed-container"></div>
+      
+      <!-- Empty state when no videos are downloaded -->
+      <div class="db-empty-desc" id="download-empty-state" style="display: none; text-align: center; padding: 60px 20px;">
+        <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">⬇️</span>
+        <strong style="color: #fff; font-size: 1rem; display: block; margin-bottom: 4px;">No Offline Downloads Yet</strong>
+        <p style="color: rgba(255,255,255,0.45); font-size: 0.78rem; margin: 0 0 16px;">Download drama episodes from the player drawer to watch anywhere with zero internet connection.</p>
+        <button class="btn-spotlight-play" type="button" data-route="/watch" data-series="the-beginning" data-episode="1">
+          ▶ Watch & Download Ep 1
+        </button>
+      </div>
     </div>
 
-    <footer class="db-storage-footer">
-      <span>476.96MB cached</span>
+    <!-- Live Storage Quota Indicator (Pic 8) -->
+    <footer class="db-storage-footer" id="download-storage-footer">
+      <span id="storage-cached-text">0.0MB cached</span>
       <span class="db-sub-divider">|</span>
-      <span>128.66GB available remaining</span>
+      <span id="storage-avail-text">128.6GB available remaining</span>
     </footer>
   </div>
 </section>

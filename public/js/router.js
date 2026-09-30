@@ -15,7 +15,7 @@ import historyHtml from "../pages/history.html?raw";
 import downloadHtml from "../pages/download.html?raw";
 import { initPlayer } from "./player.js";
 import { initForYouFeed, destroyForYouFeed } from "./foryou.js";
-import { renderHistoryFeed } from "./profile-subpages.js";
+import { renderHistoryFeed, renderDownloadPage } from "./profile-subpages.js";
 import {
   getAllProgress,
   clearAllProgress,

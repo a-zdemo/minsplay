@@ -820,3 +820,47 @@
   flex-shrink: 0;
 }
 .comments-send-btn:active { transform: scale(0.92); }
+
+/* ==========================================================================
+   Profile Header Layout Fix (Prevents Badge & Button Collision)
+   ========================================================================== */
+.profile-user-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.profile-user-meta {
+  flex: 1 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+.profile-username {
+  margin: 0 !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.profile-sub-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.profile-tier-badge {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.btn-edit-profile {
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}

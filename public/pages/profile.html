@@ -1,0 +1,146 @@
+<section class="profile-page" id="profile-page-root">
+  <div class="profile-scroll-body">
+    
+    <!-- User Avatar & Profile Card -->
+    <header class="profile-user-card">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar-inner" id="profile-avatar-badge">
+          <img src="/icons/icon-animated.svg" alt="Minsplay Ant Mascot" class="profile-avatar-img" />
+        </div>
+        <span class="profile-vip-crown" id="profile-vip-crown" style="display: none;">👑</span>
+      </div>
+
+      <div class="profile-user-meta">
+        <div class="profile-name-row">
+          <h2 class="profile-username">Minsplay Viewer</h2>
+          <span class="profile-tier-badge" id="profile-tier-badge">FREE MEMBER</span>
+        </div>
+        <p class="profile-id-text">User ID: <span id="profile-member-id">#84920</span></p>
+      </div>
+
+      <button class="btn-edit-profile" type="button" data-route="/member" aria-label="Upgrade VIP">
+        Upgrade 👑
+      </button>
+    </header>
+
+    <!-- Wallet & Check-in Summary Shelf -->
+    <section class="profile-wallet-card">
+      <div class="wallet-left">
+        <div class="wallet-coin-item">
+          <span class="wallet-label">Coin Balance</span>
+          <div class="wallet-val-row">
+            <span class="wallet-symbol">🪙</span>
+            <span class="wallet-amount" id="profile-coin-balance">50</span>
+          </div>
+        </div>
+        <div class="wallet-streak-item">
+          <span class="wallet-label">Daily Streak</span>
+          <div class="wallet-val-row">
+            <span class="wallet-streak-amount" id="profile-streak-count">Day 1</span>
+            <span class="streak-flame">🔥</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn-wallet-action" id="btn-profile-checkin" type="button">
+        Daily Gift 🎁
+      </button>
+    </section>
+
+    <!-- Quick Shortcuts Grid -->
+    <section class="profile-nav-grid">
+      <article class="profile-nav-card" data-route="/mylist">
+        <span class="pnav-icon">🕒</span>
+        <div class="pnav-meta">
+          <strong>Watch History</strong>
+          <span id="profile-history-count">0 Series In Progress</span>
+        </div>
+        <span class="pnav-arrow">›</span>
+      </article>
+
+      <article class="profile-nav-card" data-route="/member">
+        <span class="pnav-icon">👑</span>
+        <div class="pnav-meta">
+          <strong>VIP Pass & Perks</strong>
+          <span id="profile-vip-summary">Explore VIP benefits</span>
+        </div>
+        <span class="pnav-arrow">›</span>
+      </article>
+    </section>
+
+    <!-- Playback Preferences Section -->
+    <section class="profile-settings-group">
+      <h3 class="profile-group-title">Playback Preferences</h3>
+      <div class="settings-list">
+        
+        <div class="settings-item">
+          <div class="settings-item-meta">
+            <strong>Auto-Play Next Episode</strong>
+            <p>Automatically advance to next episode when current ends</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="setting-autoplay-next" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-item-meta">
+            <strong>Stream Quality</strong>
+            <p>Select playback resolution</p>
+          </div>
+          <select class="settings-select" id="setting-video-quality">
+            <option value="auto">Auto (Adaptive)</option>
+            <option value="1080p">1080p Full HD</option>
+            <option value="720p">720p HD</option>
+            <option value="saver">Data Saver</option>
+          </select>
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-item-meta">
+            <strong>Vertical Swipe Gestures</strong>
+            <p>Swipe up or down to jump between drama episodes</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="setting-swipe-gestures" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Data & Cache Management Section -->
+    <section class="profile-settings-group">
+      <h3 class="profile-group-title">Data & Storage Management</h3>
+      <div class="settings-list">
+        <div class="settings-item action-item" id="btn-clear-history">
+          <div class="settings-item-meta">
+            <strong style="color: #ff5252;">Clear Watch History</strong>
+            <p>Deletes your continue watching resume points</p>
+          </div>
+          <span class="settings-arrow">🗑️</span>
+        </div>
+
+        <div class="settings-item action-item" id="btn-reset-cache">
+          <div class="settings-item-meta">
+            <strong>Clear App Cache</strong>
+            <p>Purges cached video assets and Service Worker cache</p>
+          </div>
+          <span class="settings-arrow">↻</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- About & App Info Section -->
+    <section class="profile-app-info">
+      <div class="app-info-logo">
+        <img src="/icons/icon-animated.svg" alt="Minsplay Ant" style="width: 32px; height: 32px;" />
+        <span>Minsplay PWA</span>
+      </div>
+      <p class="app-version-pill">Version 2.4.0 Standalone • Build 2026</p>
+      <p class="app-copyright">© 2026 Minsplay Inc. High-octane vertical drama platform.</p>
+    </section>
+
+  </div>
+</section>

@@ -2,56 +2,25 @@ import homeHtml from "../pages/home.html?raw";
 import seriesHtml from "../pages/series.html?raw";
 import watchHtml from "../pages/watch.html?raw";
 import mylistHtml from "../pages/mylist.html?raw";
+import memberHtml from "../pages/member.html?raw";
+import profileHtml from "../pages/profile.html?raw";
 import { initPlayer } from "./player.js";
-import { getAllProgress, isEpisodeUnlocked, getUserCoins, getCheckinData, claimDailyReward } from "./storage.js";
+import {
+  getAllProgress,
+  clearAllProgress,
+  isEpisodeUnlocked,
+  getUserCoins,
+  spendCoins,
+  getCheckinData,
+  claimDailyReward,
+  getVipData,
+  activateVip,
+  getUserSettings,
+  saveUserSetting
+} from "./storage.js";
 import { DRAMA_CATALOG, getSeriesById } from "./series-data.js";
 
 const RECENT_SEARCHES_KEY = "minsplay_recent_searches";
-
-// Member & Profile VIP Screens
-const memberHtml = `
-  <section class="page-container" style="padding: 2.5rem 1.25rem 5rem; text-align: center;">
-    <div style="font-size: 3rem; margin-bottom: 0.5rem;">👑</div>
-    <h1 style="font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">VIP Membership</h1>
-    <p style="font-size: 0.88rem; color: rgba(255,255,255,0.65); line-height: 1.5; max-width: 300px; margin: 0 auto 1.5rem;">
-      Enjoy full access to all drama series, ad-free streaming, and instant 4K releases.
-    </p>
-    <div style="background: linear-gradient(145deg, #181824, #101016); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; max-width: 320px; margin: 0 auto 1.5rem; text-align: left;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <span style="font-weight: 700; color: #fff;">Annual Pass</span>
-        <span style="background: #ff2e63; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px;">BEST VALUE</span>
-      </div>
-      <p style="margin: 0; font-size: 0.8rem; color: rgba(255,255,255,0.5);">Instant unlock for 500+ short drama episodes</p>
-    </div>
-    <button class="btn btn-primary" type="button" data-route="/" style="max-width: 320px; width: 100%;">
-      Explore Popular Dramas
-    </button>
-  </section>
-`;
-
-const profileHtml = `
-  <section class="page-container" style="padding: 2.5rem 1.25rem 5rem;">
-    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 2rem;">
-      <div style="width: 60px; height: 60px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-        <img src="/icons/icon-animated.svg" alt="Minsplay Ant Mascot" style="width: 100%; height: 100%; object-fit: contain;" />
-      </div>
-      <div>
-        <h2 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0 0 4px;">Minsplay Viewer</h2>
-        <span style="background: rgba(255,46,99,0.2); color: #ff2e63; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(255,46,99,0.4);">Member ID #84920</span>
-      </div>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 10px;">
-      <div class="episode-card" data-route="/mylist" style="justify-content: space-between;">
-        <span style="font-weight: 600; color: #fff;">My Watch History</span>
-        <span style="color: rgba(255,255,255,0.4);">›</span>
-      </div>
-      <div class="episode-card" data-route="/" style="justify-content: space-between;">
-        <span style="font-weight: 600; color: #fff;">Account Preferences</span>
-        <span style="color: rgba(255,255,255,0.4);">›</span>
-      </div>
-    </div>
-  </section>
-`;
 
 const routes = {
   "/": homeHtml,
@@ -64,6 +33,21 @@ const routes = {
 
 let currentActiveSeriesId = "the-beginning";
 let pendingEpisode = 1;
+
+export function showAppToast(message) {
+  let toast = document.getElementById("app-floating-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "app-floating-toast";
+    toast.className = "app-toast-pill";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add("visible");
+  setTimeout(() => {
+    toast.classList.remove("visible");
+  }, 2400);
+}
 
 export async function navigateTo(path, { seriesId, episode = 1 } = {}) {
   if (seriesId) currentActiveSeriesId = seriesId;
@@ -78,9 +62,7 @@ export async function navigateTo(path, { seriesId, episode = 1 } = {}) {
     params.set("ep", episode);
   }
   const queryString = params.toString();
-  if (queryString) {
-    targetUrl += `?${queryString}`;
-  }
+  if (queryString) targetUrl += `?${queryString}`;
 
   if (window.location.pathname + window.location.search !== targetUrl) {
     window.history.pushState({ path, seriesId: currentActiveSeriesId, episode }, "", targetUrl);
@@ -152,9 +134,6 @@ function updateContinueWatching() {
     .join("");
 }
 
-/* ==========================================================================
-   Daily Gift 7-Day Streak & Coin System (Section 19)
-   ========================================================================== */
 function initDailyGiftSystem() {
   const giftBtn = document.getElementById("btn-gift-modal");
   const giftModal = document.getElementById("daily-gift-modal");
@@ -165,42 +144,26 @@ function initDailyGiftSystem() {
   const coinPill = document.getElementById("header-coin-pill");
   const coinCount = document.getElementById("header-coin-count");
 
-  // Sync header coin balance
   function syncCoinDisplay() {
-    if (coinCount) {
-      coinCount.textContent = getUserCoins().toString();
-    }
+    if (coinCount) coinCount.textContent = getUserCoins().toString();
     const checkin = getCheckinData();
-    if (notifDot) {
-      notifDot.style.display = checkin.claimedToday ? "none" : "block";
-    }
+    if (notifDot) notifDot.style.display = checkin.claimedToday ? "none" : "block";
   }
 
   syncCoinDisplay();
-
-  // Listen for global coin balance changes
   window.addEventListener("coinsUpdated", () => syncCoinDisplay());
 
   function renderStreakGrid() {
     if (!gridContainer) return;
     const { streak, claimedToday } = getCheckinData();
     const rewards = [20, 30, 40, 50, 60, 80, 100];
-    const activeIndex = claimedToday ? -1 : streak % 7;
 
     let html = "";
-    // Days 1 through 6
     for (let day = 1; day <= 6; day++) {
-      const isClaimed = day <= (claimedToday ? streak : streak);
+      const isClaimed = day <= streak;
       const isToday = !claimedToday && day === streak + 1;
-      let stateClass = "";
-      let checkIcon = "🪙";
-
-      if (isClaimed) {
-        stateClass = "claimed";
-        checkIcon = "✓";
-      } else if (isToday) {
-        stateClass = "active-today";
-      }
+      let stateClass = isClaimed ? "claimed" : (isToday ? "active-today" : "");
+      let checkIcon = isClaimed ? "✓" : "🪙";
 
       html += `
         <div class="streak-card ${stateClass}">
@@ -211,7 +174,6 @@ function initDailyGiftSystem() {
       `;
     }
 
-    // Day 7 Super Bonus
     const isDay7Claimed = streak >= 7;
     const isDay7Today = !claimedToday && streak === 6;
     html += `
@@ -228,38 +190,19 @@ function initDailyGiftSystem() {
     `;
 
     gridContainer.innerHTML = html;
-
     if (claimBtn) {
-      if (claimedToday) {
-        claimBtn.disabled = true;
-        claimBtn.textContent = "Claimed Today ✓";
-      } else {
-        claimBtn.disabled = false;
-        claimBtn.textContent = "Claim Today's Reward 🎁";
-      }
+      claimBtn.disabled = claimedToday;
+      claimBtn.textContent = claimedToday ? "Claimed Today ✓" : "Claim Today's Reward 🎁";
     }
   }
 
-  function openGiftModal() {
-    if (!giftModal) return;
-    renderStreakGrid();
-    giftModal.style.display = "flex";
-  }
-
-  function closeGiftModal() {
-    if (!giftModal) return;
-    giftModal.style.display = "none";
-  }
+  function openGiftModal() { if (giftModal) { renderStreakGrid(); giftModal.style.display = "flex"; } }
+  function closeGiftModal() { if (giftModal) giftModal.style.display = "none"; }
 
   if (giftBtn) giftBtn.onclick = openGiftModal;
   if (coinPill) coinPill.onclick = openGiftModal;
   if (closeBtn) closeBtn.onclick = closeGiftModal;
-
-  if (giftModal) {
-    giftModal.onclick = (e) => {
-      if (e.target === giftModal) closeGiftModal();
-    };
-  }
+  if (giftModal) giftModal.onclick = (e) => { if (e.target === giftModal) closeGiftModal(); };
 
   if (claimBtn) {
     claimBtn.onclick = () => {
@@ -267,14 +210,12 @@ function initDailyGiftSystem() {
       if (res.success) {
         syncCoinDisplay();
         renderStreakGrid();
+        showAppToast(`🎁 Claimed +${res.reward} Coins! Streak: Day ${res.streak}`);
       }
     };
   }
 }
 
-/**
- * Filter & Tab Logic for Home Screen (Section 15)
- */
 function initHomeFilterSystem() {
   const subNav = document.getElementById("home-sub-nav");
   const chipsBar = document.getElementById("category-chips-bar");
@@ -301,31 +242,22 @@ function initHomeFilterSystem() {
     tabBtn.classList.add("active");
 
     const tab = tabBtn.getAttribute("data-tab");
-
     if (chipsBar) {
       const isCategories = tab === "categories";
       chipsBar.style.display = isCategories ? "flex" : "none";
-      if (homeScrollBody) {
-        homeScrollBody.classList.toggle("with-chips", isCategories);
-      }
+      if (homeScrollBody) homeScrollBody.classList.toggle("with-chips", isCategories);
     }
-
-    if (spotlightCard) {
-      spotlightCard.style.display = tab === "popular" ? "block" : "none";
-    }
+    if (spotlightCard) spotlightCard.style.display = tab === "popular" ? "block" : "none";
 
     switch (tab) {
       case "popular":
         if (heading) heading.textContent = "Popular Series";
         renderGrid(DRAMA_CATALOG);
         break;
-
       case "new":
         if (heading) heading.textContent = "New Releases";
-        const newDramas = DRAMA_CATALOG.filter((d) => d.badge === "New" || d.id === "bastard-hit-daughter" || d.id === "fake-husband");
-        renderGrid(newDramas);
+        renderGrid(DRAMA_CATALOG.filter((d) => d.badge === "New" || d.id === "bastard-hit-daughter" || d.id === "fake-husband"));
         break;
-
       case "rankings":
         if (heading) heading.textContent = "Top Rankings";
         const ranked = [...DRAMA_CATALOG].sort((a, b) => {
@@ -335,32 +267,22 @@ function initHomeFilterSystem() {
         });
         renderGrid(ranked, true);
         break;
-
       case "categories":
         if (heading) heading.textContent = "Category Catalog";
         renderGrid(DRAMA_CATALOG);
         break;
-
       case "anime":
         if (heading) heading.textContent = "Action & Fantasy Dramas";
-        const animeDramas = DRAMA_CATALOG.filter(
-          (d) => d.genre.includes("Revenge") || d.genre.includes("Identity") || d.tags.includes("Martial") || d.id.includes("dragon")
-        );
-        renderGrid(animeDramas);
+        renderGrid(DRAMA_CATALOG.filter((d) => d.genre.includes("Revenge") || d.genre.includes("Identity") || d.tags.includes("Martial") || d.id.includes("dragon")));
         break;
-
       case "vip":
         if (heading) heading.textContent = "VIP Exclusives";
-        const vipDramas = DRAMA_CATALOG.filter((d) => d.badge === "Hot" || d.plays.includes("M"));
-        renderGrid(vipDramas);
+        renderGrid(DRAMA_CATALOG.filter((d) => d.badge === "Hot" || d.plays.includes("M")));
         break;
-
       case "original":
         if (heading) heading.textContent = "Original+ Series";
-        const originals = DRAMA_CATALOG.filter((d) => d.artCode === "ORIGINAL" || d.badge === "Following");
-        renderGrid(originals);
+        renderGrid(DRAMA_CATALOG.filter((d) => d.artCode === "ORIGINAL" || d.badge === "Following"));
         break;
-
       default:
         renderGrid(DRAMA_CATALOG);
     }
@@ -370,26 +292,20 @@ function initHomeFilterSystem() {
     chipsBar.addEventListener("click", (e) => {
       const chip = e.target.closest(".chip-item");
       if (!chip) return;
-
       chipsBar.querySelectorAll(".chip-item").forEach((c) => c.classList.remove("active"));
       chip.classList.add("active");
-
       const genre = chip.getAttribute("data-genre");
       if (genre === "all") {
         if (heading) heading.textContent = "All Categories";
         renderGrid(DRAMA_CATALOG);
       } else {
         if (heading) heading.textContent = `${genre} Dramas`;
-        const filtered = DRAMA_CATALOG.filter((d) => d.genre.toLowerCase().includes(genre.toLowerCase()) || d.tags.toLowerCase().includes(genre.toLowerCase()));
-        renderGrid(filtered);
+        renderGrid(DRAMA_CATALOG.filter((d) => d.genre.toLowerCase().includes(genre.toLowerCase()) || d.tags.toLowerCase().includes(genre.toLowerCase())));
       }
     });
   }
 }
 
-/**
- * Instant Fuzzy Search Overlay Controller (Section 15)
- */
 function initSearchOverlayEngine() {
   const searchPill = document.getElementById("home-search-pill");
   const overlay = document.getElementById("search-overlay");
@@ -409,11 +325,7 @@ function initSearchOverlayEngine() {
   if (!searchPill || !overlay || !input) return;
 
   function getRecentSearches() {
-    try {
-      return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
-    } catch {
-      return [];
-    }
+    try { return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || "[]"); } catch { return []; }
   }
 
   function saveRecentSearch(term) {
@@ -429,28 +341,22 @@ function initSearchOverlayEngine() {
   function renderRecentSearches() {
     const recents = getRecentSearches();
     if (!recentShelf || !recentTagsList) return;
-
     if (recents.length === 0) {
       recentShelf.style.display = "none";
       return;
     }
-
     recentShelf.style.display = "flex";
     recentTagsList.innerHTML = recents
-      .map(
-        (term) => `
+      .map((term) => `
         <button class="search-tag-chip recent-chip" type="button" data-search-term="${term}">
           <span>${term}</span>
           <span class="recent-chip-remove" data-remove-term="${term}">✕</span>
         </button>
-      `
-      )
-      .join("");
+      `).join("");
   }
 
   function executeSearch(query) {
     const q = query.trim().toLowerCase();
-
     if (!q) {
       if (clearBtn) clearBtn.style.display = "none";
       if (resultsBlock) resultsBlock.style.display = "none";
@@ -478,9 +384,7 @@ function initSearchOverlayEngine() {
       if (emptyState) emptyState.style.display = "none";
       if (resultsBlock) resultsBlock.style.display = "flex";
       if (resultsTitle) resultsTitle.textContent = `Found ${matched.length} Drama${matched.length > 1 ? "s" : ""}`;
-      if (resultsGrid) {
-        resultsGrid.innerHTML = matched.map((d) => createDramaCardMarkup(d)).join("");
-      }
+      if (resultsGrid) resultsGrid.innerHTML = matched.map((d) => createDramaCardMarkup(d)).join("");
     } else {
       if (resultsBlock) resultsBlock.style.display = "none";
       if (emptyState) {
@@ -504,7 +408,6 @@ function initSearchOverlayEngine() {
 
   searchPill.onclick = openSearchOverlay;
   if (cancelBtn) cancelBtn.onclick = closeSearchOverlay;
-
   if (clearBtn) {
     clearBtn.onclick = () => {
       input.value = "";
@@ -513,10 +416,7 @@ function initSearchOverlayEngine() {
     };
   }
 
-  input.addEventListener("input", (e) => {
-    executeSearch(e.target.value);
-  });
-
+  input.addEventListener("input", (e) => executeSearch(e.target.value));
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -549,7 +449,6 @@ function initSearchOverlayEngine() {
         renderRecentSearches();
         return;
       }
-
       const chip = e.target.closest("[data-search-term]");
       if (chip) {
         const term = chip.getAttribute("data-search-term");
@@ -563,6 +462,195 @@ function initSearchOverlayEngine() {
     clearRecentBtn.onclick = () => {
       localStorage.removeItem(RECENT_SEARCHES_KEY);
       renderRecentSearches();
+    };
+  }
+}
+
+/* ==========================================================================
+   VIP Member Screen Controller (Section 16 - In-App Toast)
+   ========================================================================== */
+function initMemberScreen() {
+  const plansContainer = document.getElementById("vip-plans-container");
+  const coinBtn = document.getElementById("btn-activate-vip-coins");
+  const cardBtn = document.getElementById("btn-activate-mock-pay");
+  const statusIndicator = document.getElementById("vip-active-indicator");
+  const expiryText = document.getElementById("vip-expiry-text");
+  const balanceHint = document.getElementById("vip-wallet-balance-hint");
+
+  let selectedPlan = "monthly";
+  let selectedDays = 30;
+  let selectedCoins = 600;
+  let selectedPrice = "$8.99";
+
+  function syncVipUI() {
+    const vip = getVipData();
+    const coins = getUserCoins();
+
+    if (balanceHint) balanceHint.textContent = `🪙 ${coins} Coins Available`;
+    if (statusIndicator) {
+      if (vip.isVip) {
+        statusIndicator.textContent = "VIP ACTIVE 👑";
+        statusIndicator.classList.add("active");
+      } else {
+        statusIndicator.textContent = "FREE EXPLORER";
+        statusIndicator.classList.remove("active");
+      }
+    }
+
+    if (expiryText) {
+      if (vip.isVip) {
+        expiryText.style.display = "block";
+        expiryText.textContent = `✓ Active Plan: ${vip.plan.toUpperCase()} • ${vip.daysLeft} days remaining`;
+      } else {
+        expiryText.style.display = "none";
+      }
+    }
+
+    if (coinBtn) coinBtn.textContent = `🪙 Activate with ${selectedCoins} Coins`;
+    if (cardBtn) cardBtn.textContent = `💳 Subscribe with Card (${selectedPrice})`;
+  }
+
+  syncVipUI();
+
+  if (plansContainer) {
+    plansContainer.addEventListener("click", (e) => {
+      const card = e.target.closest(".vip-plan-card");
+      if (!card) return;
+
+      plansContainer.querySelectorAll(".vip-plan-card").forEach((c) => c.classList.remove("selected"));
+      card.classList.add("selected");
+
+      selectedPlan = card.getAttribute("data-plan");
+      selectedDays = parseInt(card.getAttribute("data-days"), 10);
+      selectedCoins = parseInt(card.getAttribute("data-coins"), 10);
+      selectedPrice = card.getAttribute("data-price");
+
+      syncVipUI();
+    });
+  }
+
+  if (coinBtn) {
+    coinBtn.onclick = () => {
+      const currentCoins = getUserCoins();
+      if (currentCoins >= selectedCoins) {
+        spendCoins(selectedCoins);
+        activateVip(selectedPlan, selectedDays);
+        showAppToast(`👑 VIP Pass Activated! (${selectedPlan.toUpperCase()} - ${selectedDays}d)`);
+        syncVipUI();
+      } else {
+        showAppToast(`Need ${selectedCoins} 🪙! Current balance: ${currentCoins} 🪙`);
+      }
+    };
+  }
+
+  if (cardBtn) {
+    cardBtn.onclick = () => {
+      activateVip(selectedPlan, selectedDays);
+      showAppToast(`💳 ${selectedPlan.toUpperCase()} Pass Subscribed (${selectedPrice})!`);
+      syncVipUI();
+    };
+  }
+}
+
+/* ==========================================================================
+   User Profile & Settings Controller (Section 17 - In-App Toast)
+   ========================================================================== */
+function initProfileScreen() {
+  const coinBal = document.getElementById("profile-coin-balance");
+  const streakCount = document.getElementById("profile-streak-count");
+  const tierBadge = document.getElementById("profile-tier-badge");
+  const crownBadge = document.getElementById("profile-vip-crown");
+  const avatarFrame = document.getElementById("profile-avatar-badge");
+  const historyCount = document.getElementById("profile-history-count");
+  const vipSummary = document.getElementById("profile-vip-summary");
+  const checkinBtn = document.getElementById("btn-profile-checkin");
+
+  const autoplayToggle = document.getElementById("setting-autoplay-next");
+  const qualitySelect = document.getElementById("setting-video-quality");
+  const swipeToggle = document.getElementById("setting-swipe-gestures");
+  const clearHistoryBtn = document.getElementById("btn-clear-history");
+  const resetCacheBtn = document.getElementById("btn-reset-cache");
+
+  function syncProfile() {
+    const coins = getUserCoins();
+    const checkin = getCheckinData();
+    const vip = getVipData();
+    const progressList = getAllProgress();
+    const settings = getUserSettings();
+
+    if (coinBal) coinBal.textContent = coins.toString();
+    if (streakCount) streakCount.textContent = `Day ${checkin.streak || 1}`;
+
+    if (tierBadge) {
+      if (vip.isVip) {
+        tierBadge.textContent = "VIP MEMBER 👑";
+        tierBadge.classList.add("vip");
+      } else {
+        tierBadge.textContent = "FREE MEMBER";
+        tierBadge.classList.remove("vip");
+      }
+    }
+
+    if (crownBadge) crownBadge.style.display = vip.isVip ? "block" : "none";
+    if (avatarFrame) avatarFrame.classList.toggle("vip-frame", vip.isVip);
+
+    if (historyCount) historyCount.textContent = `${progressList.length} Series In Progress`;
+    if (vipSummary) vipSummary.textContent = vip.isVip ? `${vip.daysLeft} days remaining` : "Explore VIP benefits";
+
+    if (autoplayToggle) autoplayToggle.checked = settings.autoplayNext;
+    if (qualitySelect) qualitySelect.value = settings.videoQuality;
+    if (swipeToggle) swipeToggle.checked = settings.swipeGestures;
+  }
+
+  syncProfile();
+
+  if (checkinBtn) {
+    checkinBtn.onclick = () => {
+      const res = claimDailyReward();
+      if (res.success) {
+        showAppToast(`🎁 Claimed +${res.reward} Coins! Streak: Day ${res.streak}`);
+        syncProfile();
+      } else {
+        showAppToast("Already claimed today's gift! Return tomorrow.");
+      }
+    };
+  }
+
+  if (autoplayToggle) {
+    autoplayToggle.onchange = () => {
+      saveUserSetting("autoplayNext", autoplayToggle.checked);
+      showAppToast(`Auto-Play: ${autoplayToggle.checked ? "Enabled" : "Disabled"}`);
+    };
+  }
+  if (qualitySelect) {
+    qualitySelect.onchange = () => {
+      saveUserSetting("videoQuality", qualitySelect.value);
+      showAppToast(`Quality: ${qualitySelect.value.toUpperCase()}`);
+    };
+  }
+  if (swipeToggle) {
+    swipeToggle.onchange = () => {
+      saveUserSetting("swipeGestures", swipeToggle.checked);
+      showAppToast(`Swipe Gestures: ${swipeToggle.checked ? "Enabled" : "Disabled"}`);
+    };
+  }
+
+  if (clearHistoryBtn) {
+    clearHistoryBtn.onclick = () => {
+      clearAllProgress();
+      showAppToast("🗑️ Watch history cleared successfully");
+      syncProfile();
+    };
+  }
+
+  if (resetCacheBtn) {
+    resetCacheBtn.onclick = () => {
+      if ("caches" in window) {
+        caches.keys().then((names) => {
+          names.forEach((name) => caches.delete(name));
+        });
+      }
+      showAppToast("↻ App cache purged successfully");
     };
   }
 }
@@ -607,9 +695,7 @@ function renderSeriesDetail(seriesId) {
     startBtn.setAttribute("data-episode", "1");
   }
 
-  if (epCountEl) {
-    epCountEl.textContent = `${drama.episodes.length} Total`;
-  }
+  if (epCountEl) epCountEl.textContent = `${drama.episodes.length} Total`;
 
   if (epListEl) {
     epListEl.innerHTML = drama.episodes
@@ -731,7 +817,6 @@ async function renderRoute(path) {
 
   mainContent.innerHTML = html;
   window.scrollTo(0, 0);
-
   updateBottomNavActive(path);
 
   if (path === "/watch") {
@@ -745,6 +830,10 @@ async function renderRoute(path) {
     initDailyGiftSystem();
   } else if (path === "/mylist") {
     initMyListScreen();
+  } else if (path === "/member") {
+    initMemberScreen();
+  } else if (path === "/profile") {
+    initProfileScreen();
   }
 }
 

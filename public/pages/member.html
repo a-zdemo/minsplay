@@ -1,0 +1,135 @@
+<section class="member-page" id="member-page-root">
+  <div class="member-scroll-body">
+    
+    <!-- Top VIP Status Card -->
+    <header class="vip-status-banner" id="vip-status-banner">
+      <div class="vip-status-badge-row">
+        <span class="vip-crown-badge">👑 VIP PRIVILEGE</span>
+        <span class="vip-active-indicator" id="vip-active-indicator">FREE EXPLORER</span>
+      </div>
+      <h1 class="vip-banner-title" id="vip-banner-title">Unlock Unlimited Drama</h1>
+      <p class="vip-banner-desc" id="vip-banner-desc">
+        Enjoy 100% ad-free streaming, all locked episodes open, and instant 4K premieres.
+      </p>
+      <div class="vip-expiry-text" id="vip-expiry-text" style="display: none;"></div>
+    </header>
+
+    <!-- VIP Perks 4-Column Grid -->
+    <section class="vip-perks-section">
+      <h3 class="vip-section-heading">Member Exclusive Privileges</h3>
+      <div class="vip-perks-grid">
+        <div class="perk-card">
+          <div class="perk-icon-wrap">🚫</div>
+          <h4 class="perk-title">Zero Ads</h4>
+          <p class="perk-desc">No video or reward ads ever</p>
+        </div>
+        <div class="perk-card">
+          <div class="perk-icon-wrap">🔓</div>
+          <h4 class="perk-title">All Unlocked</h4>
+          <p class="perk-desc">All episodes open across all series</p>
+        </div>
+        <div class="perk-card">
+          <div class="perk-icon-wrap">⚡</div>
+          <h4 class="perk-title">4K Ultra HD</h4>
+          <p class="perk-desc">Highest bitrate streaming</p>
+        </div>
+        <div class="perk-card">
+          <div class="perk-icon-wrap">💎</div>
+          <h4 class="perk-title">VIP Premieres</h4>
+          <p class="perk-desc">First access to fresh releases</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tiered Subscription Plans Selector -->
+    <section class="vip-plans-section">
+      <div class="vip-plans-header">
+        <h3 class="vip-section-heading">Choose Your Membership Pass</h3>
+        <span class="vip-wallet-hint" id="vip-wallet-balance-hint">🪙 50 Coins Available</span>
+      </div>
+
+      <div class="vip-plans-grid" id="vip-plans-container">
+        <!-- Plan 1: Weekly -->
+        <article class="vip-plan-card" data-plan="weekly" data-days="7" data-coins="200" data-price="$2.99">
+          <div class="plan-header">
+            <span class="plan-name">Weekly Pass</span>
+            <span class="plan-tag">Trial</span>
+          </div>
+          <div class="plan-price">
+            <span class="plan-currency">$</span>
+            <span class="plan-amount">2.99</span>
+            <span class="plan-period">/ 7 days</span>
+          </div>
+          <p class="plan-coins-alt">Or activate with <strong>200 🪙</strong></p>
+          <ul class="plan-features">
+            <li>✓ Full access to all 9 drama series</li>
+            <li>✓ Ad-free uninterrupted watching</li>
+          </ul>
+        </article>
+
+        <!-- Plan 2: Monthly (Popular) -->
+        <article class="vip-plan-card popular selected" data-plan="monthly" data-days="30" data-coins="600" data-price="$8.99">
+          <div class="plan-popular-pill">★ MOST POPULAR</div>
+          <div class="plan-header">
+            <span class="plan-name">Monthly VIP</span>
+            <span class="plan-tag save-tag">Save 30%</span>
+          </div>
+          <div class="plan-price">
+            <span class="plan-currency">$</span>
+            <span class="plan-amount">8.99</span>
+            <span class="plan-period">/ 30 days</span>
+          </div>
+          <p class="plan-coins-alt">Or activate with <strong>600 🪙</strong></p>
+          <ul class="plan-features">
+            <li>✓ Everything in Weekly Pass</li>
+            <li>✓ VIP badge in player and profile</li>
+            <li>✓ 4K Ultra HD video unlocks</li>
+          </ul>
+        </article>
+
+        <!-- Plan 3: Annual (Best Value) -->
+        <article class="vip-plan-card best-value" data-plan="annual" data-days="365" data-coins="1800" data-price="$49.99">
+          <div class="plan-popular-pill gold">👑 BEST VALUE</div>
+          <div class="plan-header">
+            <span class="plan-name">Annual Pass</span>
+            <span class="plan-tag save-tag">Save 60%</span>
+          </div>
+          <div class="plan-price">
+            <span class="plan-currency">$</span>
+            <span class="plan-amount">49.99</span>
+            <span class="plan-period">/ year</span>
+          </div>
+          <p class="plan-coins-alt">Or activate with <strong>1,800 🪙</strong></p>
+          <ul class="plan-features">
+            <li>✓ 365 Days of unlimited streaming</li>
+            <li>✓ Permanent VIP ant avatar frame</li>
+            <li>✓ Priority customer support</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- Activation Action Bar -->
+    <div class="vip-action-bar">
+      <button class="btn-activate-vip" id="btn-activate-vip-coins" type="button">
+        🪙 Activate with 600 Coins
+      </button>
+      <button class="btn-activate-mock-pay" id="btn-activate-mock-pay" type="button">
+        💳 Subscribe with Card ($8.99)
+      </button>
+      <p class="vip-disclaimer-text">
+        🔒 Cancel anytime. Coins earned via Daily Gift streak can be used directly for VIP passes.
+      </p>
+    </div>
+
+    <!-- VIP Guarantee Box -->
+    <section class="vip-guarantee-card">
+      <div class="guarantee-icon">🛡</div>
+      <div class="guarantee-text">
+        <strong>Minsplay 100% Satisfaction Guarantee</strong>
+        <p>Instant unlock on all series across mobile, tablet, and standalone PWA.</p>
+      </div>
+    </section>
+
+  </div>
+</section>

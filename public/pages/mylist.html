@@ -1,10 +1,133 @@
-<section class="mylist-page" id="mylist-page-root"> <!-- Sticky Top Header with Sub-Tabs (Following / History / Reminder Set) --> <header class="mylist-header"> <div class="mylist-tabs" id="mylist-tab-bar"> <button class="mylist-tab active" type="button" data-subtab="following">Following</button> <button class="mylist-tab" type="button" data-subtab="history">History</button> <button class="mylist-tab" type="button" data-subtab="reminder">Reminder Set</button> </div> <button class="mylist-manage-btn" type="button" aria-label="Manage List"> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"> <line x1="8" y1="6" x2="21" y2="6"></line> <line x1="8" y1="12" x2="21" y2="12"></line> <line x1="8" y1="18" x2="21" y2="18"></line> <line x1="3" y1="6" x2="3.01" y2="6"></line> <line x1="3" y1="12" x2="3.01" y2="12"></line> <line x1="3" y1="18" x2="3.01" y2="18"></line> </svg> </button> </header>
-<div class="mylist-body"> <!-- Tab 1: Following (Collected Series) --> <div class="mylist-tab-pane active" id="pane-following"> <div class="mylist-drama-list" id="following-drama-list"> <!-- Item 1 --> <article class="mylist-card" data-route="/watch" data-episode="1"> <div class="mylist-poster-wrap"> <div class="poster-gradient-art art-gold"> <span class="art-symbol">👑</span> </div> <span class="poster-badge badge-hot">Hot</span> <div class="mylist-card-progress-bar"> <div class="mylist-card-progress-fill" style="width: 25%;"></div> </div> </div> <div class="mylist-meta"> <h3 class="mylist-title">Definitely Not The Dragon God</h3> <p class="mylist-genre">Hidden Identity, Underdog Story</p> <p class="mylist-ep-info">EP.1 / EP.5</p> </div> </article>
-<!-- Item 2 --> <article class="mylist-card" data-route="/watch" data-episode="1"> <div class="mylist-poster-wrap"> <div class="poster-gradient-art art-blue"> <span class="art-symbol">⚔️</span> </div> <div class="mylist-card-progress-bar"> <div class="mylist-card-progress-fill" style="width: 60%;"></div> </div> </div> <div class="mylist-meta"> <h3 class="mylist-title">The Beginning: An Outsider's Ascent</h3> <p class="mylist-genre">Urban Suspense, Revenge</p> <p class="mylist-ep-info">EP.1 / EP.5</p> </div> </article>
-<!-- Item 3 --> <article class="mylist-card" data-route="/series"> <div class="mylist-poster-wrap"> <div class="poster-gradient-art art-purple"> <span class="art-symbol">🛡️</span> </div> <span class="poster-badge badge-new">New</span> <div class="mylist-card-progress-bar"> <div class="mylist-card-progress-fill" style="width: 10%;"></div> </div> </div> <div class="mylist-meta"> <h3 class="mylist-title">Kneel! That's the Dragon Rider</h3> <p class="mylist-genre">Revenge, Action</p> <p class="mylist-ep-info">EP.1 / EP.10</p> </div> </article> </div> </div>
-<!-- Tab 2: History (Dynamic Sync from localStorage via storage.js) --> <div class="mylist-tab-pane" id="pane-history"> <div class="mylist-drama-list" id="history-drama-list"> <!-- Injected dynamically by router.js --> </div> </div>
-<!-- Tab 3: Reminder Set --> <div class="mylist-tab-pane" id="pane-reminder"> <div class="mylist-empty-state"> <span class="empty-icon">🔔</span> <p class="empty-text">No drama release reminders set yet.</p> <button class="btn-spotlight-play" type="button" data-route="/">Browse Trending</button> </div> </div>
-<!-- Most Trending Horizontal Shelf (DramaBox Pattern) --> <section class="trending-shelf-section"> <h2 class="trending-heading">Most Trending</h2> <div class="trending-horizontal-scroll"> <article class="trending-card" data-route="/series"> <div class="trending-poster-wrap"> <div class="poster-gradient-art art-dark"> <span class="art-symbol">🥊</span> </div> <span class="trending-rank rank-1">1</span> </div> <h4 class="trending-title">What If I'm One Hell of a Fighter</h4> </article>
-<article class="trending-card" data-route="/series"> <div class="trending-poster-wrap"> <div class="poster-gradient-art art-emerald"> <span class="art-symbol">🐺</span> </div> <span class="trending-rank rank-2">2</span> </div> <h4 class="trending-title">The Betrayed Wolfless</h4> </article>
-<article class="trending-card" data-route="/series"> <div class="trending-poster-wrap"> <div class="poster-gradient-art art-crimson"> <span class="art-symbol">🥀</span> </div> <span class="trending-rank rank-3">3</span> </div> <h4 class="trending-title">Poisoned by His Love</h4> </article>
-<article class="trending-card" data-route="/series"> <div class="trending-poster-wrap"> <div class="poster-gradient-art art-violet"> <span class="art-symbol">⚡</span> </div> <span class="trending-rank rank-other">4</span> </div> <h4 class="trending-title">Forbidden Fling</h4> </article> </div> </section> </div> </section>
+<section class="mylist-page" id="mylist-page-root">
+<!-- Sticky Top Header with Sub-Tabs (Following / History / Reminder Set) -->
+<header class="mylist-header">
+<div class="mylist-tabs" id="mylist-tab-bar">
+<button class="mylist-tab active" type="button" data-subtab="following">Following</button>
+<button class="mylist-tab" type="button" data-subtab="history">History</button>
+<button class="mylist-tab" type="button" data-subtab="reminder">Reminder Set</button>
+</div>
+<button class="mylist-manage-btn" type="button" aria-label="Manage List">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<line x1="8" y1="6" x2="21" y2="6"></line>
+<line x1="8" y1="12" x2="21" y2="12"></line>
+<line x1="8" y1="18" x2="21" y2="18"></line>
+<line x1="3" y1="6" x2="3.01" y2="6"></line>
+<line x1="3" y1="12" x2="3.01" y2="12"></line>
+<line x1="3" y1="18" x2="3.01" y2="18"></line>
+</svg>
+</button>
+</header>
+<div class="mylist-body">
+<!-- Tab 1: Following (Collected Series) -->
+<div class="mylist-tab-pane active" id="pane-following">
+<div class="mylist-drama-list" id="following-drama-list">
+<!-- Item 1 -->
+<article class="mylist-card" data-route="/watch" data-series="dragon-god" data-episode="1">
+<div class="mylist-poster-wrap">
+<div class="poster-gradient-art art-gold">
+<span class="art-symbol">👑</span>
+</div>
+<span class="poster-badge badge-hot">Hot</span>
+<div class="mylist-card-progress-bar">
+<div class="mylist-card-progress-fill" style="width: 25%;"></div>
+</div>
+</div>
+<div class="mylist-meta">
+<h3 class="mylist-title">Definitely Not The Dragon God</h3>
+<p class="mylist-genre">Hidden Identity, Underdog Story</p>
+<p class="mylist-ep-info">EP.1 / EP.5</p>
+</div>
+</article>
+<!-- Item 2 -->
+<article class="mylist-card" data-route="/watch" data-series="the-beginning" data-episode="1">
+<div class="mylist-poster-wrap">
+<div class="poster-gradient-art art-blue">
+<span class="art-symbol">⚔️</span>
+</div>
+<div class="mylist-card-progress-bar">
+<div class="mylist-card-progress-fill" style="width: 60%;"></div>
+</div>
+</div>
+<div class="mylist-meta">
+<h3 class="mylist-title">The Beginning: An Outsider's Ascent</h3>
+<p class="mylist-genre">Urban Suspense, Revenge</p>
+<p class="mylist-ep-info">EP.1 / EP.5</p>
+</div>
+</article>
+<!-- Item 3 -->
+<article class="mylist-card" data-route="/series" data-series="dragon-rider">
+<div class="mylist-poster-wrap">
+<div class="poster-gradient-art art-purple">
+<span class="art-symbol">🛡️</span>
+</div>
+<span class="poster-badge badge-new">New</span>
+<div class="mylist-card-progress-bar">
+<div class="mylist-card-progress-fill" style="width: 10%;"></div>
+</div>
+</div>
+<div class="mylist-meta">
+<h3 class="mylist-title">Kneel! That's the Dragon Rider</h3>
+<p class="mylist-genre">Revenge, Action</p>
+<p class="mylist-ep-info">EP.1 / EP.5</p>
+</div>
+</article>
+</div>
+</div>
+<!-- Tab 2: History (Dynamic Sync from localStorage via storage.js) -->
+<div class="mylist-tab-pane" id="pane-history">
+<div class="mylist-drama-list" id="history-drama-list">
+<!-- Injected dynamically by router.js -->
+</div>
+</div>
+<!-- Tab 3: Reminder Set -->
+<div class="mylist-tab-pane" id="pane-reminder">
+<div class="mylist-empty-state">
+<span class="empty-icon">🔔</span>
+<p class="empty-text">No drama release reminders set yet.</p>
+<button class="btn-spotlight-play" type="button" data-route="/">Browse Trending</button>
+</div>
+</div>
+<!-- Most Trending Horizontal Shelf (DramaBox Pattern) -->
+<section class="trending-shelf-section">
+<h2 class="trending-heading">Most Trending</h2>
+<div class="trending-horizontal-scroll">
+<article class="trending-card" data-route="/series" data-series="hell-fighter">
+<div class="trending-poster-wrap">
+<div class="poster-gradient-art art-dark">
+<span class="art-symbol">🥊</span>
+</div>
+<span class="trending-rank rank-1">1</span>
+</div>
+<h4 class="trending-title">What If I'm One Hell of a Fighter</h4>
+</article>
+<article class="trending-card" data-route="/series" data-series="master-of-dragons">
+<div class="trending-poster-wrap">
+<div class="poster-gradient-art art-red">
+<span class="art-symbol">🐉</span>
+</div>
+<span class="trending-rank rank-2">2</span>
+</div>
+<h4 class="trending-title">Master of Dragons</h4>
+</article>
+<article class="trending-card" data-route="/series" data-series="poisoned-by-love">
+<div class="trending-poster-wrap">
+<div class="poster-gradient-art art-crimson">
+<span class="art-symbol">🥀</span>
+</div>
+<span class="trending-rank rank-3">3</span>
+</div>
+<h4 class="trending-title">Poisoned by His Love</h4>
+</article>
+<article class="trending-card" data-route="/series" data-series="forbidden-fling">
+<div class="trending-poster-wrap">
+<div class="poster-gradient-art art-violet">
+<span class="art-symbol">⚡</span>
+</div>
+<span class="trending-rank rank-other">4</span>
+</div>
+<h4 class="trending-title">Forbidden Fling</h4>
+</article>
+</div>
+</section>
+</div>
+</section>

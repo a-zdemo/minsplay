@@ -3,14 +3,14 @@ const PROGRESS_KEY = "minsplay_watch_progress";
 const UNLOCKED_KEY = "minsplay_unlocked";
 
 /**
- * Save playback position for an episode
+ * Save playback position for an episode under its specific series
  */
-export function saveProgress(seriesId, episodeId, position, duration) {
+export function saveProgress(seriesId, episodeId, position, duration, seriesTitle = "Drama Series") {
   try {
     const allProgress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}");
     allProgress[seriesId] = {
       seriesId,
-      seriesTitle: "The Beginning",
+      seriesTitle,
       episodeId,
       episodeTitle: `Episode ${episodeId}`,
       position: Math.floor(position),
@@ -49,26 +49,29 @@ export function getAllProgress() {
 }
 
 /**
- * Entitlements: check if an episode is unlocked
+ * Entitlements: Check if an episode is unlocked for a given series.
+ * Scoped by `${seriesId}_${episodeId}` with fallback for legacy numeric keys.
  */
-export function isEpisodeUnlocked(episodeId, isFree = false) {
+export function isEpisodeUnlocked(seriesId, episodeId, isFree = false) {
   if (isFree) return true;
   try {
     const unlocked = JSON.parse(localStorage.getItem(UNLOCKED_KEY) || "[]");
-    return unlocked.includes(episodeId);
+    const scopedKey = `${seriesId}_${episodeId}`;
+    return unlocked.includes(scopedKey) || unlocked.includes(episodeId);
   } catch {
     return false;
   }
 }
 
 /**
- * Entitlements: grant access to an episode
+ * Entitlements: Grant access to an episode under a series
  */
-export function unlockEpisode(episodeId) {
+export function unlockEpisode(seriesId, episodeId) {
   try {
     const unlocked = JSON.parse(localStorage.getItem(UNLOCKED_KEY) || "[]");
-    if (!unlocked.includes(episodeId)) {
-      unlocked.push(episodeId);
+    const scopedKey = `${seriesId}_${episodeId}`;
+    if (!unlocked.includes(scopedKey)) {
+      unlocked.push(scopedKey);
       localStorage.setItem(UNLOCKED_KEY, JSON.stringify(unlocked));
     }
   } catch (err) {

@@ -1,102 +1,52 @@
-<section class="series-page">
+
+<section class="series-page" id="series-page-root">
   <div class="page-container">
     
     <!-- Top Back Navigation -->
     <header class="series-nav">
-      <button class="nav-back-btn" type="button" data-route="/" aria-label="Go Back">
+      <button class="nav-back-btn" id="series-back-btn" type="button" data-route="/" aria-label="Go Back">
         ← Back
       </button>
-      <span class="nav-title">Series Details</span>
+      <span class="nav-title" id="series-nav-title">Series Details</span>
     </header>
 
-    <!-- Series Hero Banner / Info -->
+    <!-- Series Hero Banner / Info (Rendered dynamically) -->
     <div class="series-hero">
-      <div class="series-hero-poster">
-        <span>Poster</span>
+      <div class="series-hero-poster" id="series-hero-poster">
+        <span id="series-hero-art-symbol">⚔️</span>
       </div>
       
       <div class="series-hero-meta">
-        <span class="badge badge-accent">Featured</span>
-        <h1 class="series-title">The Beginning</h1>
-        <p class="series-tags">Urban • Drama • Suspense</p>
-        <p class="series-stats">5 Episodes • Complete</p>
+        <span class="badge badge-accent" id="series-badge">Popular</span>
+        <h1 class="series-title" id="series-title">The Beginning</h1>
+        <p class="series-tags" id="series-tags">Urban • Suspense • Counterattack</p>
+        <p class="series-stats" id="series-stats">5 Episodes • 14.2M Plays</p>
       </div>
     </div>
 
     <!-- Synopsis -->
     <div class="series-synopsis">
-      <p>
-        A determined outsider steps into an unforgiving world of ambition and betrayal. 
-        As hidden family truths unravel, every choice comes at a steep price.
+      <p id="series-synopsis">
+        Loading series synopsis...
       </p>
     </div>
 
-    <!-- Main Call to Action -->
+    <!-- Primary CTA: Starts Watching Ep 1 of Current Series -->
     <div class="series-cta">
-      <button class="btn btn-primary" type="button" data-route="/watch" data-episode="1">
+      <button class="btn btn-primary" id="btn-series-start-watch" type="button" data-route="/watch" data-series="the-beginning" data-episode="1">
         ▶ Start Watching Ep 1
       </button>
     </div>
 
-    <!-- Episodes Section (Per Section 24 & 25) -->
+    <!-- Episodes Section (Dynamic render per Section 24) -->
     <div class="episodes-container">
       <div class="episodes-header">
         <h2 class="section-title">Episodes</h2>
-        <span class="episode-count-pill">5 Total</span>
+        <span class="episode-count-pill" id="series-episode-count">5 Total</span>
       </div>
 
-      <div class="episode-list">
-
-        <!-- Ep 1: Free -->
-        <article class="episode-card episode-free" data-route="/watch" data-episode="1">
-          <div class="episode-index">01</div>
-          <div class="episode-info">
-            <h3 class="episode-title">Episode 1: The Encounter</h3>
-            <p class="episode-duration">1m 45s</p>
-          </div>
-          <span class="status-tag status-free">FREE</span>
-        </article>
-
-        <!-- Ep 2: Free -->
-        <article class="episode-card episode-free" data-route="/watch" data-episode="2">
-          <div class="episode-index">02</div>
-          <div class="episode-info">
-            <h3 class="episode-title">Episode 2: Deep Water</h3>
-            <p class="episode-duration">2m 10s</p>
-          </div>
-          <span class="status-tag status-free">FREE</span>
-        </article>
-
-        <!-- Ep 3: Locked -->
-        <article class="episode-card episode-locked" data-locked="true" data-episode="3">
-          <div class="episode-index">03</div>
-          <div class="episode-info">
-            <h3 class="episode-title">Episode 3: The Crossroad</h3>
-            <p class="episode-duration">1m 55s</p>
-          </div>
-          <span class="status-tag status-locked">🔒 LOCKED</span>
-        </article>
-
-        <!-- Ep 4: Locked -->
-        <article class="episode-card episode-locked" data-locked="true" data-episode="4">
-          <div class="episode-index">04</div>
-          <div class="episode-info">
-            <h3 class="episode-title">Episode 4: Payback</h3>
-            <p class="episode-duration">2m 05s</p>
-          </div>
-          <span class="status-tag status-locked">🔒 LOCKED</span>
-        </article>
-
-        <!-- Ep 5: Locked -->
-        <article class="episode-card episode-locked" data-locked="true" data-episode="5">
-          <div class="episode-index">05</div>
-          <div class="episode-info">
-            <h3 class="episode-title">Episode 5: The Reckoning</h3>
-            <p class="episode-duration">2m 30s</p>
-          </div>
-          <span class="status-tag status-locked">🔒 LOCKED</span>
-        </article>
-
+      <div class="episode-list" id="series-episode-list">
+        <!-- Rendered dynamically by router.js -->
       </div>
     </div>
 

@@ -1,45 +1,9 @@
 import { saveProgress, getSeriesProgress, isEpisodeUnlocked, unlockEpisode } from "./storage.js";
+import { getSeriesById } from "./series-data.js";
 
-export const EPISODES = [
-  {
-    id: 1,
-    title: "Episode 1: The Encounter",
-    duration: "0m 10s",
-    isFree: true,
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    id: 2,
-    title: "Episode 2: Deep Water",
-    duration: "0m 10s",
-    isFree: true,
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    id: 3,
-    title: "Episode 3: The Crossroad",
-    duration: "0m 10s",
-    isFree: false,
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    id: 4,
-    title: "Episode 4: Payback",
-    duration: "0m 10s",
-    isFree: false,
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    id: 5,
-    title: "Episode 5: The Reckoning",
-    duration: "0m 10s",
-    isFree: false,
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-];
-
+let currentSeries = null;
+let currentEpisodes = [];
 let currentEpisodeIndex = 0;
-const SERIES_ID = "the-beginning";
 let hudTimer = null;
 let isLiked = false;
 let isFavorited = false;
@@ -56,7 +20,10 @@ function formatTime(seconds) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-export function initPlayer(initialEp = 1) {
+export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
+  currentSeries = getSeriesById(seriesId);
+  currentEpisodes = currentSeries.episodes;
+
   const video = document.getElementById("minsplay-video");
   const gestureSurface = document.getElementById("gesture-surface");
   const playIndicator = document.getElementById("center-play-indicator");
@@ -77,6 +44,7 @@ export function initPlayer(initialEp = 1) {
   const hudRight = document.getElementById("hud-right");
   const hudBottom = document.getElementById("hud-bottom");
   const swipeHint = document.getElementById("hud-swipe-hint");
+  const backBtn = document.getElementById("watch-back-btn");
 
   // Meta displays
   const epBadge = document.getElementById("watch-ep-badge");
@@ -92,6 +60,7 @@ export function initPlayer(initialEp = 1) {
   const openDrawerBtn = document.getElementById("btn-open-drawer");
   const closeDrawerBtn = document.getElementById("drawer-close-btn");
   const lockOpenDrawerBtn = document.getElementById("btn-lock-open-drawer");
+  const drawerLabel = document.getElementById("episodes-drawer-label");
 
   // Actions
   const likeBtn = document.getElementById("btn-action-like");
@@ -104,6 +73,31 @@ export function initPlayer(initialEp = 1) {
   const toast = document.getElementById("watch-toast");
 
   if (!video) return;
+
+  // Set Back Button to return to this specific drama's detail screen
+  if (backBtn) {
+    backBtn.setAttribute("data-route", "/series");
+    backBtn.setAttribute("data-series", currentSeries.id);
+  }
+
+  // Update Top HUD Series Title
+  const hudSeriesTitle = document.querySelector(".hud-series-title");
+  if (hudSeriesTitle) {
+    hudSeriesTitle.textContent = currentSeries.shortTitle || currentSeries.title;
+  }
+
+  // Update Drawer Subheading & Drawer Count
+  const drawerHeading = document.querySelector(".drawer-heading");
+  const drawerSubheading = document.querySelector(".drawer-subheading");
+  if (drawerHeading) drawerHeading.textContent = currentSeries.shortTitle || currentSeries.title;
+  if (drawerSubheading) drawerSubheading.textContent = `Select Episode (${currentEpisodes.length} Episodes Total)`;
+  if (drawerLabel) drawerLabel.textContent = `${currentEpisodes.length} Eps`;
+
+  // Update Genre Tags under Title
+  const hudGenreTags = document.querySelector(".hud-genre-tags");
+  if (hudGenreTags) {
+    hudGenreTags.textContent = currentSeries.tags;
+  }
 
   function showToast(message) {
     if (!toast) return;
@@ -145,8 +139,8 @@ export function initPlayer(initialEp = 1) {
 
   function renderDrawerGrid() {
     if (!drawerGrid) return;
-    drawerGrid.innerHTML = EPISODES.map((ep, idx) => {
-      const unlocked = isEpisodeUnlocked(ep.id, ep.isFree);
+    drawerGrid.innerHTML = currentEpisodes.map((ep, idx) => {
+      const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
       const isActive = idx === currentEpisodeIndex;
       return `
         <button
@@ -178,11 +172,11 @@ export function initPlayer(initialEp = 1) {
   }
 
   function loadEpisode(index) {
-    currentEpisodeIndex = Math.max(0, Math.min(index, EPISODES.length - 1));
-    const ep = EPISODES[currentEpisodeIndex];
+    currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
+    const ep = currentEpisodes[currentEpisodeIndex];
     if (!ep) return;
 
-    const unlocked = isEpisodeUnlocked(ep.id, ep.isFree);
+    const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
 
     if (epBadge) epBadge.textContent = `Ep ${ep.id}`;
     if (epTitle) epTitle.textContent = ep.title;
@@ -212,7 +206,7 @@ export function initPlayer(initialEp = 1) {
     video.src = ep.src;
     video.load();
 
-    const saved = getSeriesProgress(SERIES_ID);
+    const saved = getSeriesProgress(currentSeries.id);
     if (saved && saved.episodeId === ep.id && saved.position > 1) {
       video.currentTime = saved.position;
     }
@@ -233,14 +227,12 @@ export function initPlayer(initialEp = 1) {
   // Rewarded Ad Simulation Engine (Section 18)
   // ========================================
   function startRewardedAdFlow() {
-    const ep = EPISODES[currentEpisodeIndex];
+    const ep = currentEpisodes[currentEpisodeIndex];
     if (!ep || !adModal) return;
 
-    // Hide the lock dialog
     if (lockModal) lockModal.style.display = "none";
     if (adRewardSplash) adRewardSplash.style.display = "none";
 
-    // Reset ad UI state
     adModal.style.display = "flex";
     if (adSkipBtn) {
       adSkipBtn.disabled = true;
@@ -255,7 +247,6 @@ export function initPlayer(initialEp = 1) {
     const totalDurationMs = 5000;
     const startTime = Date.now();
 
-    // Progress bar fill animation (60fps)
     clearInterval(adProgressInterval);
     adProgressInterval = setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -268,7 +259,6 @@ export function initPlayer(initialEp = 1) {
       }
     }, 50);
 
-    // 1-second countdown interval
     clearInterval(adTimerInterval);
     adTimerInterval = setInterval(() => {
       remainingSeconds -= 1;
@@ -276,27 +266,23 @@ export function initPlayer(initialEp = 1) {
       if (remainingSeconds > 0) {
         if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
       } else {
-        // Countdown Finished: Grant Reward!
         clearInterval(adTimerInterval);
         clearInterval(adProgressInterval);
 
         if (adTimerPill) adTimerPill.textContent = "Reward Granted!";
         if (adProgressFill) adProgressFill.style.width = "100%";
 
-        // Enable Skip/Close button
         if (adSkipBtn) {
           adSkipBtn.disabled = false;
           adSkipBtn.classList.remove("disabled");
           adSkipBtn.textContent = "✓";
         }
 
-        // Show celebratory splash card
         if (adRewardSplash) adRewardSplash.style.display = "flex";
 
-        // Unlock episode in storage
-        unlockEpisode(ep.id);
+        // Unlock scoped to this series and episode
+        unlockEpisode(currentSeries.id, ep.id);
 
-        // Auto-close ad and start video playback after 1.2s celebration
         setTimeout(() => {
           completeAdAndPlay(ep.id);
         }, 1200);
@@ -313,11 +299,10 @@ export function initPlayer(initialEp = 1) {
     loadEpisode(currentEpisodeIndex);
   }
 
-  // Handle manual tap on close button after ad is complete
   if (adSkipBtn) {
     adSkipBtn.onclick = () => {
       if (!adSkipBtn.disabled) {
-        const ep = EPISODES[currentEpisodeIndex];
+        const ep = currentEpisodes[currentEpisodeIndex];
         completeAdAndPlay(ep.id);
       }
     };
@@ -336,8 +321,8 @@ export function initPlayer(initialEp = 1) {
     }, { passive: true });
 
     gestureSurface.addEventListener("touchend", (e) => {
-      const ep = EPISODES[currentEpisodeIndex];
-      const isLocked = !isEpisodeUnlocked(ep.id, ep.isFree);
+      const ep = currentEpisodes[currentEpisodeIndex];
+      const isLocked = !isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
 
       const touchEndY = e.changedTouches[0].screenY;
       const touchEndX = e.changedTouches[0].screenX;
@@ -345,10 +330,9 @@ export function initPlayer(initialEp = 1) {
       const diffX = touchStartX - touchEndX;
       const duration = Date.now() - touchStartTime;
 
-      // Vertical swipe gesture
       if (Math.abs(diffY) > 60 && Math.abs(diffY) > Math.abs(diffX) * 1.2) {
         if (diffY > 0) {
-          if (currentEpisodeIndex < EPISODES.length - 1) {
+          if (currentEpisodeIndex < currentEpisodes.length - 1) {
             showToast("Advancing to Next Episode");
             loadEpisode(currentEpisodeIndex + 1);
           } else {
@@ -365,7 +349,6 @@ export function initPlayer(initialEp = 1) {
         return;
       }
 
-      // Tap handling (only when video is unlocked)
       if (!isLocked && duration < 350 && Math.abs(diffY) < 15 && Math.abs(diffX) < 15) {
         handleTapToggle();
       }
@@ -398,8 +381,8 @@ export function initPlayer(initialEp = 1) {
     showHUD();
   };
   video.onpause = () => {
-    const ep = EPISODES[currentEpisodeIndex];
-    if (isEpisodeUnlocked(ep.id, ep.isFree)) {
+    const ep = currentEpisodes[currentEpisodeIndex];
+    if (isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree)) {
       if (playIndicator) playIndicator.classList.add("active");
       showHUD();
     }
@@ -424,8 +407,8 @@ export function initPlayer(initialEp = 1) {
     const curSec = Math.floor(cur);
     if (curSec > 0 && curSec !== lastSavedSec && curSec % 2 === 0) {
       lastSavedSec = curSec;
-      const ep = EPISODES[currentEpisodeIndex];
-      saveProgress(SERIES_ID, ep.id, cur, dur);
+      const ep = currentEpisodes[currentEpisodeIndex];
+      saveProgress(currentSeries.id, ep.id, cur, dur, currentSeries.shortTitle || currentSeries.title);
     }
   };
 
@@ -478,8 +461,8 @@ export function initPlayer(initialEp = 1) {
       e.stopPropagation();
       if (navigator.share) {
         navigator.share({
-          title: "The Beginning on Minsplay",
-          text: "Watch this trending drama short series on Minsplay!",
+          title: `${currentSeries.title} on Minsplay`,
+          text: `Watch ${currentSeries.title} on Minsplay!`,
           url: window.location.href,
         }).catch(() => {});
       } else {
@@ -547,15 +530,12 @@ export function initPlayer(initialEp = 1) {
     };
   }
 
-  // Rewarded Ad Unlock Trigger (Section 18)
   if (unlockBtn) {
     unlockBtn.onclick = () => {
       startRewardedAdFlow();
     };
   }
 
-  const startIdx = Math.max(0, Math.min(initialEp - 1, EPISODES.length - 1));
+  const startIdx = Math.max(0, Math.min(initialEp - 1, currentEpisodes.length - 1));
   loadEpisode(startIdx);
 }
-
-

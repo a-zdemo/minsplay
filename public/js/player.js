@@ -1,3 +1,4 @@
+/* STREAMING_CHUNK:Importing dependencies and configuring player state... */
 import { saveProgress, getSeriesProgress, isEpisodeUnlocked, unlockEpisode, getUserCoins, spendCoins } from "./storage.js";
 import { getSeriesById } from "./series-data.js";
 import { showAppToast } from "./router.js";
@@ -20,12 +21,13 @@ function formatTime(seconds) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
+/* STREAMING_CHUNK:Initializing player DOM references and series titles... */
 export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   currentSeries = getSeriesById(seriesId);
   currentEpisodes = currentSeries.episodes;
 
+  const playerRoot = document.getElementById("watch-page-root");
   const video = document.getElementById("minsplay-video");
-  const gestureSurface = document.getElementById("gesture-surface");
   const playIndicator = document.getElementById("center-play-indicator");
   const lockModal = document.getElementById("watch-lock-modal");
   const lockedEpNum = document.getElementById("locked-ep-number");
@@ -52,7 +54,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   const timeDuration = document.getElementById("hud-time-duration");
 
   const drawerBackdrop = document.getElementById("drawer-backdrop");
-  const drawerSheet = document.getElementById("drawer-sheet");
   const drawerGrid = document.getElementById("drawer-episode-grid");
   const openDrawerBtn = document.getElementById("btn-open-drawer");
   const closeDrawerBtn = document.getElementById("drawer-close-btn");
@@ -65,7 +66,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   const favLabel = document.getElementById("fav-label");
   const shareBtn = document.getElementById("btn-action-share");
   const soundBtn = document.getElementById("btn-sound-toggle");
-  const fullscreenBtn = document.getElementById("btn-fullscreen-toggle");
 
   if (!video) return;
 
@@ -74,19 +74,13 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     backBtn.setAttribute("data-series", currentSeries.id);
   }
 
-  // Sync series title in both top HUD and bottom HUD
+  // Synchronize series title across all HUD headers and drawers
+  const seriesName = currentSeries.shortTitle || currentSeries.title;
   document.querySelectorAll(".hud-series-title").forEach((el) => {
-    el.textContent = currentSeries.shortTitle || currentSeries.title;
+    el.textContent = seriesName;
   });
 
-  const drawerHeading = document.querySelector(".drawer-heading");
-  const drawerSubheading = document.querySelector(".drawer-subheading");
-  if (drawerHeading) drawerHeading.textContent = currentSeries.shortTitle || currentSeries.title;
-  if (drawerSubheading) drawerSubheading.textContent = `Select Episode (${currentEpisodes.length} Episodes Total)`;
   if (drawerLabel) drawerLabel.textContent = `${currentEpisodes.length} Eps`;
-
-  const hudGenreTags = document.querySelector(".hud-genre-tags");
-  if (hudGenreTags) hudGenreTags.textContent = currentSeries.tags;
 
   function showStatus(msg) {
     if (!statusPill) return;
@@ -94,6 +88,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     statusPill.style.display = msg ? "block" : "none";
   }
 
+  /* STREAMING_CHUNK:Configuring HUD auto-dimming transitions... */
   function showHUD() {
     [hudTop, hudRight, hudBottom].forEach((el) => {
       if (el) el.classList.remove("hud-hidden");
@@ -117,6 +112,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
+  /* STREAMING_CHUNK:Configuring episode drawer rendering... */
   function renderDrawerGrid() {
     if (!drawerGrid) return;
     drawerGrid.innerHTML = currentEpisodes.map((ep, idx) => {
@@ -124,13 +120,11 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       const isActive = idx === currentEpisodeIndex;
       return `
         <button class="drawer-ep-card ${isActive ? 'active' : ''} ${!unlocked ? 'locked' : ''}" data-drawer-ep="${idx + 1}" type="button">
-          <div class="drawer-ep-header">
-            <span class="drawer-ep-num">EP ${ep.id}</span>
-            <span class="drawer-ep-badge ${unlocked ? 'badge-free' : 'badge-locked'}">
-              ${unlocked ? (ep.isFree ? 'FREE' : 'UNLOCKED') : '🔒 LOCK'}
-            </span>
-          </div>
+          <span class="drawer-ep-num">EP ${ep.id}</span>
           <span class="drawer-ep-name">${ep.title}</span>
+          <span class="drawer-ep-badge ${unlocked ? 'badge-free' : 'badge-locked'}">
+            ${unlocked ? (ep.isFree ? 'FREE' : 'UNLOCKED') : '🔒 LOCK'}
+          </span>
         </button>
       `;
     }).join("");
@@ -138,19 +132,17 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
 
   function openDrawer() {
     renderDrawerGrid();
-    if (drawerBackdrop) drawerBackdrop.classList.add("open");
-    if (drawerSheet) drawerSheet.classList.add("open");
+    if (drawerBackdrop) drawerBackdrop.style.display = "flex";
   }
 
   function closeDrawer() {
-    if (drawerBackdrop) drawerBackdrop.classList.remove("open");
-    if (drawerSheet) drawerSheet.classList.remove("open");
+    if (drawerBackdrop) drawerBackdrop.style.display = "none";
   }
 
   function syncCoinBalanceInModal() {
     if (lockModalCoinBalance) lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
   }
-
+  /* STREAMING_CHUNK:Configuring episode loading and state switches... */
   function loadEpisode(index) {
     currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
     const ep = currentEpisodes[currentEpisodeIndex];
@@ -158,6 +150,11 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
 
     const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
 
+    // Sync titles on every episode change
+    const seriesName = currentSeries.shortTitle || currentSeries.title;
+    document.querySelectorAll(".hud-series-title").forEach((el) => {
+      el.textContent = seriesName;
+    });
     if (epBadge) epBadge.textContent = `Ep ${ep.id}`;
     if (epTitle) epTitle.textContent = ep.title;
     if (lockedEpNum) lockedEpNum.textContent = `${ep.id}`;
@@ -197,79 +194,60 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  // =========================================================================
-  // Vertical Swipe-to-Play-Next Gesture Engine (TikTok / DramaBox Pattern)
-  // =========================================================================
+  /* STREAMING_CHUNK:Attaching resilient swipe-to-play-next gestures... */
   let touchStartY = 0;
   let touchStartX = 0;
   let touchStartTime = 0;
 
-  if (gestureSurface) {
-    gestureSurface.addEventListener("touchstart", (e) => {
-      if (!e.touches || e.touches.length === 0) return;
-      touchStartY = e.touches[0].clientY;
-      touchStartX = e.touches[0].clientX;
-      touchStartTime = Date.now();
-    }, { passive: true });
+  const targetSurface = playerRoot || document;
 
-    // CRITICAL: Prevent Chrome on Android from canceling vertical swipe gestures
-    gestureSurface.addEventListener("touchmove", (e) => {
-      if (e.cancelable) e.preventDefault();
-    }, { passive: false });
+  targetSurface.addEventListener("touchstart", (e) => {
+    if (!e.touches || e.touches.length === 0) return;
+    touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
+    touchStartTime = Date.now();
+  }, { passive: true });
 
-    gestureSurface.addEventListener("touchend", (e) => {
-      if (!e.changedTouches || e.changedTouches.length === 0) return;
-      const touchEndY = e.changedTouches[0].clientY;
-      const touchEndX = e.changedTouches[0].clientX;
-      const diffY = touchStartY - touchEndY;
-      const diffX = touchStartX - touchEndX;
-      const duration = Date.now() - touchStartTime;
+  targetSurface.addEventListener("touchend", (e) => {
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+    const touchEndY = e.changedTouches[0].clientY;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffY = touchStartY - touchEndY;
+    const diffX = touchStartX - touchEndX;
+    const duration = Date.now() - touchStartTime;
 
-      // 1. Vertical Swipe Detected (diffY > 40px means swiped UP)
-      if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX) * 1.1) {
-        if (diffY > 0) {
-          // Swipe UP -> Next Episode
-          if (currentEpisodeIndex < currentEpisodes.length - 1) {
-            showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
-            loadEpisode(currentEpisodeIndex + 1);
-          } else {
-            showAppToast("🎬 You've reached the latest episode!");
-          }
-        } else {
-          // Swipe DOWN -> Previous Episode
-          if (currentEpisodeIndex > 0) {
-            showAppToast(`◀ Previous: Episode ${currentEpisodes[currentEpisodeIndex - 1].id}`);
-            loadEpisode(currentEpisodeIndex - 1);
-          } else {
-            showAppToast("🎬 This is the first episode!");
-          }
-        }
-        return;
-      }
+    // Do not trigger swipe when interacting with buttons, scrubbers, or open drawers
+    if (e.target.closest("button, input, .drawer-sheet-box, .subtitles-sheet, .lock-modal-dialog")) {
+      return;
+    }
 
-      // 2. Short Tap -> Toggle Play / Pause and HUD
-      if (duration < 350 && Math.abs(diffY) < 15 && Math.abs(diffX) < 15) {
-        handleTapToggle();
-      }
-    }, { passive: true });
-
-    // Desktop mouse wheel scroll support
-    let wheelDebounce = false;
-    gestureSurface.addEventListener("wheel", (e) => {
-      if (wheelDebounce) return;
-      if (Math.abs(e.deltaY) > 40) {
-        wheelDebounce = true;
-        setTimeout(() => { wheelDebounce = false; }, 600);
-        if (e.deltaY > 0 && currentEpisodeIndex < currentEpisodes.length - 1) {
+    // Vertical swipe detected (> 40px threshold)
+    if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX) * 1.1) {
+      if (diffY > 0) {
+        // Swipe UP -> Next Episode
+        if (currentEpisodeIndex < currentEpisodes.length - 1) {
           showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
           loadEpisode(currentEpisodeIndex + 1);
-        } else if (e.deltaY < 0 && currentEpisodeIndex > 0) {
+        } else {
+          showAppToast("🎬 You've reached the latest episode!");
+        }
+      } else {
+        // Swipe DOWN -> Previous Episode
+        if (currentEpisodeIndex > 0) {
           showAppToast(`◀ Previous: Episode ${currentEpisodes[currentEpisodeIndex - 1].id}`);
           loadEpisode(currentEpisodeIndex - 1);
+        } else {
+          showAppToast("🎬 This is the first episode!");
         }
       }
-    }, { passive: true });
-  }
+      return;
+    }
+
+    // Short tap (< 300ms) toggles play/pause and HUD visibility
+    if (duration < 300 && Math.abs(diffY) < 12 && Math.abs(diffX) < 12) {
+      handleTapToggle();
+    }
+  }, { passive: true });
 
   function handleTapToggle() {
     const isHudHidden = hudBottom && hudBottom.classList.contains("hud-hidden");
@@ -289,6 +267,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     }
   }
 
+  /* STREAMING_CHUNK:Wiring actions, scrubber, and coin unlocks... */
   if (unlockCoinsBtn) {
     unlockCoinsBtn.onclick = () => {
       const ep = currentEpisodes[currentEpisodeIndex];
@@ -461,7 +440,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
 
   if (openDrawerBtn) openDrawerBtn.onclick = (e) => { e.stopPropagation(); openDrawer(); };
   if (closeDrawerBtn) closeDrawerBtn.onclick = closeDrawer;
-  if (drawerBackdrop) drawerBackdrop.onclick = closeDrawer;
+  if (drawerBackdrop) drawerBackdrop.onclick = (e) => { if (e.target === drawerBackdrop) closeDrawer(); };
   if (lockOpenDrawerBtn) lockOpenDrawerBtn.onclick = () => openDrawer();
 
   if (drawerGrid) {

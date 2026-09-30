@@ -2133,3 +2133,185 @@
 .video-play-toggle {
   pointer-events: none !important;
 }
+
+/* STREAMING_CHUNK:Styling unified DramaBox full-bleed player and HUDs... */
+.fullbleed-player {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background: #000000 !important;
+  overflow: hidden !important;
+  z-index: 100 !important;
+  touch-action: none !important;
+}
+
+.fullbleed-player .video-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #000000 !important;
+  overflow: hidden !important;
+  z-index: 1 !important;
+}
+
+.fullbleed-video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* Frosted HUD Circle Buttons */
+.hud-circle-btn {
+  all: unset !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+  font-size: 1.25rem !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+.hud-circle-btn:active { transform: scale(0.92) !important; }
+
+/* Top Floating HUD */
+.watch-hud-top {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 60px !important;
+  padding: 12px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%) !important;
+  z-index: 25 !important;
+  transition: opacity 0.3s ease !important;
+}
+.watch-hud-meta { display: flex; align-items: center; gap: 8px; }
+.watch-hud-top .hud-series-title { font-size: 1rem; font-weight: 800; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+.watch-hud-top .watch-ep-badge { background: #ff2e63; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; }
+.watch-top-actions { display: flex; align-items: center; gap: 10px; }
+
+/* Right Floating Action Rail */
+.watch-hud-right {
+  position: absolute !important;
+  right: 12px !important;
+  bottom: 125px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 16px !important;
+  z-index: 25 !important;
+  transition: opacity 0.3s ease !important;
+}
+.rail-action-btn { all: unset; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+.rail-btn-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(20, 20, 28, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  color: #ffffff;
+  transition: transform 0.15s ease;
+}
+.rail-action-btn:active .rail-btn-icon { transform: scale(0.9); }
+.rail-action-btn.active .rail-btn-icon { color: #ff2e63; border-color: #ff2e63; }
+.rail-btn-label { font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.9); text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+/* Bottom Floating HUD */
+.watch-hud-bottom {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  padding: 12px 16px 20px !important;
+  background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 75%, transparent 100%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  z-index: 25 !important;
+  transition: opacity 0.3s ease !important;
+}
+.hud-bottom-info { display: flex; flex-direction: column; gap: 2px; }
+.hud-bottom-title { margin: 0; font-size: 1.05rem; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+.hud-bottom-sub { margin: 0; font-size: 0.78rem; color: rgba(255,255,255,0.7); }
+
+/* Clean 3px Pink Scrubber Slider */
+.hud-scrubber-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+.hud-slider-wrap { flex: 1; display: flex; align-items: center; }
+.hud-seek-slider {
+  width: 100%;
+  height: 3px;
+  accent-color: #ff2e63;
+  cursor: pointer;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+/* Auto-Dimming HUD State */
+.hud-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Subtitles Overlay: Positioned cleanly above scrubber */
+.subtitles-overlay {
+  position: absolute !important;
+  left: 14px !important;
+  right: 14px !important;
+  bottom: 95px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 18 !important;
+  pointer-events: none !important;
+  text-align: center !important;
+}
+
+/* Episode Drawer Modal Box */
+.drawer-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 220 !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+}
+.drawer-sheet-box {
+  background: #14141c;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 65vh;
+  padding: 10px 16px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+.drawer-ep-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 6px 0;
+}

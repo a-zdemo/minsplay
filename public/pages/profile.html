@@ -5,7 +5,12 @@
     <header class="profile-user-card">
       <div class="profile-avatar-wrap">
         <div class="profile-avatar-inner" id="profile-avatar-badge">
-          <img src="/icons/icon-animated.svg" alt="Minsplay Ant Mascot" class="profile-avatar-img" />
+          <img 
+            src="/icons/icon-animated.svg" 
+            alt="Minsplay Ant Mascot" 
+            class="profile-avatar-img"
+            onerror="this.onerror=null; this.src='/icons/icon-192.png';"
+          />
         </div>
         <span class="profile-vip-crown" id="profile-vip-crown" style="display: none;">👑</span>
       </div>
@@ -30,7 +35,7 @@
           <span class="wallet-label">Coin Balance</span>
           <div class="wallet-val-row">
             <span class="wallet-symbol">🪙</span>
-            <span class="wallet-amount" id="profile-coin-balance">50</span>
+            <span class="wallet-amount" id="profile-coin-balance">20</span>
           </div>
         </div>
         <div class="wallet-streak-item">
@@ -110,7 +115,7 @@
       </div>
     </section>
 
-    <!-- Data & Cache Management Section -->
+    <!-- Data & Storage Management Section -->
     <section class="profile-settings-group">
       <h3 class="profile-group-title">Data & Storage Management</h3>
       <div class="settings-list">
@@ -135,7 +140,12 @@
     <!-- About & App Info Section -->
     <section class="profile-app-info">
       <div class="app-info-logo">
-        <img src="/icons/icon-animated.svg" alt="Minsplay Ant" style="width: 32px; height: 32px;" />
+        <img 
+          src="/icons/icon-animated.svg" 
+          alt="Minsplay Ant" 
+          style="width: 32px; height: 32px;"
+          onerror="this.onerror=null; this.src='/icons/icon-192.png';"
+        />
         <span>Minsplay PWA</span>
       </div>
       <p class="app-version-pill">Version 2.4.0 Standalone • Build 2026</p>

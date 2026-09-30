@@ -3,6 +3,7 @@ import { initPWA } from "./pwa.js";
 import { initCommentsSystem } from "./comments.js";
 import { initInboxSubViews } from "./inbox.js";
 import { initWalletSubViews } from "./wallet.js";
+import { initProfileSubpages } from "./profile-subpages.js";
 
 function startApp() {
   try {
@@ -11,6 +12,7 @@ function startApp() {
     initCommentsSystem();
     initInboxSubViews();
     initWalletSubViews();
+    initProfileSubpages();
   } catch (error) {
     console.error("Minsplay startup error:", error);
   }

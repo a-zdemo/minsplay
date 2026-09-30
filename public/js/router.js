@@ -8,8 +8,14 @@ import foryouHtml from "../pages/foryou.html?raw";
 import inboxHtml from "../pages/inbox.html?raw";
 import settingsHtml from "../pages/settings.html?raw";
 import walletHtml from "../pages/wallet.html?raw";
+import rewardsHtml from "../pages/rewards.html?raw";
+import eventsHtml from "../pages/events.html?raw";
+import giftsHtml from "../pages/gifts.html?raw";
+import historyHtml from "../pages/history.html?raw";
+import downloadHtml from "../pages/download.html?raw";
 import { initPlayer } from "./player.js";
 import { initForYouFeed, destroyForYouFeed } from "./foryou.js";
+import { renderHistoryFeed } from "./profile-subpages.js";
 import {
   getAllProgress,
   clearAllProgress,
@@ -38,6 +44,11 @@ const routes = {
   "/inbox": inboxHtml,
   "/settings": settingsHtml,
   "/wallet": walletHtml,
+  "/rewards": rewardsHtml,
+  "/events": eventsHtml,
+  "/gifts": giftsHtml,
+  "/history": historyHtml,
+  "/download": downloadHtml,
 };
 
 let currentActiveSeriesId = "the-beginning";
@@ -126,21 +137,16 @@ function updateContinueWatching() {
 
   section.style.display = "flex";
   container.innerHTML = records
-    .map(
-      (rec) => `
+    .map((rec) => `
       <article class="continue-card" data-route="/watch" data-series="${rec.seriesId}" data-episode="${rec.episodeId}">
         <div class="continue-poster">
           <span style="font-size: 0.72rem; font-weight: 700; color: #fff;">▶ Ep ${rec.episodeId}</span>
-          <div class="continue-progress-bar">
-            <div class="continue-progress-fill" style="width: ${rec.percentage}%;"></div>
-          </div>
+          <div class="continue-progress-bar"><div class="continue-progress-fill" style="width: ${rec.percentage}%;"></div></div>
         </div>
         <h4 class="drama-title" style="margin-top: 4px; font-size: 0.75rem;">${rec.seriesTitle}</h4>
         <p class="drama-genre">${rec.episodeTitle} • ${rec.percentage}%</p>
       </article>
-    `
-    )
-    .join("");
+    `).join("");
 }
 
 function initDailyGiftSystem() {
@@ -594,9 +600,7 @@ function initProfileScreen() {
   }
 }
 
-function initInboxScreen() {
-  // Inbox subviews are managed by initInboxSubViews() in inbox.js
-}
+function initInboxScreen() {}
 
 function initSettingsScreen() {
   const clearCacheBtn = document.getElementById("btn-settings-clear-cache");
@@ -634,7 +638,7 @@ function initSettingsScreen() {
   if (clearHistoryBtn) {
     clearHistoryBtn.onclick = () => {
       clearAllProgress();
-      showAppToast("Watch history cleared 🗑️");
+      showAppToast("Watch history cleared 🗑️️");
     };
   }
   if (guestResetBtn) {
@@ -649,10 +653,6 @@ function initWalletScreen() {
   const rewardCoinsEl = document.getElementById("wallet-reward-coins");
   const purchasedCoinsEl = document.getElementById("wallet-purchased-coins");
   const autoUnlockToggle = document.getElementById("setting-auto-unlock");
-  const transRow = document.getElementById("btn-wallet-trans");
-  const rewardsRow = document.getElementById("btn-wallet-rewards");
-  const consumptionRow = document.getElementById("btn-wallet-consumption");
-
   const coins = getUserCoins();
   if (rewardCoinsEl) rewardCoinsEl.textContent = coins.toString();
   if (purchasedCoinsEl) purchasedCoinsEl.textContent = "0";
@@ -665,10 +665,6 @@ function initWalletScreen() {
       showAppToast(`Auto-unlock: ${autoUnlockToggle.checked ? "Enabled" : "Disabled"}`);
     };
   }
-
-  if (transRow) transRow.onclick = () => showAppToast("No top-up transactions yet");
-  if (rewardsRow) rewardsRow.onclick = () => showAppToast(`Current reward balance: ${coins} 🪙`);
-  if (consumptionRow) consumptionRow.onclick = () => showAppToast("No coin consumption records");
 }
 
 function renderSeriesDetail(seriesId) {
@@ -693,12 +689,8 @@ function renderSeriesDetail(seriesId) {
   if (synopsisEl) synopsisEl.textContent = drama.synopsis;
 
   if (badgeEl) {
-    if (drama.badge) {
-      badgeEl.textContent = drama.badge;
-      badgeEl.style.display = "inline-block";
-    } else {
-      badgeEl.style.display = "none";
-    }
+    badgeEl.textContent = drama.badge || "";
+    badgeEl.style.display = drama.badge ? "inline-block" : "none";
   }
 
   if (posterEl) {
@@ -714,28 +706,21 @@ function renderSeriesDetail(seriesId) {
   if (epCountEl) epCountEl.textContent = `${drama.episodes.length} Total`;
 
   if (epListEl) {
-    epListEl.innerHTML = drama.episodes
-      .map((ep) => {
-        const unlocked = isEpisodeUnlocked(drama.id, ep.id, ep.isFree);
-        return `
-          <article 
-            class="episode-card ${unlocked ? "episode-free" : "episode-locked"}" 
-            data-route="/watch" 
-            data-series="${drama.id}" 
-            data-episode="${ep.id}"
-          >
-            <div class="episode-index">${ep.id < 10 ? `0${ep.id}` : ep.id}</div>
-            <div class="episode-info">
-              <h3 class="episode-title">${ep.title}</h3>
-              <p class="episode-duration">${ep.duration}</p>
-            </div>
-            <span class="status-tag ${unlocked ? "status-free" : "status-locked"}">
-              ${unlocked ? (ep.isFree ? "FREE" : "UNLOCKED") : "🔒 LOCKED"}
-            </span>
-          </article>
-        `;
-      })
-      .join("");
+    epListEl.innerHTML = drama.episodes.map((ep) => {
+      const unlocked = isEpisodeUnlocked(drama.id, ep.id, ep.isFree);
+      return `
+        <article class="episode-card ${unlocked ? "episode-free" : "episode-locked"}" data-route="/watch" data-series="${drama.id}" data-episode="${ep.id}">
+          <div class="episode-index">${ep.id < 10 ? `0${ep.id}` : ep.id}</div>
+          <div class="episode-info">
+            <h3 class="episode-title">${ep.title}</h3>
+            <p class="episode-duration">${ep.duration}</p>
+          </div>
+          <span class="status-tag ${unlocked ? "status-free" : "status-locked"}">
+            ${unlocked ? (ep.isFree ? "FREE" : "UNLOCKED") : "🔒 LOCKED"}
+          </span>
+        </article>
+      `;
+    }).join("");
   }
 }
 
@@ -756,27 +741,19 @@ function initMyListScreen() {
         </div>
       `;
     } else {
-      historyList.innerHTML = records
-        .map(
-          (rec) => `
-          <article class="mylist-card" data-route="/watch" data-series="${rec.seriesId}" data-episode="${rec.episodeId}">
-            <div class="mylist-poster-wrap">
-              <div class="poster-gradient-art art-blue">
-                <span class="art-symbol">▶</span>
-              </div>
-              <div class="mylist-card-progress-bar">
-                <div class="mylist-card-progress-fill" style="width: ${rec.percentage}%;"></div>
-              </div>
-            </div>
-            <div class="mylist-meta">
-              <h3 class="mylist-title">${rec.seriesTitle}</h3>
-              <p class="mylist-genre">${rec.episodeTitle} • ${rec.percentage}% complete</p>
-              <p class="mylist-ep-info">EP.${rec.episodeId}</p>
-            </div>
-          </article>
-        `
-        )
-        .join("");
+      historyList.innerHTML = records.map((rec) => `
+        <article class="mylist-card" data-route="/watch" data-series="${rec.seriesId}" data-episode="${rec.episodeId}">
+          <div class="mylist-poster-wrap">
+            <div class="poster-gradient-art art-blue"><span class="art-symbol">▶</span></div>
+            <div class="mylist-card-progress-bar"><div class="mylist-card-progress-fill" style="width: ${rec.percentage}%;"></div></div>
+          </div>
+          <div class="mylist-meta">
+            <h3 class="mylist-title">${rec.seriesTitle}</h3>
+            <p class="mylist-genre">${rec.episodeTitle} • ${rec.percentage}% complete</p>
+            <p class="mylist-ep-info">EP.${rec.episodeId}</p>
+          </div>
+        </article>
+      `).join("");
     }
   }
 
@@ -784,15 +761,10 @@ function initMyListScreen() {
     tabBar.addEventListener("click", (e) => {
       const tab = e.target.closest(".mylist-tab");
       if (!tab) return;
-
       const subtab = tab.getAttribute("data-subtab");
       tabBar.querySelectorAll(".mylist-tab").forEach((btn) => btn.classList.remove("active"));
       tab.classList.add("active");
-
-      document.querySelectorAll(".mylist-tab-pane").forEach((pane) => {
-        pane.classList.remove("active");
-      });
-
+      document.querySelectorAll(".mylist-tab-pane").forEach((pane) => pane.classList.remove("active"));
       const activePane = document.getElementById(`pane-${subtab}`);
       if (activePane) activePane.classList.add("active");
     });
@@ -803,11 +775,7 @@ function updateBottomNavActive(path) {
   const navItems = document.querySelectorAll(".bottom-nav .nav-item");
   navItems.forEach((btn) => {
     const route = btn.getAttribute("data-route");
-    if (route === path) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
+    btn.classList.toggle("active", route === path);
   });
 }
 
@@ -832,8 +800,18 @@ async function renderRoute(path) {
 
   const bottomNav = document.getElementById("bottom-nav");
   if (bottomNav) {
-    // Hide bottom navigation on full player, settings, inbox, and wallet for full immersion
-    bottomNav.style.display = (path === "/watch" || path === "/inbox" || path === "/settings" || path === "/wallet") ? "none" : "flex";
+    const isSubpage = (
+      path === "/watch" ||
+      path === "/inbox" ||
+      path === "/settings" ||
+      path === "/wallet" ||
+      path === "/rewards" ||
+      path === "/events" ||
+      path === "/gifts" ||
+      path === "/history" ||
+      path === "/download"
+    );
+    bottomNav.style.display = isSubpage ? "none" : "flex";
   }
 
   mainContent.innerHTML = html;
@@ -863,6 +841,8 @@ async function renderRoute(path) {
     initSettingsScreen();
   } else if (path === "/wallet") {
     initWalletScreen();
+  } else if (path === "/history") {
+    renderHistoryFeed();
   }
 }
 
@@ -872,13 +852,12 @@ export function initRouter() {
     if (routeTrigger) {
       if (routeTrigger.id === "home-search-pill") return;
 
-      e.preventDefault();
       const targetRoute = routeTrigger.getAttribute("data-route");
-      const epAttr = routeTrigger.getAttribute("data-episode");
-      const seriesAttr =
-        routeTrigger.getAttribute("data-series") ||
-        routeTrigger.getAttribute("data-series-id");
+      if (!targetRoute) return;
 
+      e.preventDefault();
+      const epAttr = routeTrigger.getAttribute("data-episode");
+      const seriesAttr = routeTrigger.getAttribute("data-series") || routeTrigger.getAttribute("data-series-id");
       const episode = epAttr ? parseInt(epAttr, 10) : 1;
       navigateTo(targetRoute, { seriesId: seriesAttr, episode });
     }

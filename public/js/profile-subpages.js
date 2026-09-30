@@ -1,4 +1,4 @@
-import { showAppToast, navigateTo } from "./router.js";
+import { showAppToast } from "./router.js";
 import { getAllProgress, clearAllProgress, addCoins } from "./storage.js";
 import { DRAMA_CATALOG } from "./series-data.js";
 
@@ -7,7 +7,6 @@ let isHistoryEditMode = false;
 
 export function initProfileSubpages() {
   document.addEventListener("click", (e) => {
-    // 1. Redeem Code Action in Gifts (Pic 4)
     if (e.target.closest("#btn-submit-gift")) {
       const input = document.getElementById("input-gift-code");
       const code = input ? input.value.trim().toUpperCase() : "";
@@ -25,20 +24,17 @@ export function initProfileSubpages() {
       return;
     }
 
-    // 2. Rules pill in Rewards (Pic 2)
     if (e.target.closest("#btn-rewards-rules")) {
       showAppToast("Earn points daily to extend your VIP membership!");
       return;
     }
 
-    // 3. Redeem Cards in Rewards
     const redeemCard = e.target.closest(".db-redeem-card");
     if (redeemCard) {
       showAppToast("Subscribe to VIP to unlock point redemption ⚡");
       return;
     }
 
-    // 4. History Edit Mode Toggle (Pics 5, 6, 7)
     if (e.target.closest("#btn-history-edit-mode")) {
       toggleHistoryEditMode(true);
       return;
@@ -48,7 +44,6 @@ export function initProfileSubpages() {
       return;
     }
 
-    // 5. Select Item in History Edit Mode
     const historyRow = e.target.closest(".db-history-row");
     if (historyRow && isHistoryEditMode) {
       const id = historyRow.getAttribute("data-history-id");
@@ -64,7 +59,6 @@ export function initProfileSubpages() {
       return;
     }
 
-    // 6. Remove Selected Items from History
     if (e.target.closest("#btn-history-remove") && selectedHistoryIds.size > 0) {
       clearAllProgress();
       showAppToast(`Removed ${selectedHistoryIds.size} drama records 🗑️`);

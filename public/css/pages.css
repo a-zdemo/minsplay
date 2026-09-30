@@ -2114,3 +2114,22 @@
   pointer-events: none !important;
   text-align: center !important;
 }
+
+/* ==========================================================================
+   Full-Bleed Gesture Surface & Touch Action Override
+   ========================================================================== */
+.video-touch-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 10 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: none !important;
+}
+
+.video-play-toggle {
+  pointer-events: none !important;
+}

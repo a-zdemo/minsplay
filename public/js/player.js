@@ -1,5 +1,6 @@
 import { saveProgress, getSeriesProgress, isEpisodeUnlocked, unlockEpisode, getUserCoins, spendCoins } from "./storage.js";
 import { getSeriesById } from "./series-data.js";
+import { showAppToast } from "./router.js";
 
 let currentSeries = null;
 let currentEpisodes = [];
@@ -9,7 +10,6 @@ let isLiked = false;
 let isFavorited = false;
 let likeCount = 14200;
 
-// Ad countdown timers
 let adTimerInterval = null;
 let adProgressInterval = null;
 
@@ -34,28 +34,23 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   const lockModalCoinBalance = document.getElementById("lock-modal-coin-balance");
   const statusPill = document.getElementById("hud-status-pill");
 
-  // Rewarded Ad Elements (Section 18)
   const adModal = document.getElementById("rewarded-ad-modal");
   const adTimerPill = document.getElementById("ad-timer-pill");
   const adSkipBtn = document.getElementById("ad-skip-btn");
   const adProgressFill = document.getElementById("ad-progress-fill");
   const adRewardSplash = document.getElementById("ad-reward-splash");
 
-  // Floating HUD containers
   const hudTop = document.getElementById("hud-top");
   const hudRight = document.getElementById("hud-right");
   const hudBottom = document.getElementById("hud-bottom");
-  const swipeHint = document.getElementById("hud-swipe-hint");
   const backBtn = document.getElementById("watch-back-btn");
 
-  // Meta displays
   const epBadge = document.getElementById("watch-ep-badge");
   const epTitle = document.getElementById("watch-current-title");
   const seekSlider = document.getElementById("video-seek");
   const timeCurrent = document.getElementById("hud-time-current");
   const timeDuration = document.getElementById("hud-time-duration");
 
-  // Drawer Elements
   const drawerBackdrop = document.getElementById("drawer-backdrop");
   const drawerSheet = document.getElementById("drawer-sheet");
   const drawerGrid = document.getElementById("drawer-episode-grid");
@@ -64,7 +59,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   const lockOpenDrawerBtn = document.getElementById("btn-lock-open-drawer");
   const drawerLabel = document.getElementById("episodes-drawer-label");
 
-  // Actions
   const likeBtn = document.getElementById("btn-action-like");
   const likeCounter = document.getElementById("like-counter");
   const favBtn = document.getElementById("btn-action-fav");
@@ -72,7 +66,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   const shareBtn = document.getElementById("btn-action-share");
   const soundBtn = document.getElementById("btn-sound-toggle");
   const fullscreenBtn = document.getElementById("btn-fullscreen-toggle");
-  const toast = document.getElementById("watch-toast");
 
   if (!video) return;
 
@@ -81,10 +74,10 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     backBtn.setAttribute("data-series", currentSeries.id);
   }
 
-  const hudSeriesTitle = document.querySelector(".hud-series-title");
-  if (hudSeriesTitle) {
-    hudSeriesTitle.textContent = currentSeries.shortTitle || currentSeries.title;
-  }
+  // Sync series title in both top HUD and bottom HUD
+  document.querySelectorAll(".hud-series-title").forEach((el) => {
+    el.textContent = currentSeries.shortTitle || currentSeries.title;
+  });
 
   const drawerHeading = document.querySelector(".drawer-heading");
   const drawerSubheading = document.querySelector(".drawer-subheading");
@@ -93,16 +86,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   if (drawerLabel) drawerLabel.textContent = `${currentEpisodes.length} Eps`;
 
   const hudGenreTags = document.querySelector(".hud-genre-tags");
-  if (hudGenreTags) {
-    hudGenreTags.textContent = currentSeries.tags;
-  }
-
-  function showToast(message) {
-    if (!toast) return;
-    toast.textContent = message;
-    toast.classList.add("visible");
-    setTimeout(() => toast.classList.remove("visible"), 2200);
-  }
+  if (hudGenreTags) hudGenreTags.textContent = currentSeries.tags;
 
   function showStatus(msg) {
     if (!statusPill) return;
@@ -114,7 +98,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     [hudTop, hudRight, hudBottom].forEach((el) => {
       if (el) el.classList.remove("hud-hidden");
     });
-
     clearTimeout(hudTimer);
     if (!video.paused) {
       hudTimer = setTimeout(() => {
@@ -122,7 +105,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
           [hudTop, hudRight, hudBottom].forEach((el) => {
             if (el) el.classList.add("hud-hidden");
           });
-          if (swipeHint) swipeHint.style.opacity = "0";
         }
       }, 3000);
     }
@@ -141,15 +123,11 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
       const isActive = idx === currentEpisodeIndex;
       return `
-        <button
-          class="drawer-ep-card ${isActive ? "active" : ""} ${!unlocked ? "locked" : ""}"
-          data-drawer-ep="${idx + 1}"
-          type="button"
-        >
+        <button class="drawer-ep-card ${isActive ? 'active' : ''} ${!unlocked ? 'locked' : ''}" data-drawer-ep="${idx + 1}" type="button">
           <div class="drawer-ep-header">
             <span class="drawer-ep-num">EP ${ep.id}</span>
-            <span class="drawer-ep-badge ${unlocked ? "badge-free" : "badge-locked"}">
-              ${unlocked ? (ep.isFree ? "FREE" : "UNLOCKED") : "🔒 LOCK"}
+            <span class="drawer-ep-badge ${unlocked ? 'badge-free' : 'badge-locked'}">
+              ${unlocked ? (ep.isFree ? 'FREE' : 'UNLOCKED') : '🔒 LOCK'}
             </span>
           </div>
           <span class="drawer-ep-name">${ep.title}</span>
@@ -170,9 +148,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   }
 
   function syncCoinBalanceInModal() {
-    if (lockModalCoinBalance) {
-      lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
-    }
+    if (lockModalCoinBalance) lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
   }
 
   function loadEpisode(index) {
@@ -188,22 +164,18 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
 
     closeDrawer();
 
-    // Locked Episode State
     if (!unlocked) {
       video.pause();
       video.removeAttribute("src");
       video.load();
-
       if (playIndicator) playIndicator.classList.remove("active");
       hideHUD();
       showStatus("");
-
       syncCoinBalanceInModal();
       if (lockModal) lockModal.style.display = "flex";
       return;
     }
 
-    // Unlocked Episode State
     if (lockModal) lockModal.style.display = "none";
     if (adModal) adModal.style.display = "none";
     showStatus("Buffering stream...");
@@ -216,172 +188,91 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       video.currentTime = saved.position;
     }
 
-    video
-      .play()
-      .then(() => {
-        if (playIndicator) playIndicator.classList.remove("active");
-        showHUD();
-      })
-      .catch(() => {
-        if (playIndicator) playIndicator.classList.add("active");
-        showHUD();
-      });
+    video.play().then(() => {
+      if (playIndicator) playIndicator.classList.remove("active");
+      showHUD();
+    }).catch(() => {
+      if (playIndicator) playIndicator.classList.add("active");
+      showHUD();
+    });
   }
 
-  // ========================================
-  // Coin Instant Unlock Action (Section 19)
-  // ========================================
-  if (unlockCoinsBtn) {
-    unlockCoinsBtn.onclick = () => {
-      const ep = currentEpisodes[currentEpisodeIndex];
-      const unlockCost = 30;
-      const currentCoins = getUserCoins();
-
-      if (currentCoins >= unlockCost) {
-        spendCoins(unlockCost);
-        unlockEpisode(currentSeries.id, ep.id);
-        showToast(`🪙 -30 Coins! Ep ${ep.id} Unlocked.`);
-        loadEpisode(currentEpisodeIndex);
-      } else {
-        showToast(`Need ${unlockCost} coins! Balance: ${currentCoins} 🪙`);
-      }
-    };
-  }
-
-  // ========================================
-  // Rewarded Ad Simulation Engine (Section 18)
-  // ========================================
-  function startRewardedAdFlow() {
-    const ep = currentEpisodes[currentEpisodeIndex];
-    if (!ep || !adModal) return;
-
-    if (lockModal) lockModal.style.display = "none";
-    if (adRewardSplash) adRewardSplash.style.display = "none";
-
-    adModal.style.display = "flex";
-    if (adSkipBtn) {
-      adSkipBtn.disabled = true;
-      adSkipBtn.classList.add("disabled");
-      adSkipBtn.textContent = "✕";
-    }
-    if (adProgressFill) adProgressFill.style.width = "0%";
-
-    let remainingSeconds = 5;
-    if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
-
-    const totalDurationMs = 5000;
-    const startTime = Date.now();
-
-    clearInterval(adProgressInterval);
-    adProgressInterval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progressPercent = Math.min(100, (elapsed / totalDurationMs) * 100);
-      if (adProgressFill) {
-        adProgressFill.style.width = `${progressPercent}%`;
-      }
-      if (elapsed >= totalDurationMs) {
-        clearInterval(adProgressInterval);
-      }
-    }, 50);
-
-    clearInterval(adTimerInterval);
-    adTimerInterval = setInterval(() => {
-      remainingSeconds -= 1;
-
-      if (remainingSeconds > 0) {
-        if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
-      } else {
-        clearInterval(adTimerInterval);
-        clearInterval(adProgressInterval);
-
-        if (adTimerPill) adTimerPill.textContent = "Reward Granted!";
-        if (adProgressFill) adProgressFill.style.width = "100%";
-
-        if (adSkipBtn) {
-          adSkipBtn.disabled = false;
-          adSkipBtn.classList.remove("disabled");
-          adSkipBtn.textContent = "✓";
-        }
-
-        if (adRewardSplash) adRewardSplash.style.display = "flex";
-
-        unlockEpisode(currentSeries.id, ep.id);
-
-        setTimeout(() => {
-          completeAdAndPlay(ep.id);
-        }, 1200);
-      }
-    }, 1000);
-  }
-
-  function completeAdAndPlay(epId) {
-    clearInterval(adTimerInterval);
-    clearInterval(adProgressInterval);
-
-    if (adModal) adModal.style.display = "none";
-    showToast(`🎉 Episode ${epId} Unlocked!`);
-    loadEpisode(currentEpisodeIndex);
-  }
-
-  if (adSkipBtn) {
-    adSkipBtn.onclick = () => {
-      if (!adSkipBtn.disabled) {
-        const ep = currentEpisodes[currentEpisodeIndex];
-        completeAdAndPlay(ep.id);
-      }
-    };
-  }
-
-  // Touch Swipe & Tap Gestures
+  // =========================================================================
+  // Vertical Swipe-to-Play-Next Gesture Engine (TikTok / DramaBox Pattern)
+  // =========================================================================
   let touchStartY = 0;
   let touchStartX = 0;
   let touchStartTime = 0;
 
   if (gestureSurface) {
     gestureSurface.addEventListener("touchstart", (e) => {
-      touchStartY = e.changedTouches[0].screenY;
-      touchStartX = e.changedTouches[0].screenX;
+      if (!e.touches || e.touches.length === 0) return;
+      touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
       touchStartTime = Date.now();
     }, { passive: true });
 
-    gestureSurface.addEventListener("touchend", (e) => {
-      const ep = currentEpisodes[currentEpisodeIndex];
-      const isLocked = !isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
+    // CRITICAL: Prevent Chrome on Android from canceling vertical swipe gestures
+    gestureSurface.addEventListener("touchmove", (e) => {
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
 
-      const touchEndY = e.changedTouches[0].screenY;
-      const touchEndX = e.changedTouches[0].screenX;
+    gestureSurface.addEventListener("touchend", (e) => {
+      if (!e.changedTouches || e.changedTouches.length === 0) return;
+      const touchEndY = e.changedTouches[0].clientY;
+      const touchEndX = e.changedTouches[0].clientX;
       const diffY = touchStartY - touchEndY;
       const diffX = touchStartX - touchEndX;
       const duration = Date.now() - touchStartTime;
 
-      if (Math.abs(diffY) > 60 && Math.abs(diffY) > Math.abs(diffX) * 1.2) {
+      // 1. Vertical Swipe Detected (diffY > 40px means swiped UP)
+      if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX) * 1.1) {
         if (diffY > 0) {
+          // Swipe UP -> Next Episode
           if (currentEpisodeIndex < currentEpisodes.length - 1) {
-            showToast("Advancing to Next Episode");
+            showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
             loadEpisode(currentEpisodeIndex + 1);
           } else {
-            showToast("You've reached the latest episode");
+            showAppToast("🎬 You've reached the latest episode!");
           }
         } else {
+          // Swipe DOWN -> Previous Episode
           if (currentEpisodeIndex > 0) {
-            showToast("Returning to Previous Episode");
+            showAppToast(`◀ Previous: Episode ${currentEpisodes[currentEpisodeIndex - 1].id}`);
             loadEpisode(currentEpisodeIndex - 1);
           } else {
-            showToast("This is the first episode");
+            showAppToast("🎬 This is the first episode!");
           }
         }
         return;
       }
 
-      if (!isLocked && duration < 350 && Math.abs(diffY) < 15 && Math.abs(diffX) < 15) {
+      // 2. Short Tap -> Toggle Play / Pause and HUD
+      if (duration < 350 && Math.abs(diffY) < 15 && Math.abs(diffX) < 15) {
         handleTapToggle();
+      }
+    }, { passive: true });
+
+    // Desktop mouse wheel scroll support
+    let wheelDebounce = false;
+    gestureSurface.addEventListener("wheel", (e) => {
+      if (wheelDebounce) return;
+      if (Math.abs(e.deltaY) > 40) {
+        wheelDebounce = true;
+        setTimeout(() => { wheelDebounce = false; }, 600);
+        if (e.deltaY > 0 && currentEpisodeIndex < currentEpisodes.length - 1) {
+          showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
+          loadEpisode(currentEpisodeIndex + 1);
+        } else if (e.deltaY < 0 && currentEpisodeIndex > 0) {
+          showAppToast(`◀ Previous: Episode ${currentEpisodes[currentEpisodeIndex - 1].id}`);
+          loadEpisode(currentEpisodeIndex - 1);
+        }
       }
     }, { passive: true });
   }
 
   function handleTapToggle() {
     const isHudHidden = hudBottom && hudBottom.classList.contains("hud-hidden");
-
     if (isHudHidden) {
       showHUD();
     } else {
@@ -396,6 +287,86 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
         showHUD();
       }
     }
+  }
+
+  if (unlockCoinsBtn) {
+    unlockCoinsBtn.onclick = () => {
+      const ep = currentEpisodes[currentEpisodeIndex];
+      const unlockCost = 30;
+      const currentCoins = getUserCoins();
+      if (currentCoins >= unlockCost) {
+        spendCoins(unlockCost);
+        unlockEpisode(currentSeries.id, ep.id);
+        showAppToast(`🪙 -30 Coins! Ep ${ep.id} Unlocked.`);
+        loadEpisode(currentEpisodeIndex);
+      } else {
+        showAppToast(`Need ${unlockCost} coins! Balance: ${currentCoins} 🪙`);
+      }
+    };
+  }
+
+  function startRewardedAdFlow() {
+    const ep = currentEpisodes[currentEpisodeIndex];
+    if (!ep || !adModal) return;
+    if (lockModal) lockModal.style.display = "none";
+    if (adRewardSplash) adRewardSplash.style.display = "none";
+    adModal.style.display = "flex";
+    if (adSkipBtn) {
+      adSkipBtn.disabled = true;
+      adSkipBtn.classList.add("disabled");
+      adSkipBtn.textContent = "✕";
+    }
+    if (adProgressFill) adProgressFill.style.width = "0%";
+    let remainingSeconds = 5;
+    if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
+    const totalDurationMs = 5000;
+    const startTime = Date.now();
+    clearInterval(adProgressInterval);
+    adProgressInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progressPercent = Math.min(100, (elapsed / totalDurationMs) * 100);
+      if (adProgressFill) adProgressFill.style.width = `${progressPercent}%`;
+      if (elapsed >= totalDurationMs) clearInterval(adProgressInterval);
+    }, 50);
+
+    clearInterval(adTimerInterval);
+    adTimerInterval = setInterval(() => {
+      remainingSeconds -= 1;
+      if (remainingSeconds > 0) {
+        if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
+      } else {
+        clearInterval(adTimerInterval);
+        clearInterval(adProgressInterval);
+        if (adTimerPill) adTimerPill.textContent = "Reward Granted!";
+        if (adProgressFill) adProgressFill.style.width = "100%";
+        if (adSkipBtn) {
+          adSkipBtn.disabled = false;
+          adSkipBtn.classList.remove("disabled");
+          adSkipBtn.textContent = "✓";
+        }
+        if (adRewardSplash) adRewardSplash.style.display = "flex";
+        unlockEpisode(currentSeries.id, ep.id);
+        setTimeout(() => {
+          clearInterval(adTimerInterval);
+          clearInterval(adProgressInterval);
+          if (adModal) adModal.style.display = "none";
+          showAppToast(`🎉 Episode ${ep.id} Unlocked!`);
+          loadEpisode(currentEpisodeIndex);
+        }, 1200);
+      }
+    }, 1000);
+  }
+
+  if (unlockBtn) unlockBtn.onclick = () => startRewardedAdFlow();
+  if (adSkipBtn) {
+    adSkipBtn.onclick = () => {
+      if (!adSkipBtn.disabled) {
+        const ep = currentEpisodes[currentEpisodeIndex];
+        if (adModal) adModal.style.display = "none";
+        showAppToast(`🎉 Episode ${ep.id} Unlocked!`);
+        loadEpisode(currentEpisodeIndex);
+      }
+    };
   }
 
   video.oncanplay = () => showStatus("");
@@ -420,14 +391,11 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   video.ontimeupdate = () => {
     const cur = video.currentTime || 0;
     const dur = video.duration || 0;
-
     if (seekSlider && dur > 0 && !seekSlider.matches(":active")) {
       seekSlider.value = (cur / dur) * 100;
     }
-
     if (timeCurrent) timeCurrent.textContent = formatTime(cur);
     if (timeDuration) timeDuration.textContent = formatTime(dur);
-
     const curSec = Math.floor(cur);
     if (curSec > 0 && curSec !== lastSavedSec && curSec % 2 === 0) {
       lastSavedSec = curSec;
@@ -452,10 +420,8 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       isLiked = !isLiked;
       likeBtn.classList.toggle("active", isLiked);
       likeCount = isLiked ? likeCount + 1 : likeCount - 1;
-      if (likeCounter) {
-        likeCounter.textContent = `${(likeCount / 1000).toFixed(1)}K`;
-      }
-      showToast(isLiked ? "Added to Liked Videos ♥" : "Removed Like");
+      if (likeCounter) likeCounter.textContent = `${(likeCount / 1000).toFixed(1)}K`;
+      showAppToast(isLiked ? "Added to Liked Videos ♥" : "Removed Like");
       showHUD();
     };
   }
@@ -466,16 +432,7 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       isFavorited = !isFavorited;
       favBtn.classList.toggle("active", isFavorited);
       if (favLabel) favLabel.textContent = isFavorited ? "Saved ★" : "Collect";
-      showToast(isFavorited ? "Added to My List ★" : "Removed from My List");
-      showHUD();
-    };
-  }
-
-  const commentBtn = document.getElementById("btn-action-comment");
-  if (commentBtn) {
-    commentBtn.onclick = (e) => {
-      e.stopPropagation();
-      showToast("Comments open on live release 💬");
+      showAppToast(isFavorited ? "Saved to My List ★" : "Removed from My List");
       showHUD();
     };
   }
@@ -484,19 +441,9 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     shareBtn.onclick = (e) => {
       e.stopPropagation();
       if (navigator.share) {
-        navigator.share({
-          title: `${currentSeries.title} on Minsplay`,
-          text: `Watch ${currentSeries.title} on Minsplay!`,
-          url: window.location.href,
-        }).catch(() => {});
+        navigator.share({ title: currentSeries.title, url: window.location.href }).catch(() => {});
       } else {
-        const dummy = document.createElement("input");
-        document.body.appendChild(dummy);
-        dummy.value = window.location.href;
-        dummy.select();
-        document.execCommand("copy");
-        document.body.removeChild(dummy);
-        showToast("Link copied to clipboard ↗");
+        showAppToast("Link copied to clipboard ↗");
       }
       showHUD();
     };
@@ -506,43 +453,16 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     soundBtn.onclick = (e) => {
       e.stopPropagation();
       video.muted = !video.muted;
-      showToast(video.muted ? "Muted 🔇" : "Sound Unmuted 🔊");
+      soundBtn.textContent = video.muted ? "🔇" : "🔊";
+      showAppToast(video.muted ? "Muted 🔇" : "Sound Unmuted 🔊");
       showHUD();
     };
   }
 
-  if (fullscreenBtn) {
-    fullscreenBtn.onclick = (e) => {
-      e.stopPropagation();
-      const stage = document.getElementById("watch-stage");
-      if (!document.fullscreenElement) {
-        if (stage && stage.requestFullscreen) {
-          stage.requestFullscreen();
-        } else if (video.webkitEnterFullscreen) {
-          video.webkitEnterFullscreen();
-        }
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-      }
-      showHUD();
-    };
-  }
-
-  if (openDrawerBtn) {
-    openDrawerBtn.onclick = (e) => {
-      e.stopPropagation();
-      openDrawer();
-    };
-  }
-
+  if (openDrawerBtn) openDrawerBtn.onclick = (e) => { e.stopPropagation(); openDrawer(); };
   if (closeDrawerBtn) closeDrawerBtn.onclick = closeDrawer;
   if (drawerBackdrop) drawerBackdrop.onclick = closeDrawer;
-
-  if (lockOpenDrawerBtn) {
-    lockOpenDrawerBtn.onclick = () => {
-      openDrawer();
-    };
-  }
+  if (lockOpenDrawerBtn) lockOpenDrawerBtn.onclick = () => openDrawer();
 
   if (drawerGrid) {
     drawerGrid.onclick = (e) => {
@@ -551,12 +471,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
         const epNum = parseInt(card.getAttribute("data-drawer-ep"), 10);
         loadEpisode(epNum - 1);
       }
-    };
-  }
-
-  if (unlockBtn) {
-    unlockBtn.onclick = () => {
-      startRewardedAdFlow();
     };
   }
 

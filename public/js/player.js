@@ -37,7 +37,6 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   const playIndicator = document.getElementById("center-play-indicator");
   const lockModal = document.getElementById("watch-lock-modal");
   const lockedEpNum = document.getElementById("locked-ep-number");
-  const lockModalCoinBalance = document.getElementById("lock-modal-coin-balance");
   const statusPill = document.getElementById("hud-status-pill");
 
   const hudTop = document.getElementById("hud-top");
@@ -55,9 +54,6 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   const drawerGrid = document.getElementById("drawer-episode-grid");
   const openDrawerBtn = document.getElementById("btn-open-drawer");
   const closeDrawerBtn = document.getElementById("drawer-close-btn");
-  const lockOpenDrawerBtn = document.getElementById("btn-lock-open-drawer");
-  const drawerLabel = document.getElementById("episodes-drawer-label");
-
   const speedBtn = document.getElementById("btn-speed-toggle");
   const soundBtn = document.getElementById("btn-sound-toggle");
 
@@ -73,6 +69,7 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     el.textContent = seriesName;
   });
 
+  const drawerLabel = document.getElementById("episodes-drawer-label");
   if (drawerLabel) drawerLabel.textContent = `${currentEpisodes.length} Eps`;
 
   function showStatus(msg) {
@@ -161,10 +158,9 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     }
 
     if (lockModal) lockModal.style.display = "none";
-
     showStatus("Connecting media stream...");
-    let streamUrl = ep.src;
 
+    let streamUrl = ep.src;
     if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
       const cachedBlob = await getCachedVideoBlobUrl(ep.src);
       if (cachedBlob) streamUrl = cachedBlob;
@@ -192,13 +188,63 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     });
   }
 
-  // Media Event Listeners for Reliable Diagnosis
-  video.onerror = () => {
-    console.error("[Minsplay Player] Video error loading:", video.src);
-    showStatus("Stream unreachable — check connection");
-    if (playIndicator) playIndicator.classList.add("active");
-    showAppToast("Video source offline or unreachable");
+  // ISSUE 2 FIX: Drawer click listener for episode transitions
+  if (drawerGrid) {
+    drawerGrid.onclick = (e) => {
+      const card = e.target.closest("[data-drawer-ep]");
+      if (card) {
+        const epNum = parseInt(card.getAttribute("data-drawer-ep"), 10);
+        loadEpisode(epNum - 1);
+      }
+    };
+  }
+
+  // ISSUE 1 FIX: Auto-advance to next episode when current finishes
+  video.onended = () => {
+    if (currentEpisodeIndex < currentEpisodes.length - 1) {
+      showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
+      loadEpisode(currentEpisodeIndex + 1);
+    } else {
+      showAppToast("🎬 Series Completed! Great binge.");
+    }
   };
+
+  // ISSUE 1 FIX: Swipe gestures on mobile
+  let touchStartY = 0, touchStartX = 0;
+  const targetSurface = playerRoot || document;
+
+  targetSurface.addEventListener("touchstart", (e) => {
+    if (!e.touches || e.touches.length === 0) return;
+    touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+
+  targetSurface.addEventListener("touchend", (e) => {
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+    const diffY = touchStartY - e.changedTouches[0].clientY;
+    const diffX = touchStartX - e.changedTouches[0].clientX;
+
+    if (e.target.closest("button, input, select, .drawer-sheet-box, .auth-sheet, .lock-modal-dialog")) return;
+
+    if (Math.abs(diffY) > 45 && Math.abs(diffY) > Math.abs(diffX) * 1.2) {
+      if (diffY > 0 && currentEpisodeIndex < currentEpisodes.length - 1) {
+        showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
+        loadEpisode(currentEpisodeIndex + 1);
+      } else if (diffY < 0 && currentEpisodeIndex > 0) {
+        showAppToast(`◀ Previous: Episode ${currentEpisodes[currentEpisodeIndex - 1].id}`);
+        loadEpisode(currentEpisodeIndex - 1);
+      }
+      return;
+    }
+
+    if (video.paused) {
+      video.play().then(() => playIndicator?.classList.remove("active")).catch(() => {});
+    } else {
+      video.pause();
+      playIndicator?.classList.add("active");
+    }
+    showHUD();
+  }, { passive: true });
 
   video.onloadedmetadata = () => {
     showStatus("");
@@ -208,7 +254,6 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   video.ontimeupdate = () => {
     const cur = video.currentTime || 0;
     const dur = video.duration || 0;
-
     if (seekSlider && dur > 0 && !seekSlider.matches(":active")) {
       seekSlider.value = (cur / dur) * 100;
     }
@@ -227,25 +272,9 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   if (seekSlider) {
     seekSlider.oninput = () => {
       const dur = video.duration || 0;
-      if (dur > 0) {
-        video.currentTime = (seekSlider.value / 100) * dur;
-        showHUD();
-      }
+      if (dur > 0) video.currentTime = (seekSlider.value / 100) * dur;
     };
   }
-
-  // Click & Play Toggle
-  const targetSurface = playerRoot || document;
-  targetSurface.onclick = (e) => {
-    if (e.target.closest("button, input, select, .drawer-sheet-box, .auth-sheet, .lock-modal-dialog")) return;
-    if (video.paused) {
-      video.play().then(() => playIndicator?.classList.remove("active")).catch(() => {});
-    } else {
-      video.pause();
-      playIndicator?.classList.add("active");
-    }
-    showHUD();
-  };
 
   if (speedBtn) {
     speedBtn.onclick = (e) => {

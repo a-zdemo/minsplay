@@ -130,6 +130,6 @@ export function canAccessRoute(routePath) {
   return true;
 }
 
-export function openAuthModal(intendedRoute = "") {
+export function openAuthModal() {
   navigateTo("/auth");
 }

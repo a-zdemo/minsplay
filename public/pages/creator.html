@@ -1,8 +1,6 @@
-<!-- STREAMING_CHUNK:Structuring Creator Studio dashboard and uploader view... -->
 <section class="db-subpage creator-page" id="creator-page-root">
   <div class="db-subpage-body">
     
-    <!-- Top Navigation Header -->
     <header class="db-subpage-header">
       <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
       <h2 class="db-subpage-title">Creator Studio</h2>
@@ -29,40 +27,33 @@
       </div>
     </section>
 
-    <!-- Upload New Episode Card -->
+    <!-- Upload Form -->
     <section class="creator-upload-section">
       <h3 class="creator-section-heading">Upload Drama Episode</h3>
 
       <form class="creator-form" id="form-upload-episode" onsubmit="return false;">
-        <!-- Series Selector -->
         <div class="creator-input-group">
           <label class="creator-label" for="upload-series-select">Series Title</label>
           <select class="creator-select" id="upload-series-select">
-            <option value="the-beginning">The Beginning: An Outsider's Ascent</option>
-            <option value="master-of-dragons">Master of Dragons</option>
-            <option value="dragon-god">Definitely Not The Dragon God</option>
-            <option value="bastard-hit-daughter">Protecting My Daughter</option>
             <option value="new-series">+ Create New Drama Series...</option>
           </select>
         </div>
 
-        <!-- Custom Series Title (Hidden unless + Create New Series is chosen) -->
-        <div class="creator-input-group" id="group-new-series-title" style="display: none;">
+        <div class="creator-input-group" id="group-new-series-title">
           <label class="creator-label" for="upload-new-series-title">New Drama Title</label>
-          <input type="text" class="creator-input" id="upload-new-series-title" placeholder="e.g. The CEO's Secret Heir" />
+          <input type="text" class="creator-input" id="upload-new-series-title" placeholder="e.g. The Dark Bees" />
         </div>
 
-        <!-- Episode Number & Title -->
         <div class="creator-row-2col">
           <div class="creator-input-group">
             <label class="creator-label" for="upload-ep-num">Episode #</label>
-            <input type="number" class="creator-input" id="upload-ep-num" value="6" min="1" max="100" />
+            <input type="number" class="creator-input" id="upload-ep-num" value="1" min="1" max="100" />
           </div>
           <div class="creator-input-group">
             <label class="creator-label" for="upload-ep-price">Price (Coins)</label>
             <select class="creator-select" id="upload-ep-price">
-              <option value="0">Free (0 Coins)</option>
-              <option value="30" selected>Standard (30 Coins)</option>
+              <option value="0" selected>Free (0 Coins)</option>
+              <option value="30">Standard (30 Coins)</option>
               <option value="50">Premium (50 Coins)</option>
             </select>
           </div>
@@ -70,33 +61,35 @@
 
         <div class="creator-input-group">
           <label class="creator-label" for="upload-ep-title">Episode Subtitle</label>
-          <input type="text" class="creator-input" id="upload-ep-title" placeholder="e.g. Episode 6: Unmasked" required />
+          <input type="text" class="creator-input" id="upload-ep-title" placeholder="e.g. Episode 1: The Dark Bees Return" required />
         </div>
 
-        <!-- Video File Dropzone -->
+        <!-- Video Dropzone with Live Frame Thumbnail Preview -->
         <div class="creator-input-group">
           <label class="creator-label">Vertical Video (9:16 MP4 / WebM)</label>
           <div class="creator-dropzone" id="creator-video-dropzone">
             <input type="file" id="upload-video-file" accept="video/mp4,video/webm,video/quicktime" class="creator-file-input" />
+            
             <div class="dropzone-content" id="dropzone-idle-content">
               <span class="dropzone-icon">🎬</span>
-              <strong class="dropzone-text">Tap to select vertical drama clip</strong>
-              <span class="dropzone-hint">Portrait 9:16 recommended • Max 180s per episode</span>
+              <strong class="dropzone-text">Tap to select drama video</strong>
+              <span class="dropzone-hint">Frame 1 will be automatically extracted as cover</span>
             </div>
+
             <div class="dropzone-selected" id="dropzone-selected-content" style="display: none;">
-              <span class="dropzone-check">✓</span>
+              <img id="dropzone-thumb-preview" class="dropzone-thumb-img" alt="Captured Thumbnail" style="display: none;" />
               <div class="selected-video-meta">
                 <strong id="selected-file-name">episode_clip.mp4</strong>
-                <span id="selected-file-specs">2.4MB • 10s • Portrait 9:16</span>
+                <span id="selected-file-specs">Extracting cover thumbnail...</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- In-Progress Upload Bar -->
+        <!-- Real-Time Upload Progress -->
         <div class="upload-progress-container" id="upload-progress-wrap" style="display: none;">
           <div class="progress-header-row">
-            <span class="progress-status-text" id="upload-status-text">Streaming to Cloudflare R2...</span>
+            <span class="progress-status-text" id="upload-status-text">Authorizing R2 token...</span>
             <span class="progress-percent-val" id="upload-percent-text">0%</span>
           </div>
           <div class="upload-progress-track">
@@ -104,7 +97,6 @@
           </div>
         </div>
 
-        <!-- Publish CTA -->
         <button class="creator-submit-btn" id="btn-publish-episode" type="button">
           Publish Episode to R2 Media Vault 🚀
         </button>

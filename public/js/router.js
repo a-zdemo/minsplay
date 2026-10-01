@@ -111,10 +111,11 @@ function createDramaCardMarkup(drama, rankNumber = null) {
   return `
     <article class="drama-card" data-route="/series" data-series="${drama.id}">
       <div class="drama-poster-wrap">
-        <div class="poster-gradient-art ${drama.artClass}">
-          <span class="art-symbol">${drama.artSymbol}</span>
-          <span class="art-code">${drama.artCode}</span>
-        </div>
+        ${drama.posterUrl ? `<img src="${drama.posterUrl}" class="poster-real-img" alt="${drama.title}" />` : `
+        <div class="poster-gradient-art ${drama.artClass || 'art-gold'}">
+          <span class="art-symbol">${drama.artSymbol || '🎬'}</span>
+          <span class="art-code">${drama.artCode || 'ORIGINAL'}</span>
+        </div>` }
         ${rankBadgeHtml}
         ${statusBadgeHtml}
         <div class="poster-play-count">
@@ -246,6 +247,20 @@ function initHomeFilterSystem() {
   if (!grid || !subNav) return;
 
   function renderGrid(dramas, isRanked = false) {
+    if (!dramas || dramas.length === 0) {
+      grid.innerHTML = `
+        <div class="home-empty-catalog" style="grid-column: span 3; text-align: center; padding: 40px 10px;">
+          <span style="font-size: 2.6rem; display: block; margin-bottom: 8px;">🎬</span>
+          <strong style="color: #fff; font-size: 1.05rem; display: block; margin-bottom: 6px;">No Dramas Published Yet</strong>
+          <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin: 0 0 16px;">Be the first creator to upload a vertical short drama to your Cloudflare R2 media vault.</p>
+          <button class="btn-spotlight-play" type="button" data-route="/creator">
+            + Open Creator Studio 🚀
+          </button>
+        </div>
+      `;
+      if (countBadge) countBadge.textContent = "0 Titles";
+      return;
+    }
     grid.innerHTML = dramas.map((d, idx) => createDramaCardMarkup(d, isRanked ? idx + 1 : null)).join("");
     if (countBadge) countBadge.textContent = `${dramas.length} Titles`;
   }
@@ -697,7 +712,13 @@ function renderSeriesDetail(seriesId) {
   }
 
   if (posterEl) {
-    posterEl.className = `series-hero-poster ${drama.artClass}`;
+    if (drama.posterUrl) {
+    posterEl.className = "series-hero-poster has-thumb";
+    posterEl.innerHTML = `<img src="${drama.posterUrl}" class="series-hero-img" alt="${drama.title}" />`;
+  } else {
+    posterEl.className = `series-hero-poster ${drama.artClass || 'art-gold'}`;
+    posterEl.innerHTML = `<span style="font-size: 2.2rem;">${drama.artSymbol || '🎬'}</span>`;
+  }
     posterEl.innerHTML = `<span style="font-size: 2.2rem;">${drama.artSymbol}</span>`;
   }
 

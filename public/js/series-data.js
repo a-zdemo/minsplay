@@ -1,199 +1,72 @@
-const LOCAL_SRC = "/videos/sample.mp4";
+const STORAGE_CATALOG_KEY = "minsplay_creator_catalog_v2";
 
-export const DRAMA_CATALOG = [
-  {
-    id: "the-beginning",
-    title: "The Beginning: An Outsider's Ascent",
-    shortTitle: "The Beginning",
-    genre: "Urban Suspense",
-    tags: "Urban • Suspense • Counterattack",
-    badge: "Following",
-    badgeClass: "badge-following",
-    plays: "14.2M",
-    artClass: "art-blue",
-    artSymbol: "⚔️",
-    artCode: "ORIGINAL",
-    synopsis: "A determined outsider steps into an unforgiving metropolis of ruthless ambition and corporate betrayal. When long-buried family truths unravel, every alliance comes with a steep price.",
-    episodes: [
-      { id: 1, title: "Episode 1: The Encounter", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 2, title: "Episode 2: Deep Water", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 3, title: "Episode 3: The Crossroad", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 4, title: "Episode 4: Payback", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 5, title: "Episode 5: The Reckoning", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-    ],
-  },
-  {
-    id: "master-of-dragons",
-    title: "Master of Dragons",
-    shortTitle: "Master of Dragons",
-    genre: "Revenge",
-    tags: "Action • Martial Arts • Revenge",
-    badge: "Hot",
-    badgeClass: "badge-hot",
-    plays: "6.2M",
-    artClass: "art-red",
-    artSymbol: "🐉",
-    artCode: "REVENGE",
-    synopsis: "Stripped of his heritage and left for dead in the dragon abyss, he awakens ancient bloodline secrets. Five years later, the dragon god returns to claim back everything stolen from his clan.",
-    episodes: [
-      { id: 1, title: "Episode 1: The Fall from Grace", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 2, title: "Episode 2: Awakening in Flames", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 3, title: "Episode 3: The Blood Oath", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 4, title: "Episode 4: Storming the Manor", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 5, title: "Episode 5: Dragon's Judgement", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-    ],
-  },
-  {
-    id: "dragon-god",
-    title: "Definitely Not The Dragon God",
-    shortTitle: "Not The Dragon God",
-    genre: "Hidden Identity",
-    tags: "Hidden Identity • Underdog • Comedy",
-    badge: "Following",
-    badgeClass: "badge-following",
-    plays: "84.6M",
-    artClass: "art-gold",
-    artSymbol: "👑",
-    artCode: "SECRET",
-    synopsis: "Treated as a lowly delivery driver by his arrogant in-laws, no one realizes he is the supreme leader of the Dragon Pavilion—until his true identity starts slipping out one crisis at a time.",
-    episodes: [
-      { id: 1, title: "Episode 1: The Delivery King", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 2, title: "Episode 2: The Billionaire Banquet", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 3, title: "Episode 3: Identity in Jeopardy", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 4, title: "Episode 4: Kneel Before Him", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 5, title: "Episode 5: The Grand Revelation", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-    ],
-  },
-  {
-    id: "dragon-rider",
-    title: "Kneel! That's the Dragon Rider",
-    shortTitle: "Dragon Rider",
-    genre: "Revenge",
-    tags: "Warrior • Revenge • High Energy",
-    badge: "",
-    badgeClass: "",
-    plays: "9.3M",
-    artClass: "art-purple",
-    artSymbol: "🛡️",
-    artCode: "WARRIOR",
-    synopsis: "When the Northern Border war general retires incognito to fulfill his mother's dying wish, corrupt local tycoons try to destroy his family. They are about to learn why nations bow to the Rider.",
-    episodes: [
-      { id: 1, title: "Episode 1: The Commander's Return", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 2, title: "Episode 2: Arrogant In-Laws", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 3, title: "Episode 3: Military Seal Revealed", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 4, title: "Episode 4: Total Subjugation", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 5, title: "Episode 5: Legend Immortalized", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-    ],
-  },
-  {
-    id: "bastard-hit-daughter",
-    title: "My Husband's Bastard Hit My Daughter",
-    shortTitle: "Protecting My Daughter",
-    genre: "Family Intrigue",
-    tags: "Drama • Family • Counterstrike",
-    badge: "New",
-    badgeClass: "badge-new",
-    plays: "257K",
-    artClass: "art-emerald",
-    artSymbol: "🔥",
-    artCode: "DRAMA",
-    synopsis: "A devoted mother sacrificed her career for ten years. When her husband brazenly brings his illegitimate child home to abuse her sick daughter, she unleashes her secret identity as the heiress to the nation's biggest financial conglomerate.",
-    episodes: [
-      { id: 1, title: "Episode 1: The Unforgivable Slap", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 2, title: "Episode 2: The Mask Slipped", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 3, title: "Episode 3: Freezing the Accounts", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 4, title: "Episode 4: The Boardroom Strike", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 5, title: "Episode 5: Sweet Retribution", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-    ],
-  },
-  {
-    id: "fake-husband",
-    title: "She Chose Her Fake Husband",
-    shortTitle: "Fake Husband",
-    genre: "All-Too-Late",
-    tags: "Romance • Billionaire • Regret",
-    badge: "New",
-    badgeClass: "badge-new",
-    plays: "72.5K",
-    artClass: "art-pink",
-    artSymbol: "💍",
-    artCode: "ROMANCE",
-    synopsis: "Forced into a contract marriage with a quiet clerk to save her grandfather's will, she expected nothing. But whenever she faces danger, the city's most elusive trillionaire shadows her every move.",
-    episodes: [
-      { id: 1, title: "Episode 1: A Paper Wedding", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 2, title: "Episode 2: Behind Closed Doors", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 3, title: "Episode 3: The Ex Comes Calling", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 4, title: "Episode 4: Mask Off at Midnight", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 5, title: "Episode 5: The Billionaire's Vow", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-    ],
-  },
-  {
-    id: "hell-fighter",
-    title: "What If I'm One Hell of a Fighter",
-    shortTitle: "Hell of a Fighter",
-    genre: "Counterattack",
-    tags: "Underground • Combat • Power",
-    badge: "Hot",
-    badgeClass: "badge-hot",
-    plays: "423K",
-    artClass: "art-dark",
-    artSymbol: "🥊",
-    artCode: "FIGHTER",
-    synopsis: "Mocked by his classmates and bullied at the docks, he steps into the underground ring where one punch changes his destiny forever.",
-    episodes: [
-      { id: 1, title: "Episode 1: The Bell Rings", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 2, title: "Episode 2: Unbroken Will", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 3, title: "Episode 3: Knockout Night", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 4, title: "Episode 4: Champion's Challenge", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 5, title: "Episode 5: King of the Ring", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-    ],
-  },
-  {
-    id: "poisoned-by-love",
-    title: "Poisoned by His Love",
-    shortTitle: "Poisoned Love",
-    genre: "Mafia Romance",
-    tags: "Mafia • Passion • Suspense",
-    badge: "Hot",
-    badgeClass: "badge-hot",
-    plays: "124M",
-    artClass: "art-crimson",
-    artSymbol: "🥀",
-    artCode: "MAFIA",
-    synopsis: "She saved a wounded stranger in the rain, unaware he was the city's most feared mafia godfather. Now trapped in his gilded cage, love and danger blur into an obsession she cannot escape.",
-    episodes: [
-      { id: 1, title: "Episode 1: The Stranger in the Rain", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 2, title: "Episode 2: A Gilded Prison", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 3, title: "Episode 3: Tainted Affection", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 4, title: "Episode 4: The Traitor Revealed", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 5, title: "Episode 5: Bound by Blood", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-    ],
-  },
-  {
-    id: "forbidden-fling",
-    title: "Forbidden Fling With My Bestie's Dad",
-    shortTitle: "Forbidden Fling",
-    genre: "Forbidden Love",
-    tags: "Billionaire • Taboo • Romance",
-    badge: "",
-    badgeClass: "",
-    plays: "83.4M",
-    artClass: "art-violet",
-    artSymbol: "⚡",
-    artCode: "FLING",
-    synopsis: "A chance encounter in an elite hotel lobby sparked a passionate secret romance. The morning after, she discovers he is the ruthless CEO father of her college roommate.",
-    episodes: [
-      { id: 1, title: "Episode 1: One Reckless Night", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 2, title: "Episode 2: The Sunday Dinner", duration: "0m 10s", isFree: true, src: LOCAL_SRC },
-      { id: 3, title: "Episode 3: Stolen Whispers", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 4, title: "Episode 4: Caught in the Crosshairs", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-      { id: 5, title: "Episode 5: Choosing Love", duration: "0m 10s", isFree: false, src: LOCAL_SRC },
-    ],
-  },
-];
+// Load user-published dramas from localStorage or start fresh
+function loadStoredCatalog() {
+  try {
+    const raw = localStorage.getItem(STORAGE_CATALOG_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {
+    console.error("Failed to load catalog from storage", e);
+  }
+  return [];
+}
+
+export let DRAMA_CATALOG = loadStoredCatalog();
+
+export function saveCatalogToStorage() {
+  try {
+    localStorage.setItem(STORAGE_CATALOG_KEY, JSON.stringify(DRAMA_CATALOG));
+  } catch (e) {
+    console.error("Failed to persist catalog", e);
+  }
+}
 
 export function getSeriesById(seriesId) {
-  if (!seriesId) return DRAMA_CATALOG[0];
+  if (!seriesId && DRAMA_CATALOG.length > 0) return DRAMA_CATALOG[0];
   const found = DRAMA_CATALOG.find((s) => s.id === seriesId);
-  return found || DRAMA_CATALOG[0];
+  return found || (DRAMA_CATALOG.length > 0 ? DRAMA_CATALOG[0] : null);
+}
+
+export function savePublishedEpisode({ seriesId, seriesTitle, episodeNum, title, videoUrl, posterUrl, coinPrice, synopsis, genre }) {
+  let drama = DRAMA_CATALOG.find((d) => d.id === seriesId);
+
+  if (!drama) {
+    drama = {
+      id: seriesId,
+      title: seriesTitle || title,
+      shortTitle: seriesTitle || title,
+      genre: genre || "Urban Drama",
+      tags: "Community • Creator Release",
+      badge: "Creator",
+      badgeClass: "badge-hot",
+      plays: "1",
+      posterUrl: posterUrl || "",
+      synopsis: synopsis || "Original community short drama streaming on Minsplay.",
+      episodes: []
+    };
+    DRAMA_CATALOG.unshift(drama);
+  } else if (posterUrl && !drama.posterUrl) {
+    drama.posterUrl = posterUrl;
+  }
+
+  // Ensure no duplicate episode numbers
+  const existingIndex = drama.episodes.findIndex((e) => e.id === Number(episodeNum));
+  const newEpisode = {
+    id: Number(episodeNum),
+    title: title || `Episode ${episodeNum}`,
+    duration: "1m 30s",
+    isFree: Number(coinPrice) === 0,
+    src: videoUrl,
+    posterUrl: posterUrl || drama.posterUrl || ""
+  };
+
+  if (existingIndex >= 0) {
+    drama.episodes[existingIndex] = newEpisode;
+  } else {
+    drama.episodes.push(newEpisode);
+    drama.episodes.sort((a, b) => a.id - b.id);
+  }
+
+  saveCatalogToStorage();
+  return drama;
 }

@@ -2,26 +2,28 @@ import { DRAMA_CATALOG, saveCatalogToStorage } from "./series-data.js";
 import { showAppToast, navigateTo } from "./router.js";
 import { getCurrentUser, ROLES } from "./auth.js";
 
-export function initAdminDashboard() {
-  const user = getCurrentUser();
-  const tabsBar = document.getElementById("admin-nav-tabs");
-  const refreshBtn = document.getElementById("btn-admin-refresh");
+const R2_BASE = "https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev";
+let currentEditingSeriesId = null;
+let currentEditingEpisodeId = 1;
 
+export function initAdminDashboard() {
   syncMetrics();
   renderDramaQueue();
   renderCreatorQueue();
-  renderUserRoleLadder();
+  renderCommentQueue();
+  attachAdminActions();
+  attachStreamEditorEvents();
 
+  const refreshBtn = document.getElementById("btn-admin-refresh");
   if (refreshBtn) {
     refreshBtn.onclick = () => {
       syncMetrics();
       renderDramaQueue();
-      renderCreatorQueue();
-      renderUserRoleLadder();
       showAppToast("Moderation feeds synced ✓");
     };
   }
 
+  const tabsBar = document.getElementById("admin-nav-tabs");
   if (tabsBar) {
     tabsBar.onclick = (e) => {
       const btn = e.target.closest(".admin-tab-btn");
@@ -42,8 +44,6 @@ export function initAdminDashboard() {
       }
     };
   }
-
-  attachAdminActions();
 }
 
 function syncMetrics() {
@@ -81,6 +81,7 @@ function renderDramaQueue() {
   feed.innerHTML = DRAMA_CATALOG.map((drama) => {
     const epCount = drama.episodes ? drama.episodes.length : 0;
     const status = drama.status || "approved";
+    const currentSrc = (drama.episodes && drama.episodes[0] && drama.episodes[0].src) || "None";
     const posterImg = drama.posterUrl
       ? `<img src="${drama.posterUrl}" class="admin-thumb" alt="${drama.title}"/>`
       : `<div class="admin-thumb placeholder">🎬</div>`;
@@ -93,11 +94,12 @@ function renderDramaQueue() {
             <strong class="admin-drama-name">${drama.title}</strong>
             <span class="admin-status-tag status-${status}">${status.toUpperCase()}</span>
           </div>
-          <span class="admin-drama-sub">${drama.genre || 'Drama'} • ${epCount} Episodes • ${drama.plays || '1'} Plays</span>
+          <span class="admin-drama-sub">${drama.genre || 'Drama'} • ${epCount} Episodes</span>
+          <span class="admin-stream-preview-link">Stream: <code>${currentSrc.split('/').pop()}</code></span>
           <div class="admin-action-pill-row">
-            <button class="btn-mod-action preview" data-action="preview" data-id="${drama.id}">Inspect ▶</button>
+            <button class="btn-mod-action edit-stream" data-action="edit-stream" data-id="${drama.id}">Edit Stream 🎥</button>
+            <button class="btn-mod-action preview" data-action="preview" data-id="${drama.id}">Watch ▶</button>
             <button class="btn-mod-action approve" data-action="approve" data-id="${drama.id}">Approve ✓</button>
-            <button class="btn-mod-action flag" data-action="flag" data-id="${drama.id}">Flag ⚠</button>
             <button class="btn-mod-action delete" data-action="delete" data-id="${drama.id}">Delete ✕</button>
           </div>
         </div>
@@ -105,66 +107,111 @@ function renderDramaQueue() {
     `;
   }).join("");
 }
+function attachStreamEditorEvents() {
+  const modal = document.getElementById("admin-stream-modal");
+  const closeBtn = document.getElementById("btn-close-stream-modal");
+  const urlInput = document.getElementById("admin-video-url-input");
+  const testBtn = document.getElementById("btn-test-stream-src");
+  const saveBtn = document.getElementById("btn-save-stream-src");
+  const previewVideo = document.getElementById("admin-preview-video");
+  const testBadge = document.getElementById("video-test-badge");
 
-function renderCreatorQueue() {
-  const container = document.getElementById("admin-creators-list");
-  if (!container) return;
+  if (closeBtn) closeBtn.onclick = () => { if (modal) modal.style.display = "none"; if (previewVideo) previewVideo.pause(); };
+  if (modal) modal.onclick = (e) => { if (e.target === modal) { modal.style.display = "none"; if (previewVideo) previewVideo.pause(); } };
 
-  container.innerHTML = `
-    <article class="admin-creator-card">
-      <div class="creator-card-left">
-        <span class="creator-avatar-bubble">🎬</span>
-        <div>
-          <strong>Dark Bees Studio Creator</strong>
-          <span class="creator-sub-tag">Role: CREATOR • 1 Series Live</span>
-        </div>
-      </div>
-      <div class="creator-stats-summary">
-        <span>Plays: 1.2K / 5K</span>
-        <span class="badge-upgrade-eligibility">Coin Paywall Authorized ✓</span>
-      </div>
-    </article>
-  `;
+  // Quick Prefix Buttons
+  document.querySelectorAll(".preset-btn").forEach((btn) => {
+    btn.onclick = () => {
+      const prefix = btn.getAttribute("data-prefix");
+      if (urlInput) {
+        urlInput.value = `${R2_BASE}/${prefix}`;
+        urlInput.focus();
+      }
+    };
+  });
+
+  // Verify Stream Playback
+  if (testBtn) {
+    testBtn.onclick = () => {
+      const url = urlInput ? urlInput.value.trim() : "";
+      if (!url) {
+        showAppToast("Please enter a video URL first");
+        return;
+      }
+
+      if (testBadge) testBadge.textContent = "Connecting to media stream...";
+      if (previewVideo) {
+        previewVideo.src = url;
+        previewVideo.load();
+        previewVideo.play().then(() => {
+          if (testBadge) {
+            testBadge.textContent = "Stream verified & playing smoothly! ✓";
+            testBadge.style.color = "#27c93f";
+          }
+          showAppToast("Video verified: Stream Online ⚡");
+        }).catch((err) => {
+          if (testBadge) {
+            testBadge.textContent = "Playback failed: Check file path or permissions";
+            testBadge.style.color = "#ff2e63";
+          }
+          showAppToast("Error loading video stream");
+        });
+      }
+    };
+  }
+
+  // Save and Publish Video Source
+  if (saveBtn) {
+    saveBtn.onclick = () => {
+      const url = urlInput ? urlInput.value.trim() : "";
+      if (!url) {
+        showAppToast("Cannot save empty video URL");
+        return;
+      }
+
+      const drama = DRAMA_CATALOG.find((d) => d.id === currentEditingSeriesId);
+      if (drama && drama.episodes && drama.episodes[0]) {
+        drama.episodes[0].src = url;
+        saveCatalogToStorage();
+        syncMetrics();
+        renderDramaQueue();
+        if (modal) modal.style.display = "none";
+        if (previewVideo) previewVideo.pause();
+        showAppToast(`Updated Episode 1 of "${drama.title}" successfully! 🚀`);
+      }
+    };
+  }
 }
 
-function renderUserRoleLadder() {
-  const container = document.getElementById("admin-creators-list");
-  if (!container) return;
+function openStreamEditorModal(seriesId) {
+  currentEditingSeriesId = seriesId;
+  const drama = DRAMA_CATALOG.find((d) => d.id === seriesId);
+  if (!drama) return;
 
-  const currentUser = getCurrentUser();
-  const isSuperAdmin = currentUser.role === ROLES.SUPER_ADMIN;
+  const modal = document.getElementById("admin-stream-modal");
+  const modalSub = document.getElementById("modal-editing-title");
+  const urlInput = document.getElementById("admin-video-url-input");
+  const testBadge = document.getElementById("video-test-badge");
+  const previewVideo = document.getElementById("admin-preview-video");
 
-  const roleControlHtml = `
-    <div class="admin-card r2-health-card" style="margin-top: 12px;">
-      <h4 class="card-title">Super Admin Role Delegation 👑</h4>
-      <p class="card-desc">Current Session: <code>${currentUser.username} (${currentUser.role.toUpperCase()})</code></p>
-      ${isSuperAdmin ? `
-        <div style="display: flex; gap: 8px; margin-top: 6px;">
-          <button class="btn-admin-outline" id="btn-promote-to-admin" type="button">Promote to Admin 🛡️</button>
-          <button class="btn-admin-outline" id="btn-promote-to-creator" type="button">Promote to Creator 🎬</button>
-        </div>
-      ` : `
-        <p style="color: #ffc107; font-size: 0.72rem; margin: 4px 0 0;">Super Admin privileges required to promote accounts.</p>
-      `}
-    </div>
-  `;
+  const currentSrc = (drama.episodes && drama.episodes[0] && drama.episodes[0].src) || `${R2_BASE}/episodes/${drama.id}/`;
 
-  container.insertAdjacentHTML("beforeend", roleControlHtml);
-
-  const adminPromoteBtn = document.getElementById("btn-promote-to-admin");
-  const creatorPromoteBtn = document.getElementById("btn-promote-to-creator");
-
-  if (adminPromoteBtn) {
-    adminPromoteBtn.onclick = () => showAppToast("User account elevated to Admin (Content Moderator) ✓");
+  if (modalSub) modalSub.textContent = `${drama.title} • Episode 1`;
+  if (urlInput) urlInput.value = currentSrc;
+  if (testBadge) {
+    testBadge.textContent = "Ready to verify";
+    testBadge.style.color = "rgba(255, 255, 255, 0.5)";
   }
-  if (creatorPromoteBtn) {
-    creatorPromoteBtn.onclick = () => showAppToast("User account elevated to Creator (R2 Vault Authorized) ✓");
+  if (previewVideo) {
+    previewVideo.removeAttribute("src");
+    previewVideo.load();
   }
+
+  if (modal) modal.style.display = "flex";
 }
 
 function attachAdminActions() {
   const dramasFeed = document.getElementById("admin-dramas-feed");
-  const testPingBtn = document.getElementById("btn-test-r2-ping");
 
   if (dramasFeed) {
     dramasFeed.onclick = (e) => {
@@ -172,23 +219,20 @@ function attachAdminActions() {
       if (!btn) return;
       const action = btn.getAttribute("data-action");
       const seriesId = btn.getAttribute("data-id");
-      const drama = DRAMA_CATALOG.find((d) => d.id === seriesId);
-      if (!drama) return;
 
-      if (action === "preview") {
+      if (action === "edit-stream") {
+        openStreamEditorModal(seriesId);
+      } else if (action === "preview") {
         navigateTo("/series", { seriesId });
       } else if (action === "approve") {
-        drama.status = "approved";
-        saveCatalogToStorage();
-        syncMetrics();
-        renderDramaQueue();
-        showAppToast(`"${drama.title}" marked as Approved ✓`);
-      } else if (action === "flag") {
-        drama.status = "flagged";
-        saveCatalogToStorage();
-        syncMetrics();
-        renderDramaQueue();
-        showAppToast(`"${drama.title}" flagged for compliance review ⚠`);
+        const drama = DRAMA_CATALOG.find((d) => d.id === seriesId);
+        if (drama) {
+          drama.status = "approved";
+          saveCatalogToStorage();
+          syncMetrics();
+          renderDramaQueue();
+          showAppToast(`"${drama.title}" marked as Approved ✓`);
+        }
       } else if (action === "delete") {
         const idx = DRAMA_CATALOG.findIndex((d) => d.id === seriesId);
         if (idx >= 0) {
@@ -196,26 +240,33 @@ function attachAdminActions() {
           saveCatalogToStorage();
           syncMetrics();
           renderDramaQueue();
-          showAppToast(`Removed "${drama.title}" from catalog 🗑️`);
+          showAppToast("Removed drama from catalog 🗑️");
         }
       }
     };
   }
+}
 
-  if (testPingBtn) {
-    testPingBtn.onclick = async () => {
-      showAppToast("Testing Cloudflare R2 presigned gateway...");
-      try {
-        const res = await fetch("https://lekmsvdbthupiauejffo.supabase.co/functions/v1/smart-responder", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ filename: "ping.mp4", contentType: "video/mp4", seriesId: "admin-check" })
-        });
-        if (res.ok) showAppToast("Cloudflare R2 Gateway Online: HTTP 200 ✓");
-        else showAppToast(`Signer error: HTTP ${res.status}`);
-      } catch (err) {
-        showAppToast("Ping Failed: Network check required");
-      }
-    };
-  }
+function renderCreatorQueue() {
+  const container = document.getElementById("admin-creators-list");
+  if (!container) return;
+  container.innerHTML = `
+    <article class="admin-creator-card">
+      <div class="creator-card-left">
+        <span class="creator-avatar-bubble">🎬</span>
+        <div><strong>Verified Studio Creator</strong><span class="creator-sub-tag">Coin Paywall Authorized ✓</span></div>
+      </div>
+    </article>
+  `;
+}
+
+function renderCommentQueue() {
+  const feed = document.getElementById("admin-comments-feed");
+  if (!feed) return;
+  feed.innerHTML = `
+    <article class="admin-comment-card status-ok">
+      <div class="comment-head"><strong>Viewer on The Dark Bees</strong><span class="comment-badge ok">APPROVED</span></div>
+      <p class="comment-text-body">Loving this vertical format!</p>
+    </article>
+  `;
 }

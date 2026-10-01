@@ -3182,3 +3182,127 @@
 .auth-preset-btn small { font-size: 0.64rem; color: rgba(255, 255, 255, 0.4); }
 
 .auth-disclaimer { margin: 4px 0 0; font-size: 0.66rem; color: rgba(255, 255, 255, 0.4); text-align: center; }
+
+/* ==========================================================================
+   Admin Stream Re-Linker & Modal Styles
+   ========================================================================== */
+.admin-stream-preview-link {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 2px;
+}
+.admin-stream-preview-link code {
+  color: #00d2fc;
+  background: rgba(0, 210, 252, 0.1);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.btn-mod-action.edit-stream {
+  background: rgba(0, 210, 252, 0.18) !important;
+  color: #00d2fc !important;
+  border: 1px solid rgba(0, 210, 252, 0.35) !important;
+}
+
+.admin-stream-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.admin-modal-card {
+  background: #14141e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 440px;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.95);
+}
+
+.admin-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.admin-modal-title { margin: 0; font-size: 1.05rem; font-weight: 800; color: #fff; }
+.admin-modal-sub { margin: 2px 0 0; font-size: 0.74rem; color: #00d2fc; font-weight: 700; }
+.admin-modal-close { all: unset; color: rgba(255,255,255,0.4); font-size: 1.1rem; cursor: pointer; padding: 4px; }
+
+.admin-modal-form { display: flex; flex-direction: column; gap: 10px; }
+.admin-form-label { font-size: 0.74rem; font-weight: 700; color: rgba(255, 255, 255, 0.7); }
+.admin-form-input {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  background: #1c1c28;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: #fff;
+}
+.admin-form-input:focus { border-color: #00d2fc; }
+
+.admin-quick-presets { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.preset-label { font-size: 0.68rem; color: rgba(255,255,255,0.4); }
+.preset-btn {
+  all: unset;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.preset-btn:active { background: rgba(0, 210, 252, 0.2); color: #00d2fc; }
+
+.admin-video-test-stage {
+  width: 100%;
+  background: #09090e;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.admin-preview-player {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  background: #000;
+}
+.video-test-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 6px 0;
+  text-align: center;
+}
+
+.admin-modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+.btn-admin-action {
+  all: unset;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 10px 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.btn-admin-action.test { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255,255,255,0.12); }
+.btn-admin-action.save { background: linear-gradient(90deg, #00d2fc, #0077ff); color: #fff; }

@@ -11,7 +11,7 @@
       <button class="admin-refresh-btn" id="btn-admin-refresh" type="button" title="Refresh Feed">↻</button>
     </header>
 
-    <!-- Platform Health & Storage Metric Tiles -->
+    <!-- Metrics Grid -->
     <section class="admin-metrics-grid">
       <div class="admin-metric-card">
         <span class="metric-label">Vault Dramas</span>
@@ -42,38 +42,71 @@
     <div class="admin-pane active" id="pane-dramas">
       <div class="pane-action-bar">
         <span class="pane-subtitle" id="admin-catalog-count">0 Published Series</span>
-        <button class="btn-admin-pill" id="btn-quick-audit-all" type="button">Audit Catalog</button>
       </div>
       <div class="admin-items-feed" id="admin-dramas-feed"></div>
     </div>
 
-    <!-- TAB 2: Creator Tiers & Verification -->
+    <!-- TAB 2: Creator Tiers -->
     <div class="admin-pane" id="pane-creators" style="display: none;">
-      <div class="pane-action-bar">
-        <span class="pane-subtitle">Creator Tier Ladder Approvals</span>
-      </div>
       <div class="admin-creators-list" id="admin-creators-list"></div>
     </div>
 
-    <!-- TAB 3: Comments & Interaction Moderation -->
+    <!-- TAB 3: Comments -->
     <div class="admin-pane" id="pane-comments" style="display: none;">
-      <div class="pane-action-bar">
-        <span class="pane-subtitle">Community Comments & Filter</span>
-        <button class="btn-admin-danger-pill" id="btn-purge-flagged-comments" type="button">Purge Flagged</button>
-      </div>
       <div class="admin-comments-feed" id="admin-comments-feed"></div>
     </div>
 
     <!-- TAB 4: Cloudflare R2 Media Health -->
     <div class="admin-pane" id="pane-storage" style="display: none;">
       <div class="admin-card r2-health-card">
-        <h4 class="card-title">Cloudflare R2 Bucket Health</h4>
-        <p class="card-desc">Bucket: <code>minsplay-media-vault</code></p>
-        <p class="card-desc">Region: <code>Auto / EU-West (Edge)</code></p>
-        <div class="r2-status-pill">● CDN Zero Egress Streaming Active</div>
-        <button class="btn-admin-outline" id="btn-test-r2-ping" type="button">Test R2 Ping</button>
+        <h4 class="card-title">Cloudflare R2 Media Vault</h4>
+        <p class="card-desc">Public Domain: <code>https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev</code></p>
+        <div class="r2-status-pill">● Direct Video Gateway Online</div>
+        <button class="btn-admin-outline" id="btn-test-r2-ping" type="button">Test R2 Gateway Ping</button>
       </div>
     </div>
 
   </div>
+
+  <!-- Interactive Stream Linker Modal -->
+  <aside class="admin-stream-modal" id="admin-stream-modal" style="display: none;">
+    <div class="admin-modal-card">
+      <header class="admin-modal-head">
+        <div>
+          <h3 class="admin-modal-title">Link Video Stream 🎥</h3>
+          <p class="admin-modal-sub" id="modal-editing-title">The Dark Bees • Ep 1</p>
+        </div>
+        <button class="admin-modal-close" id="btn-close-stream-modal" type="button">✕</button>
+      </header>
+
+      <div class="admin-modal-form">
+        <label class="admin-form-label">Video Stream Source URL or R2 File Name</label>
+        <div class="admin-input-wrap">
+          <input 
+            type="url" 
+            id="admin-video-url-input" 
+            class="admin-form-input" 
+            placeholder="https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev/episodes/..." 
+          />
+        </div>
+
+        <div class="admin-quick-presets">
+          <span class="preset-label">Quick R2 Folders:</span>
+          <button class="preset-btn" type="button" data-prefix="episodes/the-dark-bees/">the-dark-bees/</button>
+          <button class="preset-btn" type="button" data-prefix="episodes/the-beginning/">the-beginning/</button>
+        </div>
+
+        <!-- Live In-Modal Video Player Test -->
+        <div class="admin-video-test-stage">
+          <video id="admin-preview-video" class="admin-preview-player" playsinline controls></video>
+          <span class="video-test-badge" id="video-test-badge">Enter a video URL to test</span>
+        </div>
+
+        <div class="admin-modal-actions">
+          <button class="btn-admin-action test" id="btn-test-stream-src" type="button">Verify Stream ▶</button>
+          <button class="btn-admin-action save" id="btn-save-stream-src" type="button">Save & Publish Live ✓</button>
+        </div>
+      </div>
+    </div>
+  </aside>
 </section>

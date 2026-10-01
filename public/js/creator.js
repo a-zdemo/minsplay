@@ -192,12 +192,12 @@ function renderCreatorCMSFeed() {
   const countEl = document.getElementById("cms-total-count");
   if (!feed) return;
 
-  if (countEl) countEl.textContent = `${DRAMA_CATALOG.length} Series In Catalog`;
+  if (countEl) countEl.textContent = `${DRAMA_CATALOG.length} Series in Active Catalog`;
 
   if (DRAMA_CATALOG.length === 0) {
     feed.innerHTML = `
       <div class="cms-empty-state">
-        <span>🎬</span>
+        <span style="font-size: 2.2rem;">🎬</span>
         <p>No drama series uploaded yet.</p>
       </div>`;
     return;
@@ -208,24 +208,38 @@ function renderCreatorCMSFeed() {
     return `
       <article class="cms-series-card" data-series-id="${drama.id}">
         <header class="cms-series-head">
-          <div>
-            <strong class="cms-series-title">${drama.title}</strong>
+          <div class="cms-series-title-wrap">
+            <h3 class="cms-series-title">${drama.title}</h3>
             <span class="cms-series-sub">${drama.genre} • ${episodes.length} Episodes</span>
           </div>
-          <button class="btn-cms-delete-series" data-action="delete-series" data-series="${drama.id}">Delete Series ✕</button>
+          <button class="btn-cms-delete-series" data-action="delete-series" data-series="${drama.id}">
+            Delete Series ✕
+          </button>
         </header>
 
         <div class="cms-episodes-table">
           ${episodes.map((ep) => `
-            <div class="cms-ep-row" data-ep-id="${ep.id}">
-              <div class="cms-ep-info">
-                <span class="cms-ep-tag">EP ${ep.id}</span>
-                <strong class="cms-ep-name">${ep.title}</strong>
-                <span class="cms-price-badge ${ep.isFree ? 'free' : 'paid'}">${ep.isFree ? 'FREE' : '30 COINS'}</span>
+            <div class="cms-ep-card" data-ep-id="${ep.id}">
+              <div class="cms-ep-card-top">
+                <div class="cms-ep-title-cluster">
+                  <span class="cms-ep-pill">EP ${ep.id}</span>
+                  <strong class="cms-ep-name">${ep.title}</strong>
+                </div>
+                <span class="cms-price-badge ${ep.isFree ? 'free' : 'paid'}">
+                  ${ep.isFree ? 'FREE' : '30 COINS'}
+                </span>
               </div>
-              <div class="cms-ep-actions">
-                <button class="btn-cms-action-pill edit" data-action="edit-ep" data-series="${drama.id}" data-ep="${ep.id}">Edit ✏️</button>
-                <button class="btn-cms-action-pill delete" data-action="delete-ep" data-series="${drama.id}" data-ep="${ep.id}">Delete ✕</button>
+              
+              <div class="cms-ep-card-bottom">
+                <span class="cms-ep-meta-specs">🎬 Vertical 9:16 • Video Stream</span>
+                <div class="cms-ep-btn-cluster">
+                  <button class="btn-cms-action-pill edit" data-action="edit-ep" data-series="${drama.id}" data-ep="${ep.id}">
+                    ✏️ Edit
+                  </button>
+                  <button class="btn-cms-action-pill delete" data-action="delete-ep" data-series="${drama.id}" data-ep="${ep.id}">
+                    🗑️ Delete
+                  </button>
+                </div>
               </div>
             </div>
           `).join("")}

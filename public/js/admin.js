@@ -1,25 +1,29 @@
 import { DRAMA_CATALOG, saveCatalogToStorage } from "./series-data.js";
 import { showAppToast, navigateTo } from "./router.js";
 import { getCurrentUser, ROLES } from "./auth.js";
+import { getStoredTasks, saveStoredTasks, syncTasksFromSupabase } from "./rewards.js";
+import { upsertTaskInDatabase, deleteTaskFromDatabase } from "./tasks-api.js";
 
 const R2_BASE = "https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev";
-let currentEditingSeriesId = null;
-let currentEditingEpisodeId = 1;
+let currentEditingTaskId = null;
 
 export function initAdminDashboard() {
   syncMetrics();
   renderDramaQueue();
+  renderRewardTasksQueue();
   renderCreatorQueue();
   renderCommentQueue();
   attachAdminActions();
-  attachStreamEditorEvents();
+  attachTaskModalEvents();
 
   const refreshBtn = document.getElementById("btn-admin-refresh");
   if (refreshBtn) {
-    refreshBtn.onclick = () => {
+    refreshBtn.onclick = async () => {
+      await syncTasksFromSupabase();
       syncMetrics();
       renderDramaQueue();
-      showAppToast("Moderation feeds synced ✓");
+      renderRewardTasksQueue();
+      showAppToast("Moderation feeds synced with database ✓");
     };
   }
 
@@ -41,6 +45,7 @@ export function initAdminDashboard() {
       if (activePane) {
         activePane.style.display = "flex";
         activePane.classList.add("active");
+        if (paneId === "tasks") renderRewardTasksQueue();
       }
     };
   }
@@ -48,225 +53,197 @@ export function initAdminDashboard() {
 
 function syncMetrics() {
   const dramasCountEl = document.getElementById("metric-total-dramas");
-  const episodesCountEl = document.getElementById("metric-total-episodes");
+  const tasksCountEl = document.getElementById("metric-total-tasks");
   const issuesCountEl = document.getElementById("metric-pending-issues");
   const catalogCountEl = document.getElementById("admin-catalog-count");
 
-  let totalEpisodes = 0;
-  DRAMA_CATALOG.forEach((d) => {
-    totalEpisodes += (d.episodes ? d.episodes.length : 0);
-  });
+  const tasks = getStoredTasks();
 
   if (dramasCountEl) dramasCountEl.textContent = DRAMA_CATALOG.length.toString();
-  if (episodesCountEl) episodesCountEl.textContent = totalEpisodes.toString();
+  if (tasksCountEl) tasksCountEl.textContent = tasks.length.toString();
   if (catalogCountEl) catalogCountEl.textContent = `${DRAMA_CATALOG.length} Registered Dramas`;
 
   const flagged = DRAMA_CATALOG.filter((d) => d.status === "flagged" || d.status === "pending").length;
   if (issuesCountEl) issuesCountEl.textContent = flagged.toString();
 }
 
-function renderDramaQueue() {
-  const feed = document.getElementById("admin-dramas-feed");
+export function renderRewardTasksQueue() {
+  const feed = document.getElementById("admin-tasks-feed");
+  const countSub = document.getElementById("admin-tasks-subtitle");
   if (!feed) return;
 
-  if (DRAMA_CATALOG.length === 0) {
-    feed.innerHTML = `
-      <div class="admin-empty-state">
-        <span>🎬</span>
-        <p>No drama series found in catalog.</p>
-      </div>`;
+  const tasks = getStoredTasks();
+  if (countSub) countSub.textContent = `${tasks.length} Active Reward Tasks in Supabase`;
+
+  if (tasks.length === 0) {
+    feed.innerHTML = `<div class="admin-empty-state"><span>🪙</span><p>No reward tasks configured.</p></div>`;
     return;
   }
 
-  feed.innerHTML = DRAMA_CATALOG.map((drama) => {
-    const epCount = drama.episodes ? drama.episodes.length : 0;
-    const status = drama.status || "approved";
-    const currentSrc = (drama.episodes && drama.episodes[0] && drama.episodes[0].src) || "None";
-    const posterImg = drama.posterUrl
-      ? `<img src="${drama.posterUrl}" class="admin-thumb" alt="${drama.title}"/>`
-      : `<div class="admin-thumb placeholder">🎬</div>`;
-
-    return `
-      <article class="admin-drama-row" data-series-id="${drama.id}">
-        ${posterImg}
-        <div class="admin-drama-info">
-          <div class="admin-row-title-bar">
-            <strong class="admin-drama-name">${drama.title}</strong>
-            <span class="admin-status-tag status-${status}">${status.toUpperCase()}</span>
-          </div>
-          <span class="admin-drama-sub">${drama.genre || 'Drama'} • ${epCount} Episodes</span>
-          <span class="admin-stream-preview-link">Stream: <code>${currentSrc.split('/').pop()}</code></span>
-          <div class="admin-action-pill-row">
-            <button class="btn-mod-action edit-stream" data-action="edit-stream" data-id="${drama.id}">Edit Stream 🎥</button>
-            <button class="btn-mod-action preview" data-action="preview" data-id="${drama.id}">Watch ▶</button>
-            <button class="btn-mod-action approve" data-action="approve" data-id="${drama.id}">Approve ✓</button>
-            <button class="btn-mod-action delete" data-action="delete" data-id="${drama.id}">Delete ✕</button>
-          </div>
+  feed.innerHTML = tasks.map((task) => `
+    <article class="admin-task-card" data-task-id="${task.id}">
+      <div class="task-card-left">
+        <span class="task-card-icon">${task.icon || '🎁'}</span>
+        <div class="task-card-meta">
+          <strong class="task-card-name">${task.title}</strong>
+          <span class="task-card-reward">+${task.reward} Coins • Action: ${task.actionType}</span>
         </div>
-      </article>
-    `;
-  }).join("");
-}
-function attachStreamEditorEvents() {
-  const modal = document.getElementById("admin-stream-modal");
-  const closeBtn = document.getElementById("btn-close-stream-modal");
-  const urlInput = document.getElementById("admin-video-url-input");
-  const testBtn = document.getElementById("btn-test-stream-src");
-  const saveBtn = document.getElementById("btn-save-stream-src");
-  const previewVideo = document.getElementById("admin-preview-video");
-  const testBadge = document.getElementById("video-test-badge");
-
-  if (closeBtn) closeBtn.onclick = () => { if (modal) modal.style.display = "none"; if (previewVideo) previewVideo.pause(); };
-  if (modal) modal.onclick = (e) => { if (e.target === modal) { modal.style.display = "none"; if (previewVideo) previewVideo.pause(); } };
-
-  // Quick Prefix Buttons
-  document.querySelectorAll(".preset-btn").forEach((btn) => {
-    btn.onclick = () => {
-      const prefix = btn.getAttribute("data-prefix");
-      if (urlInput) {
-        urlInput.value = `${R2_BASE}/${prefix}`;
-        urlInput.focus();
-      }
-    };
-  });
-
-  // Verify Stream Playback
-  if (testBtn) {
-    testBtn.onclick = () => {
-      const url = urlInput ? urlInput.value.trim() : "";
-      if (!url) {
-        showAppToast("Please enter a video URL first");
-        return;
-      }
-
-      if (testBadge) testBadge.textContent = "Connecting to media stream...";
-      if (previewVideo) {
-        previewVideo.src = url;
-        previewVideo.load();
-        previewVideo.play().then(() => {
-          if (testBadge) {
-            testBadge.textContent = "Stream verified & playing smoothly! ✓";
-            testBadge.style.color = "#27c93f";
-          }
-          showAppToast("Video verified: Stream Online ⚡");
-        }).catch((err) => {
-          if (testBadge) {
-            testBadge.textContent = "Playback failed: Check file path or permissions";
-            testBadge.style.color = "#ff2e63";
-          }
-          showAppToast("Error loading video stream");
-        });
-      }
-    };
-  }
-
-  // Save and Publish Video Source
-  if (saveBtn) {
-    saveBtn.onclick = () => {
-      const url = urlInput ? urlInput.value.trim() : "";
-      if (!url) {
-        showAppToast("Cannot save empty video URL");
-        return;
-      }
-
-      const drama = DRAMA_CATALOG.find((d) => d.id === currentEditingSeriesId);
-      if (drama && drama.episodes && drama.episodes[0]) {
-        drama.episodes[0].src = url;
-        saveCatalogToStorage();
-        syncMetrics();
-        renderDramaQueue();
-        if (modal) modal.style.display = "none";
-        if (previewVideo) previewVideo.pause();
-        showAppToast(`Updated Episode 1 of "${drama.title}" successfully! 🚀`);
-      }
-    };
-  }
-}
-
-function openStreamEditorModal(seriesId) {
-  currentEditingSeriesId = seriesId;
-  const drama = DRAMA_CATALOG.find((d) => d.id === seriesId);
-  if (!drama) return;
-
-  const modal = document.getElementById("admin-stream-modal");
-  const modalSub = document.getElementById("modal-editing-title");
-  const urlInput = document.getElementById("admin-video-url-input");
-  const testBadge = document.getElementById("video-test-badge");
-  const previewVideo = document.getElementById("admin-preview-video");
-
-  const currentSrc = (drama.episodes && drama.episodes[0] && drama.episodes[0].src) || `${R2_BASE}/episodes/${drama.id}/`;
-
-  if (modalSub) modalSub.textContent = `${drama.title} • Episode 1`;
-  if (urlInput) urlInput.value = currentSrc;
-  if (testBadge) {
-    testBadge.textContent = "Ready to verify";
-    testBadge.style.color = "rgba(255, 255, 255, 0.5)";
-  }
-  if (previewVideo) {
-    previewVideo.removeAttribute("src");
-    previewVideo.load();
-  }
-
-  if (modal) modal.style.display = "flex";
-}
-
-function attachAdminActions() {
-  const dramasFeed = document.getElementById("admin-dramas-feed");
-
-  if (dramasFeed) {
-    dramasFeed.onclick = (e) => {
-      const btn = e.target.closest("[data-action]");
-      if (!btn) return;
-      const action = btn.getAttribute("data-action");
-      const seriesId = btn.getAttribute("data-id");
-
-      if (action === "edit-stream") {
-        openStreamEditorModal(seriesId);
-      } else if (action === "preview") {
-        navigateTo("/series", { seriesId });
-      } else if (action === "approve") {
-        const drama = DRAMA_CATALOG.find((d) => d.id === seriesId);
-        if (drama) {
-          drama.status = "approved";
-          saveCatalogToStorage();
-          syncMetrics();
-          renderDramaQueue();
-          showAppToast(`"${drama.title}" marked as Approved ✓`);
-        }
-      } else if (action === "delete") {
-        const idx = DRAMA_CATALOG.findIndex((d) => d.id === seriesId);
-        if (idx >= 0) {
-          DRAMA_CATALOG.splice(idx, 1);
-          saveCatalogToStorage();
-          syncMetrics();
-          renderDramaQueue();
-          showAppToast("Removed drama from catalog 🗑️");
-        }
-      }
-    };
-  }
-}
-
-function renderCreatorQueue() {
-  const container = document.getElementById("admin-creators-list");
-  if (!container) return;
-  container.innerHTML = `
-    <article class="admin-creator-card">
-      <div class="creator-card-left">
-        <span class="creator-avatar-bubble">🎬</span>
-        <div><strong>Verified Studio Creator</strong><span class="creator-sub-tag">Coin Paywall Authorized ✓</span></div>
+      </div>
+      <div class="task-card-actions">
+        <button class="btn-mod-action edit-task" data-action="edit-task" data-id="${task.id}">Edit ✏️</button>
+        <button class="btn-mod-action delete" data-action="delete-task" data-id="${task.id}">Delete ✕</button>
       </div>
     </article>
-  `;
+  `).join("");
+
+  attachRewardTasksFeedActions();
 }
 
-function renderCommentQueue() {
-  const feed = document.getElementById("admin-comments-feed");
+function attachRewardTasksFeedActions() {
+  const feed = document.getElementById("admin-tasks-feed");
   if (!feed) return;
-  feed.innerHTML = `
-    <article class="admin-comment-card status-ok">
-      <div class="comment-head"><strong>Viewer on The Dark Bees</strong><span class="comment-badge ok">APPROVED</span></div>
-      <p class="comment-text-body">Loving this vertical format!</p>
-    </article>
-  `;
+
+  feed.onclick = async (e) => {
+    const btn = e.target.closest("[data-action]");
+    if (!btn) return;
+
+    const action = btn.getAttribute("data-action");
+    const taskId = btn.getAttribute("data-id");
+    const tasks = getStoredTasks();
+
+    if (action === "edit-task") {
+      openTaskEditModal(taskId);
+    } else if (action === "delete-task") {
+      const updated = tasks.filter((t) => t.id !== taskId);
+      saveStoredTasks(updated);
+      renderRewardTasksQueue();
+      syncMetrics();
+
+      // Persist deletion directly to Supabase
+      await deleteTaskFromDatabase(taskId);
+      showAppToast("Reward task deleted from database 🗑️");
+    }
+  };
 }
+
+function openTaskEditModal(taskId = null) {
+  currentEditingTaskId = taskId;
+  const modal = document.getElementById("admin-task-modal");
+  const titleEl = document.getElementById("modal-task-title");
+  const nameInput = document.getElementById("input-task-name");
+  const rewardInput = document.getElementById("input-task-reward");
+  const iconInput = document.getElementById("input-task-icon");
+  const actionSelect = document.getElementById("select-task-action");
+  const btnInput = document.getElementById("input-task-btn");
+
+  if (!modal) return;
+
+  if (taskId) {
+    const tasks = getStoredTasks();
+    const task = tasks.find((t) => t.id === taskId);
+    if (task) {
+      if (titleEl) titleEl.textContent = "Edit Reward Task ✏";
+      if (nameInput) nameInput.value = task.title;
+      if (rewardInput) rewardInput.value = task.reward || 30;
+      if (iconInput) iconInput.value = task.icon || "🎁";
+      if (actionSelect) actionSelect.value = task.actionType || "ad";
+      if (btnInput) btnInput.value = task.btnLabel || "Go";
+    }
+  } else {
+    if (titleEl) titleEl.textContent = "Create Reward Task 🪙";
+    if (nameInput) nameInput.value = "";
+    if (rewardInput) rewardInput.value = "30";
+    if (iconInput) iconInput.value = "🎁";
+    if (actionSelect) actionSelect.value = "ad";
+    if (btnInput) btnInput.value = "Go";
+  }
+
+  modal.style.display = "flex";
+}
+
+function attachTaskModalEvents() {
+  const modal = document.getElementById("admin-task-modal");
+  const openCreateBtn = document.getElementById("btn-create-task-modal");
+  const closeBtn = document.getElementById("btn-close-task-modal");
+  const cancelBtn = document.getElementById("btn-cancel-task");
+  const saveBtn = document.getElementById("btn-save-task");
+
+  if (openCreateBtn) openCreateBtn.onclick = () => openTaskEditModal(null);
+  if (closeBtn) closeBtn.onclick = () => { if (modal) modal.style.display = "none"; };
+  if (cancelBtn) cancelBtn.onclick = () => { if (modal) modal.style.display = "none"; };
+
+  if (saveBtn) {
+    saveBtn.onclick = async () => {
+      const name = document.getElementById("input-task-name")?.value.trim();
+      const reward = parseInt(document.getElementById("input-task-reward")?.value || "30", 10);
+      const icon = document.getElementById("input-task-icon")?.value.trim() || "🎁";
+      const actionType = document.getElementById("select-task-action")?.value || "ad";
+      const btnLabel = document.getElementById("input-task-btn")?.value.trim() || "Go";
+
+      if (!name) {
+        showAppToast("Please enter a task title");
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving to Supabase...";
+
+      const tasks = getStoredTasks();
+      let targetTask = null;
+
+      if (currentEditingTaskId) {
+        targetTask = tasks.find((t) => t.id === currentEditingTaskId);
+        if (targetTask) {
+          targetTask.title = name;
+          targetTask.reward = reward;
+          targetTask.desc = `+ ${reward} reward coins`;
+          targetTask.icon = icon;
+          targetTask.actionType = actionType;
+          targetTask.btnLabel = btnLabel;
+        }
+      } else {
+        targetTask = {
+          id: `task_${Date.now()}`,
+          title: name,
+          desc: `+ ${reward} reward coins`,
+          reward,
+          icon,
+          actionType,
+          btnLabel,
+          completed: false
+        };
+        tasks.push(targetTask);
+      }
+
+      saveStoredTasks(tasks);
+      renderRewardTasksQueue();
+      syncMetrics();
+
+      // Persist to Supabase PostgreSQL table
+      await upsertTaskInDatabase(targetTask);
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save Task ✓";
+      if (modal) modal.style.display = "none";
+      showAppToast("Task saved to Supabase successfully! ✓");
+    };
+  }
+}
+
+function renderDramaQueue() {
+  const feed = document.getElementById("admin-dramas-feed");
+  if (!feed) return;
+  feed.innerHTML = DRAMA_CATALOG.map((drama) => `
+    <article class="admin-drama-row" data-series-id="${drama.id}">
+      <div class="admin-thumb placeholder">🎬</div>
+      <div class="admin-drama-info">
+        <strong class="admin-drama-name">${drama.title}</strong>
+        <span class="admin-drama-sub">${drama.genre} • ${(drama.episodes || []).length} Episodes</span>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderCreatorQueue() {}
+function renderCommentQueue() {}
+function attachAdminActions() {}

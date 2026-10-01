@@ -1,3 +1,4 @@
+import { canAccessRoute, openAuthModal, getCurrentUser, ROLES } from "./auth.js";
 import homeHtml from "../pages/home.html?raw";
 import seriesHtml from "../pages/series.html?raw";
 import watchHtml from "../pages/watch.html?raw";
@@ -74,6 +75,19 @@ export function showAppToast(message) {
 }
 
 export async function navigateTo(path, { seriesId, episode = 1 } = {}) {
+  // RBAC Route Guard
+  if (!canAccessRoute(path)) {
+    const user = getCurrentUser();
+    if (user.role === ROLES.GUEST) {
+      showAppToast("Please sign in to access this area 🔐");
+      openAuthModal(path);
+      return;
+    } else {
+      showAppToast(`Access Denied: ${user.role.toUpperCase()} cannot access ${path}`);
+      return;
+    }
+  }
+
   if (seriesId) currentActiveSeriesId = seriesId;
   pendingEpisode = episode;
 

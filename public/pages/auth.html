@@ -1,0 +1,61 @@
+<aside class="auth-modal-backdrop" id="auth-modal" style="display: none;">
+  <div class="auth-sheet">
+    <div class="auth-sheet-handle"></div>
+
+    <header class="auth-sheet-header">
+      <div class="auth-brand-badge">
+        <span class="auth-badge-icon">🎬</span>
+        <div>
+          <h3 class="auth-title">Welcome to Minsplay</h3>
+          <p class="auth-subtitle">Sign in to manage watchlist, creator releases, and privileges</p>
+        </div>
+      </div>
+      <button class="auth-close-btn" id="btn-close-auth-modal" type="button">✕</button>
+    </header>
+
+    <!-- Role Quick Switcher (For Development & Demonstration) -->
+    <div class="auth-role-tabs" id="auth-quick-roles">
+      <button class="auth-role-btn active" type="button" data-role="user">Viewer 👤</button>
+      <button class="auth-role-btn" type="button" data-role="creator">Creator 🎬</button>
+      <button class="auth-role-btn" type="button" data-role="admin">Admin 🛡️</button>
+      <button class="auth-role-btn" type="button" data-role="super_admin">Super Admin 👑</button>
+    </div>
+
+    <!-- Login Form -->
+    <form class="auth-form" id="form-auth-login" onsubmit="return false;">
+      <div class="auth-input-wrap">
+        <span class="auth-input-icon">✉</span>
+        <input 
+          type="email" 
+          id="auth-input-email" 
+          class="auth-input" 
+          placeholder="Enter email (e.g. admin@minsplay.com)" 
+          value="viewer@minsplay.com" 
+          required 
+        />
+      </div>
+
+      <button class="auth-submit-btn" id="btn-submit-login" type="button">
+        Continue with Minsplay ID ➔
+      </button>
+
+      <div class="auth-divider"><span>OR CONTINUE AS</span></div>
+
+      <!-- Quick 1-Tap Role Presets -->
+      <div class="auth-preset-grid">
+        <button class="auth-preset-btn" type="button" data-preset="superadmin@minsplay.com">
+          <span>👑 Super Admin</span>
+          <small>Platform Controls</small>
+        </button>
+        <button class="auth-preset-btn" type="button" data-preset="creator@minsplay.com">
+          <span>🎬 Verified Creator</span>
+          <small>R2 Upload Studio</small>
+        </button>
+      </div>
+
+      <p class="auth-disclaimer">
+        🔒 Role-Based Access Control verified. Content paywalls and moderation portals are protected.
+      </p>
+    </form>
+  </div>
+</aside>

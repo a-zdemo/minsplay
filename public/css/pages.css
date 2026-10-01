@@ -3045,3 +3045,140 @@
 .card-desc { margin: 0; font-size: 0.76rem; color: rgba(255,255,255,0.5); }
 .r2-status-pill { font-size: 0.75rem; color: #27c93f; font-weight: 800; margin: 4px 0 8px; }
 .btn-admin-outline { all: unset; text-align: center; background: rgba(0,210,252,0.12); border: 1px solid rgba(0,210,252,0.4); color: #00d2fc; font-weight: 800; font-size: 0.8rem; padding: 8px 0; border-radius: 8px; cursor: pointer; }
+
+/* ==========================================================================
+   Role-Based Access Control (RBAC) & Auth Sheet Styles
+   ========================================================================== */
+.auth-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 260;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.auth-sheet {
+  background: #12121a;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 480px;
+  padding: 10px 16px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.95);
+}
+.auth-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  margin: 4px auto 6px;
+}
+.auth-sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.auth-brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.auth-badge-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 46, 99, 0.15);
+  border: 1px solid rgba(255, 46, 99, 0.35);
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+}
+.auth-title { margin: 0; font-size: 1.05rem; font-weight: 800; color: #fff; }
+.auth-subtitle { margin: 2px 0 0; font-size: 0.72rem; color: rgba(255, 255, 255, 0.5); }
+.auth-close-btn { all: unset; color: rgba(255, 255, 255, 0.4); font-size: 1.1rem; cursor: pointer; padding: 4px; }
+
+/* Role Selector Tabs */
+.auth-role-tabs {
+  display: flex;
+  gap: 6px;
+  background: #181824;
+  padding: 4px;
+  border-radius: 12px;
+}
+.auth-role-btn {
+  all: unset;
+  flex: 1;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 6px 0;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+}
+.auth-role-btn.active {
+  background: #ff2e63;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(255, 46, 99, 0.4);
+}
+
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
+.auth-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1a1a26;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.auth-input-icon { color: rgba(255, 255, 255, 0.4); font-size: 1rem; }
+.auth-input { all: unset; flex: 1; color: #fff; font-size: 0.88rem; }
+.auth-submit-btn {
+  all: unset;
+  text-align: center;
+  background: linear-gradient(90deg, #ff1765 0%, #ff5e3a 100%);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.92rem;
+  padding: 12px 0;
+  border-radius: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 23, 101, 0.4);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.65rem;
+  font-weight: 800;
+  margin: 4px 0;
+}
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.auth-divider span { padding: 0 8px; }
+
+.auth-preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.auth-preset-btn {
+  all: unset;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+}
+.auth-preset-btn span { font-size: 0.78rem; font-weight: 800; color: #fff; }
+.auth-preset-btn small { font-size: 0.64rem; color: rgba(255, 255, 255, 0.4); }
+
+.auth-disclaimer { margin: 4px 0 0; font-size: 0.66rem; color: rgba(255, 255, 255, 0.4); text-align: center; }

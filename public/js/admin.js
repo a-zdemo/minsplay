@@ -1,23 +1,23 @@
 import { DRAMA_CATALOG, saveCatalogToStorage } from "./series-data.js";
 import { showAppToast, navigateTo } from "./router.js";
-
-const COMMENTS_KEY_PREFIX = "minsplay_comments_";
+import { getCurrentUser, ROLES } from "./auth.js";
 
 export function initAdminDashboard() {
+  const user = getCurrentUser();
   const tabsBar = document.getElementById("admin-nav-tabs");
   const refreshBtn = document.getElementById("btn-admin-refresh");
 
   syncMetrics();
   renderDramaQueue();
   renderCreatorQueue();
-  renderCommentQueue();
+  renderUserRoleLadder();
 
   if (refreshBtn) {
     refreshBtn.onclick = () => {
       syncMetrics();
       renderDramaQueue();
       renderCreatorQueue();
-      renderCommentQueue();
+      renderUserRoleLadder();
       showAppToast("Moderation feeds synced ✓");
     };
   }
@@ -61,7 +61,6 @@ function syncMetrics() {
   if (episodesCountEl) episodesCountEl.textContent = totalEpisodes.toString();
   if (catalogCountEl) catalogCountEl.textContent = `${DRAMA_CATALOG.length} Registered Dramas`;
 
-  // Count unapproved/flagged items
   const flagged = DRAMA_CATALOG.filter((d) => d.status === "flagged" || d.status === "pending").length;
   if (issuesCountEl) issuesCountEl.textContent = flagged.toString();
 }
@@ -106,6 +105,7 @@ function renderDramaQueue() {
     `;
   }).join("");
 }
+
 function renderCreatorQueue() {
   const container = document.getElementById("admin-creators-list");
   if (!container) return;
@@ -113,53 +113,53 @@ function renderCreatorQueue() {
   container.innerHTML = `
     <article class="admin-creator-card">
       <div class="creator-card-left">
-        <span class="creator-avatar-bubble">🐜</span>
+        <span class="creator-avatar-bubble">🎬</span>
         <div>
-          <strong>Minsplay Studio Creator</strong>
-          <span class="creator-sub-tag">Account ID: 84920 • Tier 1 Rookie</span>
+          <strong>Dark Bees Studio Creator</strong>
+          <span class="creator-sub-tag">Role: CREATOR • 1 Series Live</span>
         </div>
       </div>
       <div class="creator-stats-summary">
-        <span>Plays: 28 / 100</span>
-        <span class="badge-upgrade-eligibility">Eligible for Tier 2 Partner</span>
-      </div>
-      <div class="creator-actions-row">
-        <button class="btn-mod-action approve" id="btn-promote-creator">Promote to Tier 2 Partner 👑</button>
+        <span>Plays: 1.2K / 5K</span>
+        <span class="badge-upgrade-eligibility">Coin Paywall Authorized ✓</span>
       </div>
     </article>
   `;
-
-  const promoteBtn = document.getElementById("btn-promote-creator");
-  if (promoteBtn) {
-    promoteBtn.onclick = () => {
-      showAppToast("Creator promoted to Tier 2 Partner! Coin paywall authorized.");
-      promoteBtn.textContent = "Verified Partner ✓";
-      promoteBtn.disabled = true;
-    };
-  }
 }
 
-function renderCommentQueue() {
-  const feed = document.getElementById("admin-comments-feed");
-  if (!feed) return;
+function renderUserRoleLadder() {
+  const container = document.getElementById("admin-creators-list");
+  if (!container) return;
 
-  const mockComments = [
-    { id: "c_1", user: "Viewer_88", drama: "The Dark Bees", text: "Best cliffhanger yet! Watch till the end 🔥", status: "ok" },
-    { id: "c_2", user: "SpamBot_99", drama: "The Dark Bees", text: "Click here to claim free crypto bonus -> bit.ly/xxx", status: "flagged" },
-  ];
+  const currentUser = getCurrentUser();
+  const isSuperAdmin = currentUser.role === ROLES.SUPER_ADMIN;
 
-  feed.innerHTML = mockComments.map((c) => `
-    <article class="admin-comment-card status-${c.status}">
-      <div class="comment-head">
-        <strong>${c.user} on <em>${c.drama}</em></strong>
-        <span class="comment-badge ${c.status}">${c.status.toUpperCase()}</span>
-      </div>
-      <p class="comment-text-body">${c.text}</p>
-      <div class="comment-mod-row">
-        <button class="btn-mod-action delete" data-comment-id="${c.id}">Remove Comment 🗑️</button>
-      </div>
-    </article>
-  `).join("");
+  const roleControlHtml = `
+    <div class="admin-card r2-health-card" style="margin-top: 12px;">
+      <h4 class="card-title">Super Admin Role Delegation 👑</h4>
+      <p class="card-desc">Current Session: <code>${currentUser.username} (${currentUser.role.toUpperCase()})</code></p>
+      ${isSuperAdmin ? `
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <button class="btn-admin-outline" id="btn-promote-to-admin" type="button">Promote to Admin 🛡️</button>
+          <button class="btn-admin-outline" id="btn-promote-to-creator" type="button">Promote to Creator 🎬</button>
+        </div>
+      ` : `
+        <p style="color: #ffc107; font-size: 0.72rem; margin: 4px 0 0;">Super Admin privileges required to promote accounts.</p>
+      `}
+    </div>
+  `;
+
+  container.insertAdjacentHTML("beforeend", roleControlHtml);
+
+  const adminPromoteBtn = document.getElementById("btn-promote-to-admin");
+  const creatorPromoteBtn = document.getElementById("btn-promote-to-creator");
+
+  if (adminPromoteBtn) {
+    adminPromoteBtn.onclick = () => showAppToast("User account elevated to Admin (Content Moderator) ✓");
+  }
+  if (creatorPromoteBtn) {
+    creatorPromoteBtn.onclick = () => showAppToast("User account elevated to Creator (R2 Vault Authorized) ✓");
+  }
 }
 
 function attachAdminActions() {
@@ -204,7 +204,7 @@ function attachAdminActions() {
 
   if (testPingBtn) {
     testPingBtn.onclick = async () => {
-      showAppToast("Testing Cloudflare R2 presigned connectivity...");
+      showAppToast("Testing Cloudflare R2 presigned gateway...");
       try {
         const res = await fetch("https://lekmsvdbthupiauejffo.supabase.co/functions/v1/smart-responder", {
           method: "POST",

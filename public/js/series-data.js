@@ -1,4 +1,5 @@
 const STORAGE_CATALOG_KEY = "minsplay_creator_catalog_v2";
+const R2_PUBLIC_BASE = "https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev";
 
 function loadStoredCatalog() {
   let catalog = [];
@@ -9,41 +10,43 @@ function loadStoredCatalog() {
     console.error("Failed to load catalog from storage", e);
   }
 
-  // Auto-recovery: If "Dark Bees" is in watch progress, restore it
-  try {
-    const progressRaw = localStorage.getItem("minsplay_watch_progress");
-    if (progressRaw) {
-      const progress = JSON.parse(progressRaw);
-      const darkBees = Object.values(progress).find(
-        (p) => p.seriesTitle && p.seriesTitle.toLowerCase().includes("dark bees")
-      );
-      if (darkBees && !catalog.some((d) => d.id === darkBees.seriesId)) {
-        catalog.unshift({
-          id: darkBees.seriesId,
-          title: darkBees.seriesTitle,
-          shortTitle: darkBees.seriesTitle,
-          genre: "Urban Drama",
-          tags: "Original • Creator Release",
-          badge: "Creator",
-          badgeClass: "badge-hot",
-          plays: "1",
-          posterUrl: "",
-          synopsis: "Original community drama series on Minsplay.",
-          episodes: [
-            {
-              id: darkBees.episodeId || 1,
-              title: darkBees.episodeTitle || "Episode 1",
-              duration: "0m 10s",
-              isFree: true,
-              src: "/videos/sample.mp4",
-              posterUrl: "",
-            },
-          ],
-        });
-        localStorage.setItem(STORAGE_CATALOG_KEY, JSON.stringify(catalog));
+  // Ensure "The Dark Bees" points to Cloudflare R2, not sample.mp4
+  const darkBeesIndex = catalog.findIndex((d) => d.id === "the-dark-bees" || (d.title && d.title.toLowerCase().includes("dark bees")));
+  
+  const darkBeesSeries = {
+    id: "the-dark-bees",
+    title: "The Dark Bees",
+    shortTitle: "The Dark Bees",
+    genre: "Urban Suspense",
+    tags: "Creator Original • Suspense",
+    badge: "Creator",
+    badgeClass: "badge-hot",
+    plays: "1.2K",
+    posterUrl: "",
+    synopsis: "An elite detective infiltrates an underground syndicate known only as The Dark Bees. Every secret comes with a lethal price.",
+    episodes: [
+      {
+        id: 1,
+        title: "Episode 1: The Infiltration",
+        duration: "0m 08s",
+        isFree: true,
+        // Live Cloudflare R2 bucket endpoint
+        src: `${R2_PUBLIC_BASE}/episodes/the-dark-bees/1790818188825_test_clip.mp4`,
+        posterUrl: "",
       }
+    ]
+  };
+
+  if (darkBeesIndex >= 0) {
+    // If the stored copy had the old sample.mp4, upgrade it to R2
+    if (!catalog[darkBeesIndex].episodes[0] || catalog[darkBeesIndex].episodes[0].src.includes("sample.mp4")) {
+      catalog[darkBeesIndex] = darkBeesSeries;
+      localStorage.setItem(STORAGE_CATALOG_KEY, JSON.stringify(catalog));
     }
-  } catch (e) {}
+  } else {
+    catalog.unshift(darkBeesSeries);
+    localStorage.setItem(STORAGE_CATALOG_KEY, JSON.stringify(catalog));
+  }
 
   return catalog;
 }

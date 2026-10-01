@@ -9,11 +9,8 @@ import {
 } from "./storage.js";
 import { getSeriesById } from "./series-data.js";
 import { showAppToast } from "./router.js";
-import {
-  isEpisodeDownloaded,
-  downloadEpisode,
-  getCachedVideoBlobUrl
-} from "./downloader.js";
+import { isEpisodeDownloaded, downloadEpisode, getCachedVideoBlobUrl } from "./downloader.js";
+import { preloadNextEpisode, resolveStreamSource } from "./preloader.js";
 
 const SPEED_LEVELS = [1.0, 1.25, 1.5, 2.0];
 let currentSpeed = parseFloat(localStorage.getItem("minsplay_playback_speed") || "1.0");
@@ -25,6 +22,7 @@ let hudTimer = null;
 let isLiked = false;
 let isFavorited = false;
 let likeCount = 14200;
+let preloadTriggeredForEpisode = -1;
 
 let adTimerInterval = null;
 let adProgressInterval = null;
@@ -36,9 +34,9 @@ function formatTime(seconds) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
-  currentSeries = getSeriesById(seriesId);
-  currentEpisodes = currentSeries.episodes;
+export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
+  currentSeries = getSeriesById(seriesId) || getSeriesById();
+  currentEpisodes = currentSeries.episodes || [];
 
   const playerRoot = document.getElementById("watch-page-root");
   const video = document.getElementById("minsplay-video");
@@ -132,7 +130,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  // Drawer Grid with pure text-only buttons (NO ARROWS)
   function renderDrawerGrid() {
     if (!drawerGrid) return;
     drawerGrid.innerHTML = currentEpisodes.map((ep, idx) => {
@@ -166,7 +163,6 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
       `;
     }).join("");
   }
-
   function openDrawer() {
     renderDrawerGrid();
     if (drawerBackdrop) drawerBackdrop.style.display = "flex";
@@ -179,18 +175,20 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
   function syncCoinBalanceInModal() {
     if (lockModalCoinBalance) lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
   }
-  function loadEpisode(index) {
+
+  async function loadEpisode(index) {
     currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
     const ep = currentEpisodes[currentEpisodeIndex];
     if (!ep) return;
 
+    preloadTriggeredForEpisode = -1;
     const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
 
     const seriesName = currentSeries.shortTitle || currentSeries.title;
     document.querySelectorAll(".hud-series-title").forEach((el) => {
       el.textContent = seriesName;
     });
-    if (epBadge) epBadge.textContent = `Episode ${ep.id}`;
+    if (epBadge) epBadge.textContent = `Ep ${ep.id}`;
     if (epTitle) epTitle.textContent = ep.title;
     if (lockedEpNum) lockedEpNum.textContent = `${ep.id}`;
 
@@ -211,26 +209,17 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     if (lockModal) lockModal.style.display = "none";
     if (adModal) adModal.style.display = "none";
 
-    // Play from offline Cache API blob if available
+    // Instant Playback: Check offline cache, preloaded stream, or direct URL
+    let streamUrl = ep.src;
     if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
-      showStatus("Loading offline cache...");
-      getCachedVideoBlobUrl(ep.src).then((blobUrl) => {
-        if (blobUrl) {
-          video.src = blobUrl;
-          showAppToast(`⚡ Playing Ep ${ep.id} from offline storage`);
-        } else {
-          video.src = ep.src;
-        }
-        startPlaybackStream(ep);
-      }).catch(() => {
-        video.src = ep.src;
-        startPlaybackStream(ep);
-      });
+      const cachedBlob = await getCachedVideoBlobUrl(ep.src);
+      if (cachedBlob) streamUrl = cachedBlob;
     } else {
-      showStatus("Buffering stream...");
-      video.src = ep.src;
-      startPlaybackStream(ep);
+      streamUrl = await resolveStreamSource(ep.src);
     }
+
+    video.src = streamUrl;
+    startPlaybackStream(ep);
   }
 
   function startPlaybackStream(ep) {
@@ -252,30 +241,41 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     });
   }
 
-  // Playback Speed Selector Toggle
-  if (speedBtn) {
-    speedBtn.onclick = (e) => {
-      e.stopPropagation();
-      const currentIdx = SPEED_LEVELS.indexOf(currentSpeed);
-      const nextIdx = (currentIdx + 1) % SPEED_LEVELS.length;
-      currentSpeed = SPEED_LEVELS[nextIdx];
-      localStorage.setItem("minsplay_playback_speed", currentSpeed.toString());
+  // Preloading Trigger in ontimeupdate (Activates at t >= 2s)
+  let lastSavedSec = 0;
+  video.ontimeupdate = () => {
+    const cur = video.currentTime || 0;
+    const dur = video.duration || 0;
 
-      if (video) video.playbackRate = currentSpeed;
-      syncSpeedButton();
-      showAppToast(`⚡ Speed: ${currentSpeed}x`);
-      showHUD();
-    };
-  }
+    if (seekSlider && dur > 0 && !seekSlider.matches(":active")) {
+      seekSlider.value = (cur / dur) * 100;
+    }
+    if (timeCurrent) timeCurrent.textContent = formatTime(cur);
+    if (timeDuration) timeDuration.textContent = formatTime(dur);
 
-  // Automated Binge & Auto-Coin Unlock
-  video.onended = () => {
-    handleEpisodeEnded();
+    // Save watch progress
+    const curSec = Math.floor(cur);
+    if (curSec > 0 && curSec !== lastSavedSec && curSec % 2 === 0) {
+      lastSavedSec = curSec;
+      const ep = currentEpisodes[currentEpisodeIndex];
+      saveProgress(currentSeries.id, ep.id, cur, dur, currentSeries.shortTitle || currentSeries.title);
+    }
+
+    // DramaBox Sliding Window Trigger: Preload Next Episode once current plays for 2s
+    if (cur >= 2 && preloadTriggeredForEpisode !== currentEpisodeIndex) {
+      preloadTriggeredForEpisode = currentEpisodeIndex;
+      const nextEpIndex = currentEpisodeIndex + 1;
+      if (nextEpIndex < currentEpisodes.length) {
+        preloadNextEpisode(currentSeries.id, currentEpisodes[nextEpIndex]);
+      }
+    }
   };
+
+  // Automated Binge & Auto-Advance
+  video.onended = () => handleEpisodeEnded();
 
   function handleEpisodeEnded() {
     const settings = getUserSettings();
-
     if (settings.autoplayNext === false) {
       if (playIndicator) playIndicator.classList.add("active");
       showHUD();
@@ -294,82 +294,22 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
     const isNextUnlocked = isEpisodeUnlocked(currentSeries.id, nextEp.id, nextEp.isFree);
 
     if (isNextUnlocked) {
-      showAppToast(`▶ Auto-advancing to Episode ${nextEp.id}...`);
-      setTimeout(() => loadEpisode(nextIndex), 500);
-      return;
-    }
-
-    const autoUnlockEnabled = settings.autoUnlockNext !== false;
-    const userCoins = getUserCoins();
-    const unlockCost = 30;
-
-    if (autoUnlockEnabled && userCoins >= unlockCost) {
-      spendCoins(unlockCost);
-      unlockEpisode(currentSeries.id, nextEp.id);
-      showAppToast(`🪙 Auto-unlocked Ep ${nextEp.id} (-30 Coins)`);
-      setTimeout(() => loadEpisode(nextIndex), 750);
-    } else if (autoUnlockEnabled && userCoins < unlockCost) {
-      showAppToast(`Ep ${nextEp.id} locked! Need ${unlockCost} coins.`);
       loadEpisode(nextIndex);
     } else {
-      loadEpisode(nextIndex);
+      const userCoins = getUserCoins();
+      if (settings.autoUnlockNext !== false && userCoins >= 30) {
+        spendCoins(30);
+        unlockEpisode(currentSeries.id, nextEp.id);
+        showAppToast(`🪙 Auto-unlocked Ep ${nextEp.id} (-30 Coins)`);
+        setTimeout(() => loadEpisode(nextIndex), 400);
+      } else {
+        loadEpisode(nextIndex);
+      }
     }
-  }
-
-  // Pure Text Download Click Handler with Live State Feedback
-  if (drawerGrid) {
-    drawerGrid.onclick = (e) => {
-      const dlBtn = e.target.closest(".drawer-dl-btn");
-      if (dlBtn) {
-        e.stopPropagation();
-        const epId = parseInt(dlBtn.getAttribute("data-dl-ep"), 10);
-        const ep = currentEpisodes.find((x) => x.id === epId);
-        if (!ep) return;
-
-        const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
-        if (!unlocked) {
-          showAppToast(`🔒 Unlock Ep ${ep.id} first to download`);
-          return;
-        }
-
-        if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
-          showAppToast(`Episode ${ep.id} is already saved offline`);
-          return;
-        }
-
-        const label = dlBtn.querySelector(".dl-btn-label");
-        if (label) label.textContent = "Saving...";
-        dlBtn.classList.add("downloading");
-        showAppToast(`Downloading Ep ${ep.id} for offline...`);
-
-        downloadEpisode(currentSeries, ep).then((res) => {
-          if (res.success) {
-            if (label) label.textContent = "Saved";
-            dlBtn.classList.remove("downloading");
-            dlBtn.classList.add("downloaded");
-            showAppToast(`🎉 Ep ${ep.id} saved (${res.sizeStr})! Available offline.`);
-          } else {
-            if (label) label.textContent = "Download";
-            dlBtn.classList.remove("downloading");
-            showAppToast(`Download failed: ${res.error || "Network error"}`);
-          }
-        });
-        return;
-      }
-
-      const card = e.target.closest("[data-drawer-ep]");
-      if (card) {
-        const epNum = parseInt(card.getAttribute("data-drawer-ep"), 10);
-        loadEpisode(epNum - 1);
-      }
-    };
   }
 
   // Swipe Gestures
-  let touchStartY = 0;
-  let touchStartX = 0;
-  let touchStartTime = 0;
-
+  let touchStartY = 0, touchStartX = 0, touchStartTime = 0;
   const targetSurface = playerRoot || document;
 
   targetSurface.addEventListener("touchstart", (e) => {
@@ -381,225 +321,41 @@ export function initPlayer(seriesId = "the-beginning", initialEp = 1) {
 
   targetSurface.addEventListener("touchend", (e) => {
     if (!e.changedTouches || e.changedTouches.length === 0) return;
-    const touchEndY = e.changedTouches[0].clientY;
-    const touchEndX = e.changedTouches[0].clientX;
-    const diffY = touchStartY - touchEndY;
-    const diffX = touchStartX - touchEndX;
+    const diffY = touchStartY - e.changedTouches[0].clientY;
+    const diffX = touchStartX - e.changedTouches[0].clientX;
     const duration = Date.now() - touchStartTime;
 
-    if (e.target.closest("button, input, .drawer-sheet-box, .subtitles-sheet, .lock-modal-dialog")) {
-      return;
-    }
+    if (e.target.closest("button, input, .drawer-sheet-box, .subtitles-sheet, .lock-modal-dialog")) return;
 
     if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX) * 1.1) {
-      if (diffY > 0) {
-        if (currentEpisodeIndex < currentEpisodes.length - 1) {
-          showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
-          loadEpisode(currentEpisodeIndex + 1);
-        } else {
-          showAppToast("🎬 You've reached the latest episode!");
-        }
-      } else {
-        if (currentEpisodeIndex > 0) {
-          showAppToast(`◀ Previous: Episode ${currentEpisodes[currentEpisodeIndex - 1].id}`);
-          loadEpisode(currentEpisodeIndex - 1);
-        } else {
-          showAppToast("🎬 This is the first episode!");
-        }
+      if (diffY > 0 && currentEpisodeIndex < currentEpisodes.length - 1) {
+        loadEpisode(currentEpisodeIndex + 1);
+      } else if (diffY < 0 && currentEpisodeIndex > 0) {
+        loadEpisode(currentEpisodeIndex - 1);
       }
       return;
     }
 
     if (duration < 300 && Math.abs(diffY) < 12 && Math.abs(diffX) < 12) {
-      handleTapToggle();
+      if (video.paused) {
+        video.play().then(() => playIndicator?.classList.remove("active"));
+      } else {
+        video.pause();
+        playIndicator?.classList.add("active");
+      }
+      showHUD();
     }
   }, { passive: true });
 
-  function handleTapToggle() {
-    const isHudHidden = hudBottom && hudBottom.classList.contains("hud-hidden");
-    if (isHudHidden) {
-      showHUD();
-    } else {
-      if (video.paused) {
-        video.play().then(() => {
-          if (playIndicator) playIndicator.classList.remove("active");
-          showHUD();
-        });
-      } else {
-        video.pause();
-        if (playIndicator) playIndicator.classList.add("active");
-        showHUD();
-      }
-    }
-  }
-
-  if (unlockCoinsBtn) {
-    unlockCoinsBtn.onclick = () => {
-      const ep = currentEpisodes[currentEpisodeIndex];
-      const unlockCost = 30;
-      const currentCoins = getUserCoins();
-      if (currentCoins >= unlockCost) {
-        spendCoins(unlockCost);
-        unlockEpisode(currentSeries.id, ep.id);
-        showAppToast(`🪙 -30 Coins! Ep ${ep.id} Unlocked.`);
-        loadEpisode(currentEpisodeIndex);
-      } else {
-        showAppToast(`Need ${unlockCost} coins! Balance: ${currentCoins} 🪙`);
-      }
-    };
-  }
-
-  function startRewardedAdFlow() {
-    const ep = currentEpisodes[currentEpisodeIndex];
-    if (!ep || !adModal) return;
-    if (lockModal) lockModal.style.display = "none";
-    if (adRewardSplash) adRewardSplash.style.display = "none";
-    adModal.style.display = "flex";
-    if (adSkipBtn) {
-      adSkipBtn.disabled = true;
-      adSkipBtn.classList.add("disabled");
-      adSkipBtn.textContent = "✕";
-    }
-    if (adProgressFill) adProgressFill.style.width = "0%";
-    let remainingSeconds = 5;
-    if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
-    const totalDurationMs = 5000;
-    const startTime = Date.now();
-    clearInterval(adProgressInterval);
-    adProgressInterval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progressPercent = Math.min(100, (elapsed / totalDurationMs) * 100);
-      if (adProgressFill) adProgressFill.style.width = `${progressPercent}%`;
-      if (elapsed >= totalDurationMs) clearInterval(adProgressInterval);
-    }, 50);
-
-    clearInterval(adTimerInterval);
-    adTimerInterval = setInterval(() => {
-      remainingSeconds -= 1;
-      if (remainingSeconds > 0) {
-        if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
-      } else {
-        clearInterval(adTimerInterval);
-        clearInterval(adProgressInterval);
-        if (adTimerPill) adTimerPill.textContent = "Reward Granted!";
-        if (adProgressFill) adProgressFill.style.width = "100%";
-        if (adSkipBtn) {
-          adSkipBtn.disabled = false;
-          adSkipBtn.classList.remove("disabled");
-          adSkipBtn.textContent = "✓";
-        }
-        if (adRewardSplash) adRewardSplash.style.display = "flex";
-        unlockEpisode(currentSeries.id, ep.id);
-        setTimeout(() => {
-          clearInterval(adTimerInterval);
-          clearInterval(adProgressInterval);
-          if (adModal) adModal.style.display = "none";
-          showAppToast(`🎉 Episode ${ep.id} Unlocked!`);
-          loadEpisode(currentEpisodeIndex);
-        }, 1200);
-      }
-    }, 1000);
-  }
-
-  if (unlockBtn) unlockBtn.onclick = () => startRewardedAdFlow();
-  if (adSkipBtn) {
-    adSkipBtn.onclick = () => {
-      if (!adSkipBtn.disabled) {
-        const ep = currentEpisodes[currentEpisodeIndex];
-        if (adModal) adModal.style.display = "none";
-        showAppToast(`🎉 Episode ${ep.id} Unlocked!`);
-        loadEpisode(currentEpisodeIndex);
-      }
-    };
-  }
-
-  video.oncanplay = () => showStatus("");
-  video.onplaying = () => {
-    showStatus("");
-    if (playIndicator) playIndicator.classList.remove("active");
-    showHUD();
-  };
-  video.onpause = () => {
-    const ep = currentEpisodes[currentEpisodeIndex];
-    if (isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree)) {
-      if (playIndicator) playIndicator.classList.add("active");
-      showHUD();
-    }
-  };
-  video.onerror = () => {
-    showStatus("Stream error loading video");
-    if (playIndicator) playIndicator.classList.remove("active");
-  };
-
-  let lastSavedSec = 0;
-  video.ontimeupdate = () => {
-    const cur = video.currentTime || 0;
-    const dur = video.duration || 0;
-    if (seekSlider && dur > 0 && !seekSlider.matches(":active")) {
-      seekSlider.value = (cur / dur) * 100;
-    }
-    if (timeCurrent) timeCurrent.textContent = formatTime(cur);
-    if (timeDuration) timeDuration.textContent = formatTime(dur);
-    const curSec = Math.floor(cur);
-    if (curSec > 0 && curSec !== lastSavedSec && curSec % 2 === 0) {
-      lastSavedSec = curSec;
-      const ep = currentEpisodes[currentEpisodeIndex];
-      saveProgress(currentSeries.id, ep.id, cur, dur, currentSeries.shortTitle || currentSeries.title);
-    }
-  };
-
-  if (seekSlider) {
-    seekSlider.oninput = () => {
-      const dur = video.duration || 0;
-      if (dur > 0) {
-        video.currentTime = (seekSlider.value / 100) * dur;
-        showHUD();
-      }
-    };
-  }
-
-  if (likeBtn) {
-    likeBtn.onclick = (e) => {
+  if (speedBtn) {
+    speedBtn.onclick = (e) => {
       e.stopPropagation();
-      isLiked = !isLiked;
-      likeBtn.classList.toggle("active", isLiked);
-      likeCount = isLiked ? likeCount + 1 : likeCount - 1;
-      if (likeCounter) likeCounter.textContent = `${(likeCount / 1000).toFixed(1)}K`;
-      showAppToast(isLiked ? "Added to Liked Videos ♥" : "Removed Like");
-      showHUD();
-    };
-  }
-
-  if (favBtn) {
-    favBtn.onclick = (e) => {
-      e.stopPropagation();
-      isFavorited = !isFavorited;
-      favBtn.classList.toggle("active", isFavorited);
-      if (favLabel) favLabel.textContent = isFavorited ? "Saved ★" : "Collect";
-      showAppToast(isFavorited ? "Saved to My List ★" : "Removed from My List");
-      showHUD();
-    };
-  }
-
-  if (shareBtn) {
-    shareBtn.onclick = (e) => {
-      e.stopPropagation();
-      if (navigator.share) {
-        navigator.share({ title: currentSeries.title, url: window.location.href }).catch(() => {});
-      } else {
-        showAppToast("Link copied to clipboard ↗");
-      }
-      showHUD();
-    };
-  }
-
-  if (soundBtn) {
-    soundBtn.onclick = (e) => {
-      e.stopPropagation();
-      video.muted = !video.muted;
-      soundBtn.textContent = video.muted ? "🔇" : "🔊";
-      showAppToast(video.muted ? "Muted 🔇" : "Sound Unmuted 🔊");
-      showHUD();
+      const nextIdx = (SPEED_LEVELS.indexOf(currentSpeed) + 1) % SPEED_LEVELS.length;
+      currentSpeed = SPEED_LEVELS[nextIdx];
+      localStorage.setItem("minsplay_playback_speed", currentSpeed.toString());
+      if (video) video.playbackRate = currentSpeed;
+      syncSpeedButton();
+      showAppToast(`⚡ Speed: ${currentSpeed}x`);
     };
   }
 

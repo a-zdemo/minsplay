@@ -1,16 +1,14 @@
-/* STREAMING_CHUNK:Configuring client-side validation and direct-to-R2 upload engine... */
 import { showAppToast, navigateTo } from "./router.js";
 import { DRAMA_CATALOG } from "./series-data.js";
 
-// Your deployed Supabase Edge Function endpoint
-const SUPABASE_FUNCTION_URL = "https://lekmsvdbthupiauejffo.supabase.co/functions/v1/get-upload-url";
+// Live Supabase Edge Function Signer
+const ENDPOINT_URL = "https://lekmsvdbthupiauejffo.supabase.co/functions/v1/smart-responder";
 
 let selectedFile = null;
 let validatedSpecs = null;
 
 export function initCreatorStudio() {
   const fileInput = document.getElementById("upload-video-file");
-  const dropzone = document.getElementById("creator-video-dropzone");
   const idleContent = document.getElementById("dropzone-idle-content");
   const selectedContent = document.getElementById("dropzone-selected-content");
   const selectedFileName = document.getElementById("selected-file-name");
@@ -21,7 +19,6 @@ export function initCreatorStudio() {
 
   if (!publishBtn) return;
 
-  // Toggle custom series name field
   if (seriesSelect) {
     seriesSelect.onchange = () => {
       if (newSeriesGroup) {
@@ -30,7 +27,6 @@ export function initCreatorStudio() {
     };
   }
 
-  // Handle Video Selection & Metadata Inspection
   if (fileInput) {
     fileInput.onchange = async (e) => {
       const file = e.target.files && e.target.files[0];
@@ -49,7 +45,6 @@ export function initCreatorStudio() {
         if (selectedFileSpecs) {
           selectedFileSpecs.textContent = `${specs.fileSizeStr} • ${specs.durationSec}s • ${specs.isPortrait ? "Portrait 9:16 ✓" : "Landscape (Will Crop)"}`;
         }
-
         showAppToast("Video validated successfully! ✓");
       } catch (err) {
         selectedFile = null;
@@ -57,26 +52,31 @@ export function initCreatorStudio() {
         fileInput.value = "";
         if (idleContent) idleContent.style.display = "flex";
         if (selectedContent) selectedContent.style.display = "none";
-        showAppToast(`Validation warning: ${err.message}`);
+        showAppToast(`Validation notice: ${err.message}`);
       }
     };
   }
 
-  // Publish Episode Click Handler
   publishBtn.onclick = async () => {
     if (!selectedFile) {
-      showAppToast("Please select an MP4 drama video first");
+      showAppToast("Please select a video file first");
       return;
     }
 
     const titleInput = document.getElementById("upload-ep-title");
     const epNumInput = document.getElementById("upload-ep-num");
     const priceInput = document.getElementById("upload-ep-price");
+    const newSeriesTitleInput = document.getElementById("upload-new-series-title");
+
+    let seriesId = seriesSelect ? seriesSelect.value : "the-beginning";
+    if (seriesId === "new-series") {
+      const customTitle = newSeriesTitleInput ? newSeriesTitleInput.value.trim() : "";
+      seriesId = customTitle ? customTitle.toLowerCase().replace(/[^a-z0-9]/g, "-") : "user-series";
+    }
 
     const epTitle = titleInput ? titleInput.value.trim() : "";
     const epNum = epNumInput ? parseInt(epNumInput.value, 10) : 1;
     const price = priceInput ? parseInt(priceInput.value, 10) : 0;
-    const seriesId = seriesSelect ? seriesSelect.value : "the-beginning";
 
     if (!epTitle) {
       showAppToast("Please enter an episode subtitle");
@@ -84,7 +84,7 @@ export function initCreatorStudio() {
     }
 
     publishBtn.disabled = true;
-    publishBtn.textContent = "Requesting Upload Authorization...";
+    publishBtn.textContent = "Authorizing R2 Upload...";
 
     const progressWrap = document.getElementById("upload-progress-wrap");
     const progressFill = document.getElementById("upload-progress-fill");
@@ -92,10 +92,11 @@ export function initCreatorStudio() {
     const progressStatus = document.getElementById("upload-status-text");
 
     if (progressWrap) progressWrap.style.display = "flex";
+    if (progressStatus) progressStatus.textContent = "Requesting presigned token...";
 
     try {
-      // 1. Request presigned upload URL from Supabase Edge Function
-      const tokenRes = await fetch(SUPABASE_FUNCTION_URL, {
+      // 1. Fetch Presigned Token from smart-responder endpoint
+      const res = await fetch(ENDPOINT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -105,35 +106,41 @@ export function initCreatorStudio() {
         }),
       });
 
-      if (!tokenRes.ok) {
-        throw new Error(`Edge Signer error (Status ${tokenRes.status})`);
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Edge Signer error (Status ${res.status}): ${errBody || "Request rejected"}`);
       }
 
-      const { uploadUrl, publicUrl } = await tokenRes.json();
-      if (!uploadUrl) throw new Error("Edge Function did not return presigned URL");
+      const tokenData = await res.json();
+      const { uploadUrl, publicUrl } = tokenData;
+
+      if (!uploadUrl) {
+        throw new Error("No uploadUrl returned by edge function");
+      }
 
       // 2. Stream chunk directly to Cloudflare R2
-      if (progressStatus) progressStatus.textContent = "Direct-to-R2 streaming in progress...";
+      if (progressStatus) progressStatus.textContent = "Direct-to-R2 streaming...";
 
       await uploadToR2WithProgress(selectedFile, uploadUrl, (pct) => {
         if (progressFill) progressFill.style.width = `${pct}%`;
         if (progressPercent) progressPercent.textContent = `${pct}%`;
       });
 
-      // 3. Register newly published episode in local catalog
+      // 3. Commit newly published episode into drama catalog
       commitPublishedEpisode(seriesId, epNum, epTitle, publicUrl, price);
 
       if (progressStatus) progressStatus.textContent = "Upload Complete!";
-      showAppToast("🎉 Episode Published Successfully to Cloudflare R2!");
+      showAppToast("🎉 Episode Published to Cloudflare R2 Vault!");
 
       setTimeout(() => {
         navigateTo("/series", { seriesId });
       }, 1500);
     } catch (err) {
-      console.error("Creator upload error:", err);
+      console.error("Upload error:", err);
       showAppToast(`Upload Failed: ${err.message}`);
       publishBtn.disabled = false;
       publishBtn.textContent = "Retry Publishing 🚀";
+      if (progressStatus) progressStatus.textContent = "Upload Interrupted";
     }
   };
 }
@@ -142,7 +149,7 @@ function validateVideoFile(file) {
   return new Promise((resolve, reject) => {
     const validTypes = ["video/mp4", "video/webm", "video/quicktime"];
     if (!validTypes.includes(file.type)) {
-      return reject(new Error("Please upload an MP4 or WebM video file."));
+      return reject(new Error("Please select an MP4 or WebM video file."));
     }
 
     const tempVideo = document.createElement("video");
@@ -155,7 +162,7 @@ function validateVideoFile(file) {
       const height = tempVideo.videoHeight || 1280;
 
       if (durationSec > 180) {
-        return reject(new Error(`Video duration (${durationSec}s) exceeds the 3-minute episode cap.`));
+        return reject(new Error(`Duration (${durationSec}s) exceeds the 3-minute cap.`));
       }
 
       const isPortrait = height >= width;
@@ -198,14 +205,31 @@ function uploadToR2WithProgress(file, uploadUrl, onProgress) {
 }
 
 function commitPublishedEpisode(seriesId, episodeId, title, src, coinPrice) {
-  const drama = DRAMA_CATALOG.find((d) => d.id === seriesId);
-  if (drama) {
-    drama.episodes.push({
-      id: episodeId,
-      title,
-      duration: "0m 10s",
-      isFree: coinPrice === 0,
-      src,
-    });
+  let drama = DRAMA_CATALOG.find((d) => d.id === seriesId);
+  if (!drama) {
+    drama = {
+      id: seriesId,
+      title: title.split(":")[0] || "User Series",
+      shortTitle: title.split(":")[0] || "User Series",
+      genre: "Urban Drama",
+      tags: "Community • Creator Release",
+      badge: "Creator",
+      badgeClass: "badge-hot",
+      plays: "1",
+      artClass: "art-gold",
+      artSymbol: "🎬",
+      artCode: "CREATOR",
+      synopsis: "Community produced short drama on Minsplay.",
+      episodes: []
+    };
+    DRAMA_CATALOG.unshift(drama);
   }
+
+  drama.episodes.push({
+    id: episodeId,
+    title,
+    duration: "0m 10s",
+    isFree: coinPrice === 0,
+    src,
+  });
 }

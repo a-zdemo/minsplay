@@ -885,6 +885,47 @@ async function renderRoute(path) {
   } else if (path === "/") {
     updateContinueWatching();
     initHomeFilterSystem();
+
+  // Pagination & Load More Handler
+  let currentFeedPage = 1;
+  const loadMoreBtn = document.getElementById("btn-load-more-dramas");
+  if (loadMoreBtn) {
+    loadMoreBtn.onclick = async () => {
+      loadMoreBtn.textContent = "Loading more titles...";
+      currentFeedPage += 1;
+      const { fetchPaginatedVault } = await import("./series-data.js");
+      const result = await fetchPaginatedVault(currentFeedPage, 6);
+      
+      if (result.items && result.items.length > 0) {
+        const grid = document.getElementById("home-drama-grid");
+        if (grid) {
+          result.items.forEach((item) => {
+            const cardHtml = `
+              <article class="drama-card" data-route="/watch" data-series="${item.series_id}">
+                <div class="drama-poster-wrap">
+                  <div class="poster-gradient-art art-blue">
+                    <span class="art-symbol">🎬</span>
+                    <span class="art-code">R2 SYNC</span>
+                  </div>
+                  <span class="poster-badge badge-hot">LIVE</span>
+                </div>
+                <h3 class="drama-title">${item.title}</h3>
+                <p class="drama-genre">Cloudflare Stream</p>
+              </article>
+            `;
+            grid.insertAdjacentHTML("beforeend", cardHtml);
+          });
+        }
+      }
+      
+      if (!result.hasMore) {
+        loadMoreBtn.style.display = "none";
+      } else {
+        loadMoreBtn.textContent = "Load More Dramas ▾";
+      }
+    };
+  }
+
     initSearchOverlayEngine();
     initDailyGiftSystem();
   } else if (path === "/mylist") {

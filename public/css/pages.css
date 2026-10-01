@@ -3306,3 +3306,35 @@
 }
 .btn-admin-action.test { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255,255,255,0.12); }
 .btn-admin-action.save { background: linear-gradient(90deg, #00d2fc, #0077ff); color: #fff; }
+
+/* ==========================================================================
+   Home Screen Media Pagination & Infinite Scroll Styles
+   ========================================================================== */
+.home-pagination-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 0 24px;
+}
+
+.btn-load-more-dramas {
+  all: unset;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 10px 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+}
+
+.btn-load-more-dramas:active {
+  transform: scale(0.96);
+  background: rgba(255, 46, 99, 0.2);
+  border-color: #ff2e63;
+  color: #ff2e63;
+}

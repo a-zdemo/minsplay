@@ -1,19 +1,8 @@
 const STORAGE_CATALOG_KEY = "minsplay_creator_catalog_v2";
-const R2_PUBLIC_BASE = "https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev";
+const SYNC_ENDPOINT = "https://lekmsvdbthupiauejffo.supabase.co/functions/v1/smart-responder";
 
-// Verified reliable short-drama test stream for instant verification
-const VERIFIED_STREAM = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
-
-function loadStoredCatalog() {
-  let catalog = [];
-  try {
-    const raw = localStorage.getItem(STORAGE_CATALOG_KEY);
-    if (raw) catalog = JSON.parse(raw);
-  } catch (e) {
-    console.error("Failed to load catalog", e);
-  }
-
-  const darkBeesSeries = {
+const CORE_FLAGSHIP_DRAMAS = [
+  {
     id: "the-dark-bees",
     title: "The Dark Bees",
     shortTitle: "The Dark Bees",
@@ -23,32 +12,73 @@ function loadStoredCatalog() {
     badgeClass: "badge-hot",
     plays: "1.2K",
     posterUrl: "",
-    synopsis: "An elite operative infiltrates a clandestine syndicate known only as The Dark Bees. Every secret comes with a lethal price.",
-    episodes: [
-      {
-        id: 1,
-        title: "Episode 1: The Infiltration",
-        duration: "0m 15s",
-        isFree: true,
-        // Active stream endpoint
-        src: VERIFIED_STREAM,
-        posterUrl: "",
-      }
-    ]
-  };
-
-  const darkBeesIndex = catalog.findIndex((d) => d.id === "the-dark-bees");
-  if (darkBeesIndex >= 0) {
-    // If the stored episode was pointing to an unverified or 404 clip, update it
-    const ep = catalog[darkBeesIndex].episodes && catalog[darkBeesIndex].episodes[0];
-    if (!ep || ep.src.includes("1790818188825_test_clip.mp4")) {
-      catalog[darkBeesIndex] = darkBeesSeries;
-      localStorage.setItem(STORAGE_CATALOG_KEY, JSON.stringify(catalog));
-    }
-  } else {
-    catalog.unshift(darkBeesSeries);
-    localStorage.setItem(STORAGE_CATALOG_KEY, JSON.stringify(catalog));
+    synopsis: "An elite operative infiltrates a clandestine syndicate known only as The Dark Bees.",
+    episodes: [{ id: 1, title: "Episode 1: The Infiltration", duration: "1m 30s", isFree: true, src: "" }]
+  },
+  {
+    id: "the-beginning",
+    title: "The Beginning",
+    shortTitle: "The Beginning",
+    genre: "Urban Drama",
+    tags: "Counterattack • Drama",
+    badge: "Hot",
+    badgeClass: "badge-hot",
+    plays: "14.2M",
+    posterUrl: "",
+    synopsis: "Betrayed and left for dead, he returns to claim what was taken from his family.",
+    episodes: [{ id: 1, title: "Episode 1: The Return", duration: "1m 30s", isFree: true, src: "" }]
+  },
+  {
+    id: "master-of-dragons",
+    title: "Master of Dragons",
+    shortTitle: "Master of Dragons",
+    genre: "Action & Revenge",
+    tags: "Martial Arts • Rebirth",
+    badge: "New",
+    badgeClass: "badge-new",
+    plays: "8.9M",
+    posterUrl: "",
+    synopsis: "After 5 years in the abyss, the Supreme Dragon King reclaims his sacred domain.",
+    episodes: [{ id: 1, title: "Episode 1: Shattered Seal", duration: "1m 30s", isFree: true, src: "" }]
+  },
+  {
+    id: "dragon-god",
+    title: "Definitely Not The Dragon God",
+    shortTitle: "Dragon God",
+    genre: "Urban Fantasy",
+    tags: "Hidden Identity • Romance",
+    badge: "Hot",
+    badgeClass: "badge-hot",
+    plays: "11.5M",
+    posterUrl: "",
+    synopsis: "Treated as a lowly academy servant, Aris hides a terrifying imperial lineage.",
+    episodes: [{ id: 1, title: "Episode 1: Unworthy Servant", duration: "1m 30s", isFree: true, src: "" }]
+  },
+  {
+    id: "bastard-hit-daughter",
+    title: "Protecting My Daughter",
+    shortTitle: "Protecting My Daughter",
+    genre: "Family Revenge",
+    tags: "Underdog • Justice",
+    badge: "Hot",
+    badgeClass: "badge-hot",
+    plays: "6.4M",
+    posterUrl: "",
+    synopsis: "When a ruthless tycoon targets his only daughter, a quiet father unseals his combat training.",
+    episodes: [{ id: 1, title: "Episode 1: Don't Touch Her", duration: "1m 30s", isFree: true, src: "" }]
   }
+];
+
+function loadStoredCatalog() {
+  let catalog = [];
+  try {
+    const raw = localStorage.getItem(STORAGE_CATALOG_KEY);
+    if (raw) catalog = JSON.parse(raw);
+  } catch (e) {}
+
+  CORE_FLAGSHIP_DRAMAS.forEach((core) => {
+    if (!catalog.some((c) => c.id === core.id)) catalog.push({ ...core });
+  });
 
   return catalog;
 }
@@ -58,15 +88,13 @@ export let DRAMA_CATALOG = loadStoredCatalog();
 export function saveCatalogToStorage() {
   try {
     localStorage.setItem(STORAGE_CATALOG_KEY, JSON.stringify(DRAMA_CATALOG));
-  } catch (e) {
-    console.error("Failed to persist catalog", e);
-  }
+  } catch (e) {}
 }
 
 export function getSeriesById(seriesId) {
   if (!seriesId && DRAMA_CATALOG.length > 0) return DRAMA_CATALOG[0];
   const found = DRAMA_CATALOG.find((s) => s.id === seriesId);
-  return found || (DRAMA_CATALOG.length > 0 ? DRAMA_CATALOG[0] : null);
+  return found || DRAMA_CATALOG[0] || null;
 }
 
 export function savePublishedEpisode({
@@ -97,6 +125,8 @@ export function savePublishedEpisode({
       episodes: [],
     };
     DRAMA_CATALOG.unshift(drama);
+  } else if (posterUrl && !drama.posterUrl) {
+    drama.posterUrl = posterUrl;
   }
 
   const existingIndex = drama.episodes.findIndex((e) => e.id === Number(episodeNum));
@@ -119,3 +149,49 @@ export function savePublishedEpisode({
   saveCatalogToStorage();
   return drama;
 }
+
+/**
+ * Fetches paginated video items from the automated Supabase index
+ */
+export async function fetchPaginatedVault(page = 1, limit = 6, seriesId = "all") {
+  try {
+    const res = await fetch(`${SYNC_ENDPOINT}?page=${page}&limit=${limit}&series_id=${seriesId}`);
+    if (!res.ok) return { items: [], hasMore: false };
+    return await res.json();
+  } catch (err) {
+    console.warn("[Minsplay Vault] Pagination query error:", err);
+    return { items: [], hasMore: false };
+  }
+}
+
+/**
+ * Live syncs R2 media inventory into client catalog and dispatches update event
+ */
+export async function syncCatalogFromCloudflareR2() {
+  try {
+    const data = await fetchPaginatedVault(1, 25);
+    if (!data.items || data.items.length === 0) return;
+
+    let updated = false;
+
+    data.items.forEach((item) => {
+      let drama = DRAMA_CATALOG.find((d) => d.id === item.series_id || item.object_key.includes(d.id));
+
+      if (drama && drama.episodes && drama.episodes[0]) {
+        drama.episodes[0].src = item.public_url;
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      saveCatalogToStorage();
+      window.dispatchEvent(new CustomEvent("catalogUpdated", { detail: DRAMA_CATALOG }));
+    }
+  } catch (e) {}
+}
+
+// Initial sync on startup
+syncCatalogFromCloudflareR2();
+
+// Client interval check every 3 minutes (aligns with pg_cron)
+setInterval(() => syncCatalogFromCloudflareR2(), 3 * 60 * 1000);

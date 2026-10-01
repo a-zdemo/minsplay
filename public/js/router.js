@@ -1,3 +1,5 @@
+import creatorHtml from "../pages/creator.html?raw";
+import { initCreatorStudio } from "./creator.js";
 import homeHtml from "../pages/home.html?raw";
 import seriesHtml from "../pages/series.html?raw";
 import watchHtml from "../pages/watch.html?raw";
@@ -49,6 +51,7 @@ const routes = {
   "/gifts": giftsHtml,
   "/history": historyHtml,
   "/download": downloadHtml,
+  "/creator": creatorHtml,
 };
 
 let currentActiveSeriesId = "the-beginning";
@@ -809,7 +812,7 @@ async function renderRoute(path) {
       path === "/events" ||
       path === "/gifts" ||
       path === "/history" ||
-      path === "/download"
+      path === "/download" || path === "/creator"
     );
     bottomNav.style.display = isSubpage ? "none" : "flex";
   }
@@ -841,6 +844,8 @@ async function renderRoute(path) {
     initSettingsScreen();
   } else if (path === "/wallet") {
     initWalletScreen();
+  } else if (path === "/creator") {
+    initCreatorStudio();
   } else if (path === "/history") {
     renderHistoryFeed();
   }

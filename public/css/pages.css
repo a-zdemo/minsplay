@@ -2926,3 +2926,122 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
   flex-shrink: 0 !important;
 }
+
+/* ==========================================================================
+   Admin Content Moderation Center Styles
+   ========================================================================== */
+.admin-page { background: #07070b !important; }
+.admin-body { padding: 12px 14px 80px !important; gap: 14px !important; }
+
+.admin-header { display: flex; align-items: center; justify-content: space-between; }
+.admin-title-wrap { display: flex; align-items: center; gap: 8px; }
+.admin-security-pill {
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #00d2fc;
+  background: rgba(0, 210, 252, 0.12);
+  border: 1px solid rgba(0, 210, 252, 0.35);
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+.admin-refresh-btn {
+  all: unset;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* Metric Cards */
+.admin-metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.admin-metric-card {
+  background: #12121c;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+.metric-label { font-size: 0.68rem; color: rgba(255, 255, 255, 0.5); font-weight: 700; }
+.metric-val { font-size: 1.35rem; font-weight: 900; color: #ffffff; }
+.metric-val.danger { color: #ff2e63; }
+.metric-sub { font-size: 0.62rem; color: rgba(255, 255, 255, 0.4); }
+
+/* Navigation Tabs */
+.admin-nav-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.admin-nav-tabs::-webkit-scrollbar { display: none; }
+.admin-tab-btn {
+  all: unset;
+  padding: 6px 12px;
+  background: #14141e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.admin-tab-btn.active {
+  background: rgba(0, 210, 252, 0.15);
+  border-color: #00d2fc;
+  color: #00d2fc;
+}
+
+.admin-pane { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.pane-action-bar { display: flex; align-items: center; justify-content: space-between; }
+.pane-subtitle { font-size: 0.76rem; font-weight: 700; color: rgba(255, 255, 255, 0.5); }
+
+/* Drama Row */
+.admin-items-feed { display: flex; flex-direction: column; gap: 10px; }
+.admin-drama-row {
+  background: #12121a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.admin-thumb { width: 50px; height: 68px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+.admin-thumb.placeholder { background: #1c1c28; display: grid; place-items: center; font-size: 1.3rem; }
+.admin-drama-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.admin-row-title-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.admin-drama-name { font-size: 0.85rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-status-tag { font-size: 0.6rem; font-weight: 900; padding: 2px 6px; border-radius: 6px; }
+.admin-status-tag.status-approved { background: rgba(39, 201, 63, 0.18); color: #27c93f; }
+.admin-status-tag.status-flagged { background: rgba(255, 46, 99, 0.18); color: #ff2e63; }
+.admin-drama-sub { font-size: 0.7rem; color: rgba(255, 255, 255, 0.45); }
+
+.admin-action-pill-row { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.btn-mod-action {
+  all: unset;
+  font-size: 0.66rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-mod-action.preview { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.btn-mod-action.approve { background: rgba(39, 201, 63, 0.2); color: #27c93f; }
+.btn-mod-action.flag { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+.btn-mod-action.delete { background: rgba(255, 46, 99, 0.2); color: #ff2e63; }
+
+/* Cloudflare Status */
+.r2-health-card { background: #12121a; border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 6px; }
+.card-title { margin: 0; color: #fff; font-size: 0.95rem; font-weight: 800; }
+.card-desc { margin: 0; font-size: 0.76rem; color: rgba(255,255,255,0.5); }
+.r2-status-pill { font-size: 0.75rem; color: #27c93f; font-weight: 800; margin: 4px 0 8px; }
+.btn-admin-outline { all: unset; text-align: center; background: rgba(0,210,252,0.12); border: 1px solid rgba(0,210,252,0.4); color: #00d2fc; font-weight: 800; font-size: 0.8rem; padding: 8px 0; border-radius: 8px; cursor: pointer; }

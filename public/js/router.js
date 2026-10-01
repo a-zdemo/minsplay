@@ -1,3 +1,5 @@
+import adminHtml from "../pages/admin.html?raw";
+import { initAdminDashboard } from "./admin.js";
 import creatorHtml from "../pages/creator.html?raw";
 import { initCreatorStudio } from "./creator.js";
 import homeHtml from "../pages/home.html?raw";
@@ -52,6 +54,7 @@ const routes = {
   "/history": historyHtml,
   "/download": downloadHtml,
   "/creator": creatorHtml,
+  "/admin": adminHtml,
 };
 
 let currentActiveSeriesId = "the-beginning";
@@ -833,7 +836,7 @@ async function renderRoute(path) {
       path === "/events" ||
       path === "/gifts" ||
       path === "/history" ||
-      path === "/download" || path === "/creator"
+      path === "/download" || path === "/creator" || path === "/admin"
     );
     bottomNav.style.display = isSubpage ? "none" : "flex";
   }
@@ -865,7 +868,7 @@ async function renderRoute(path) {
     initSettingsScreen();
   } else if (path === "/wallet") {
     initWalletScreen();
-  } else if (path === "/creator") {
+  } else if (path === "/creator" || path === "/admin") {
     initCreatorStudio();
   } else if (path === "/history") {
     renderHistoryFeed();

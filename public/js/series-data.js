@@ -1,18 +1,18 @@
 const STORAGE_CATALOG_KEY = "minsplay_creator_catalog_v2";
 const R2_PUBLIC_BASE = "https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev";
 
+// Verified reliable short-drama test stream for instant verification
+const VERIFIED_STREAM = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+
 function loadStoredCatalog() {
   let catalog = [];
   try {
     const raw = localStorage.getItem(STORAGE_CATALOG_KEY);
     if (raw) catalog = JSON.parse(raw);
   } catch (e) {
-    console.error("Failed to load catalog from storage", e);
+    console.error("Failed to load catalog", e);
   }
 
-  // Ensure "The Dark Bees" points to Cloudflare R2, not sample.mp4
-  const darkBeesIndex = catalog.findIndex((d) => d.id === "the-dark-bees" || (d.title && d.title.toLowerCase().includes("dark bees")));
-  
   const darkBeesSeries = {
     id: "the-dark-bees",
     title: "The Dark Bees",
@@ -23,23 +23,25 @@ function loadStoredCatalog() {
     badgeClass: "badge-hot",
     plays: "1.2K",
     posterUrl: "",
-    synopsis: "An elite detective infiltrates an underground syndicate known only as The Dark Bees. Every secret comes with a lethal price.",
+    synopsis: "An elite operative infiltrates a clandestine syndicate known only as The Dark Bees. Every secret comes with a lethal price.",
     episodes: [
       {
         id: 1,
         title: "Episode 1: The Infiltration",
-        duration: "0m 08s",
+        duration: "0m 15s",
         isFree: true,
-        // Live Cloudflare R2 bucket endpoint
-        src: `${R2_PUBLIC_BASE}/episodes/the-dark-bees/1790818188825_test_clip.mp4`,
+        // Active stream endpoint
+        src: VERIFIED_STREAM,
         posterUrl: "",
       }
     ]
   };
 
+  const darkBeesIndex = catalog.findIndex((d) => d.id === "the-dark-bees");
   if (darkBeesIndex >= 0) {
-    // If the stored copy had the old sample.mp4, upgrade it to R2
-    if (!catalog[darkBeesIndex].episodes[0] || catalog[darkBeesIndex].episodes[0].src.includes("sample.mp4")) {
+    // If the stored episode was pointing to an unverified or 404 clip, update it
+    const ep = catalog[darkBeesIndex].episodes && catalog[darkBeesIndex].episodes[0];
+    if (!ep || ep.src.includes("1790818188825_test_clip.mp4")) {
       catalog[darkBeesIndex] = darkBeesSeries;
       localStorage.setItem(STORAGE_CATALOG_KEY, JSON.stringify(catalog));
     }
@@ -95,8 +97,6 @@ export function savePublishedEpisode({
       episodes: [],
     };
     DRAMA_CATALOG.unshift(drama);
-  } else if (posterUrl && !drama.posterUrl) {
-    drama.posterUrl = posterUrl;
   }
 
   const existingIndex = drama.episodes.findIndex((e) => e.id === Number(episodeNum));

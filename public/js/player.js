@@ -9,7 +9,7 @@ import {
 } from "./storage.js";
 import { getSeriesById } from "./series-data.js";
 import { showAppToast } from "./router.js";
-import { isEpisodeDownloaded, downloadEpisode, getCachedVideoBlobUrl } from "./downloader.js";
+import { isEpisodeDownloaded, getCachedVideoBlobUrl } from "./downloader.js";
 import { preloadNextEpisode, resolveStreamSource } from "./preloader.js";
 
 const SPEED_LEVELS = [1.0, 1.25, 1.5, 2.0];
@@ -19,13 +19,7 @@ let currentSeries = null;
 let currentEpisodes = [];
 let currentEpisodeIndex = 0;
 let hudTimer = null;
-let isLiked = false;
-let isFavorited = false;
-let likeCount = 14200;
 let preloadTriggeredForEpisode = -1;
-
-let adTimerInterval = null;
-let adProgressInterval = null;
 
 function formatTime(seconds) {
   if (isNaN(seconds) || seconds < 0) return "0:00";
@@ -36,23 +30,15 @@ function formatTime(seconds) {
 
 export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   currentSeries = getSeriesById(seriesId) || getSeriesById();
-  currentEpisodes = currentSeries.episodes || [];
+  currentEpisodes = (currentSeries && currentSeries.episodes) || [];
 
   const playerRoot = document.getElementById("watch-page-root");
   const video = document.getElementById("minsplay-video");
   const playIndicator = document.getElementById("center-play-indicator");
   const lockModal = document.getElementById("watch-lock-modal");
   const lockedEpNum = document.getElementById("locked-ep-number");
-  const unlockBtn = document.getElementById("btn-unlock-mock");
-  const unlockCoinsBtn = document.getElementById("btn-unlock-coins");
   const lockModalCoinBalance = document.getElementById("lock-modal-coin-balance");
   const statusPill = document.getElementById("hud-status-pill");
-
-  const adModal = document.getElementById("rewarded-ad-modal");
-  const adTimerPill = document.getElementById("ad-timer-pill");
-  const adSkipBtn = document.getElementById("ad-skip-btn");
-  const adProgressFill = document.getElementById("ad-progress-fill");
-  const adRewardSplash = document.getElementById("ad-reward-splash");
 
   const hudTop = document.getElementById("hud-top");
   const hudRight = document.getElementById("hud-right");
@@ -73,21 +59,16 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   const drawerLabel = document.getElementById("episodes-drawer-label");
 
   const speedBtn = document.getElementById("btn-speed-toggle");
-  const likeBtn = document.getElementById("btn-action-like");
-  const likeCounter = document.getElementById("like-counter");
-  const favBtn = document.getElementById("btn-action-fav");
-  const favLabel = document.getElementById("fav-label");
-  const shareBtn = document.getElementById("btn-action-share");
   const soundBtn = document.getElementById("btn-sound-toggle");
 
   if (!video) return;
 
-  if (backBtn) {
+  if (backBtn && currentSeries) {
     backBtn.setAttribute("data-route", "/series");
     backBtn.setAttribute("data-series", currentSeries.id);
   }
 
-  const seriesName = currentSeries.shortTitle || currentSeries.title;
+  const seriesName = currentSeries ? (currentSeries.shortTitle || currentSeries.title) : "Drama Series";
   document.querySelectorAll(".hud-series-title").forEach((el) => {
     el.textContent = seriesName;
   });
@@ -108,44 +89,27 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   syncSpeedButton();
 
   function showHUD() {
-    [hudTop, hudRight, hudBottom].forEach((el) => {
-      if (el) el.classList.remove("hud-hidden");
-    });
+    [hudTop, hudRight, hudBottom].forEach((el) => el && el.classList.remove("hud-hidden"));
     clearTimeout(hudTimer);
     if (!video.paused) {
       hudTimer = setTimeout(() => {
         if (!video.paused) {
-          [hudTop, hudRight, hudBottom].forEach((el) => {
-            if (el) el.classList.add("hud-hidden");
-          });
+          [hudTop, hudRight, hudBottom].forEach((el) => el && el.classList.add("hud-hidden"));
         }
-      }, 3000);
+      }, 3500);
     }
   }
 
   function hideHUD() {
     clearTimeout(hudTimer);
-    [hudTop, hudRight, hudBottom].forEach((el) => {
-      if (el) el.classList.add("hud-hidden");
-    });
+    [hudTop, hudRight, hudBottom].forEach((el) => el && el.classList.add("hud-hidden"));
   }
 
   function renderDrawerGrid() {
-    if (!drawerGrid) return;
+    if (!drawerGrid || !currentSeries) return;
     drawerGrid.innerHTML = currentEpisodes.map((ep, idx) => {
       const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
       const isActive = idx === currentEpisodeIndex;
-      const downloaded = isEpisodeDownloaded(currentSeries.id, ep.id);
-
-      let dlLabel = "Download";
-      let dlClass = "";
-      if (!unlocked) {
-        dlLabel = "Locked";
-        dlClass = "disabled";
-      } else if (downloaded) {
-        dlLabel = "Saved";
-        dlClass = "downloaded";
-      }
 
       return `
         <div class="drawer-ep-card-wrap">
@@ -155,9 +119,6 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
             <span class="drawer-ep-badge ${unlocked ? 'badge-free' : 'badge-locked'}">
               ${unlocked ? (ep.isFree ? 'FREE' : 'UNLOCKED') : 'LOCK'}
             </span>
-          </button>
-          <button class="drawer-dl-btn ${dlClass}" data-dl-ep="${ep.id}" type="button" aria-label="Download Ep ${ep.id}">
-            <span class="dl-btn-label">${dlLabel}</span>
           </button>
         </div>
       `;
@@ -172,22 +133,16 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     if (drawerBackdrop) drawerBackdrop.style.display = "none";
   }
 
-  function syncCoinBalanceInModal() {
-    if (lockModalCoinBalance) lockModalCoinBalance.textContent = `${getUserCoins()} Avail`;
-  }
-
   async function loadEpisode(index) {
     currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
     const ep = currentEpisodes[currentEpisodeIndex];
-    if (!ep) return;
+    if (!ep || !currentSeries) return;
 
     preloadTriggeredForEpisode = -1;
     const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
 
     const seriesName = currentSeries.shortTitle || currentSeries.title;
-    document.querySelectorAll(".hud-series-title").forEach((el) => {
-      el.textContent = seriesName;
-    });
+    document.querySelectorAll(".hud-series-title").forEach((el) => el.textContent = seriesName);
     if (epBadge) epBadge.textContent = `Ep ${ep.id}`;
     if (epTitle) epTitle.textContent = ep.title;
     if (lockedEpNum) lockedEpNum.textContent = `${ep.id}`;
@@ -201,16 +156,15 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
       if (playIndicator) playIndicator.classList.remove("active");
       hideHUD();
       showStatus("");
-      syncCoinBalanceInModal();
       if (lockModal) lockModal.style.display = "flex";
       return;
     }
 
     if (lockModal) lockModal.style.display = "none";
-    if (adModal) adModal.style.display = "none";
 
-    // Instant Playback: Check offline cache, preloaded stream, or direct URL
+    showStatus("Connecting media stream...");
     let streamUrl = ep.src;
+
     if (isEpisodeDownloaded(currentSeries.id, ep.id)) {
       const cachedBlob = await getCachedVideoBlobUrl(ep.src);
       if (cachedBlob) streamUrl = cachedBlob;
@@ -219,10 +173,6 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     }
 
     video.src = streamUrl;
-    startPlaybackStream(ep);
-  }
-
-  function startPlaybackStream(ep) {
     video.load();
     video.playbackRate = currentSpeed;
 
@@ -232,17 +182,29 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     }
 
     video.play().then(() => {
-      video.playbackRate = currentSpeed;
+      showStatus("");
       if (playIndicator) playIndicator.classList.remove("active");
       showHUD();
     }).catch(() => {
+      showStatus("");
       if (playIndicator) playIndicator.classList.add("active");
       showHUD();
     });
   }
 
-  // Preloading Trigger in ontimeupdate (Activates at t >= 2s)
-  let lastSavedSec = 0;
+  // Media Event Listeners for Reliable Diagnosis
+  video.onerror = () => {
+    console.error("[Minsplay Player] Video error loading:", video.src);
+    showStatus("Stream unreachable — check connection");
+    if (playIndicator) playIndicator.classList.add("active");
+    showAppToast("Video source offline or unreachable");
+  };
+
+  video.onloadedmetadata = () => {
+    showStatus("");
+    if (timeDuration) timeDuration.textContent = formatTime(video.duration || 0);
+  };
+
   video.ontimeupdate = () => {
     const cur = video.currentTime || 0;
     const dur = video.duration || 0;
@@ -253,99 +215,37 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     if (timeCurrent) timeCurrent.textContent = formatTime(cur);
     if (timeDuration) timeDuration.textContent = formatTime(dur);
 
-    // Save watch progress
-    const curSec = Math.floor(cur);
-    if (curSec > 0 && curSec !== lastSavedSec && curSec % 2 === 0) {
-      lastSavedSec = curSec;
-      const ep = currentEpisodes[currentEpisodeIndex];
-      saveProgress(currentSeries.id, ep.id, cur, dur, currentSeries.shortTitle || currentSeries.title);
-    }
-
-    // DramaBox Sliding Window Trigger: Preload Next Episode once current plays for 2s
     if (cur >= 2 && preloadTriggeredForEpisode !== currentEpisodeIndex) {
       preloadTriggeredForEpisode = currentEpisodeIndex;
-      const nextEpIndex = currentEpisodeIndex + 1;
-      if (nextEpIndex < currentEpisodes.length) {
-        preloadNextEpisode(currentSeries.id, currentEpisodes[nextEpIndex]);
+      const nextIdx = currentEpisodeIndex + 1;
+      if (nextIdx < currentEpisodes.length && currentSeries) {
+        preloadNextEpisode(currentSeries.id, currentEpisodes[nextIdx]);
       }
     }
   };
 
-  // Automated Binge & Auto-Advance
-  video.onended = () => handleEpisodeEnded();
-
-  function handleEpisodeEnded() {
-    const settings = getUserSettings();
-    if (settings.autoplayNext === false) {
-      if (playIndicator) playIndicator.classList.add("active");
-      showHUD();
-      return;
-    }
-
-    if (currentEpisodeIndex >= currentEpisodes.length - 1) {
-      showAppToast("🎬 Series Completed! Great binge.");
-      if (playIndicator) playIndicator.classList.add("active");
-      showHUD();
-      return;
-    }
-
-    const nextIndex = currentEpisodeIndex + 1;
-    const nextEp = currentEpisodes[nextIndex];
-    const isNextUnlocked = isEpisodeUnlocked(currentSeries.id, nextEp.id, nextEp.isFree);
-
-    if (isNextUnlocked) {
-      loadEpisode(nextIndex);
-    } else {
-      const userCoins = getUserCoins();
-      if (settings.autoUnlockNext !== false && userCoins >= 30) {
-        spendCoins(30);
-        unlockEpisode(currentSeries.id, nextEp.id);
-        showAppToast(`🪙 Auto-unlocked Ep ${nextEp.id} (-30 Coins)`);
-        setTimeout(() => loadEpisode(nextIndex), 400);
-      } else {
-        loadEpisode(nextIndex);
+  if (seekSlider) {
+    seekSlider.oninput = () => {
+      const dur = video.duration || 0;
+      if (dur > 0) {
+        video.currentTime = (seekSlider.value / 100) * dur;
+        showHUD();
       }
-    }
+    };
   }
 
-  // Swipe Gestures
-  let touchStartY = 0, touchStartX = 0, touchStartTime = 0;
+  // Click & Play Toggle
   const targetSurface = playerRoot || document;
-
-  targetSurface.addEventListener("touchstart", (e) => {
-    if (!e.touches || e.touches.length === 0) return;
-    touchStartY = e.touches[0].clientY;
-    touchStartX = e.touches[0].clientX;
-    touchStartTime = Date.now();
-  }, { passive: true });
-
-  targetSurface.addEventListener("touchend", (e) => {
-    if (!e.changedTouches || e.changedTouches.length === 0) return;
-    const diffY = touchStartY - e.changedTouches[0].clientY;
-    const diffX = touchStartX - e.changedTouches[0].clientX;
-    const duration = Date.now() - touchStartTime;
-
-    if (e.target.closest("button, input, .drawer-sheet-box, .subtitles-sheet, .lock-modal-dialog")) return;
-
-    if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX) * 1.1) {
-      if (diffY > 0 && currentEpisodeIndex < currentEpisodes.length - 1) {
-        loadEpisode(currentEpisodeIndex + 1);
-      } else if (diffY < 0 && currentEpisodeIndex > 0) {
-        loadEpisode(currentEpisodeIndex - 1);
-      }
-      return;
+  targetSurface.onclick = (e) => {
+    if (e.target.closest("button, input, select, .drawer-sheet-box, .auth-sheet, .lock-modal-dialog")) return;
+    if (video.paused) {
+      video.play().then(() => playIndicator?.classList.remove("active")).catch(() => {});
+    } else {
+      video.pause();
+      playIndicator?.classList.add("active");
     }
-
-    if (duration < 300 && Math.abs(diffY) < 12 && Math.abs(diffX) < 12) {
-      if (video.paused) {
-        video.play().then(() => playIndicator?.classList.remove("active"));
-      } else {
-        video.pause();
-        playIndicator?.classList.add("active");
-      }
-      showHUD();
-    }
-  }, { passive: true });
+    showHUD();
+  };
 
   if (speedBtn) {
     speedBtn.onclick = (e) => {
@@ -359,10 +259,18 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     };
   }
 
+  if (soundBtn) {
+    soundBtn.onclick = (e) => {
+      e.stopPropagation();
+      video.muted = !video.muted;
+      soundBtn.textContent = video.muted ? "🔇" : "🔊";
+      showAppToast(video.muted ? "Muted 🔇" : "Sound Unmuted 🔊");
+    };
+  }
+
   if (openDrawerBtn) openDrawerBtn.onclick = (e) => { e.stopPropagation(); openDrawer(); };
   if (closeDrawerBtn) closeDrawerBtn.onclick = closeDrawer;
   if (drawerBackdrop) drawerBackdrop.onclick = (e) => { if (e.target === drawerBackdrop) closeDrawer(); };
-  if (lockOpenDrawerBtn) lockOpenDrawerBtn.onclick = () => openDrawer();
 
   const startIdx = Math.max(0, Math.min(initialEp - 1, currentEpisodes.length - 1));
   loadEpisode(startIdx);

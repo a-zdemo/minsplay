@@ -1,173 +1,152 @@
 <section class="home-page" id="home-page-root">
-<!-- Pinned Sticky Top Header -->
-<header class="home-sticky-header">
-<div class="home-header-inner">
-<div class="search-input-pill" id="home-search-pill" role="button" aria-label="Search Dramas">
-<svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-<circle cx="11" cy="11" r="8"></circle>
-<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-</svg>
-<span class="search-placeholder">Deny Me, Dragon King</span>
-</div>
-<div class="header-action-group">
-<!-- Live Coin Balance Pill (Section 19) -->
-<div class="header-coin-pill" id="header-coin-pill" role="button" aria-label="Coins Balance">
-<span class="coin-symbol">🪙</span>
-<span class="coin-count" id="header-coin-count">50</span>
-</div>
-<button class="header-icon-btn vip-btn" type="button" data-route="/member" aria-label="VIP Membership">
-<span class="vip-crown">👑</span>
-</button>
-<button class="header-icon-btn gift-btn" id="btn-gift-modal" type="button" aria-label="Daily Gift Rewards">
-<span class="gift-box">🎁</span>
-<span class="notification-dot" id="gift-notification-dot"></span>
-</button>
-</div>
-</div>
-<!-- Pinned Horizontal Filter Sub-Nav Tabs -->
-<nav class="sub-nav-tabs" id="home-sub-nav">
-<button class="tab-item active" type="button" data-tab="popular">Popular</button>
-<button class="tab-item" type="button" data-tab="new">New</button>
-<button class="tab-item" type="button" data-tab="rankings">Rankings</button>
-<button class="tab-item" type="button" data-tab="categories">Categories</button>
-<button class="tab-item" type="button" data-tab="anime">Anime</button>
-<button class="tab-item" type="button" data-tab="vip">VIP</button>
-<button class="tab-item" type="button" data-tab="original">Original+</button>
-</nav>
-<!-- Genre Sub-Chips Bar (Appears when 'Categories' tab is active) -->
-<div class="category-chips-bar" id="category-chips-bar" style="display: none;">
-<button class="chip-item active" type="button" data-genre="all">All</button>
-<button class="chip-item" type="button" data-genre="Urban Suspense">Urban</button>
-<button class="chip-item" type="button" data-genre="Revenge">Revenge</button>
-<button class="chip-item" type="button" data-genre="Hidden Identity">Identity</button>
-<button class="chip-item" type="button" data-genre="Family Intrigue">Family</button>
-<button class="chip-item" type="button" data-genre="All-Too-Late">Romance</button>
-<button class="chip-item" type="button" data-genre="Counterattack">Action</button>
-<button class="chip-item" type="button" data-genre="Mafia Romance">Mafia</button>
-</div>
-</header>
-<div class="home-scroll-body" id="home-scroll-body">
-<!-- Dynamic Continue Watching Shelf -->
-<section class="content-section continue-watching-section" id="continue-watching-section" style="display: none;">
-<div class="section-header">
-<h2 class="section-heading">Continue Watching</h2>
-<span class="section-link-more" data-route="/mylist">History ›</span>
-</div>
-<div class="continue-watching-scroll" id="continue-watching-list">
-<!-- Injected dynamically by router.js -->
-</div>
-</section>
-<!-- Featured Spotlight Drama (Hidden in filtered/ranked views) -->
-<section class="spotlight-card" id="home-spotlight-card" data-route="/series" data-series="the-beginning">
-<div class="spotlight-banner">
-<div class="spotlight-badge">★ EXCLUSIVE ORIGINAL</div>
-<div class="spotlight-info">
-<h2 class="spotlight-title">The Beginning</h2>
-<p class="spotlight-meta">Urban • Suspense • 5 Episodes Complete</p>
-<div class="spotlight-action-row">
-<button class="btn-spotlight-play" type="button" data-route="/watch" data-series="the-beginning" data-episode="1">
-▶ Watch Ep 1 Free
-</button>
-<span class="spotlight-views">▶ 14.2M Plays</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Main Dynamic Drama Grid Section -->
-<section class="content-section" id="home-main-section">
-<div class="section-header">
-<h2 class="section-heading" id="grid-section-heading">Popular Series</h2>
-<span class="section-link-more" id="grid-count-badge">9 Titles</span>
-</div>
-<div class="drama-grid-3col" id="home-drama-grid">
-<!-- Injected dynamically by router.js -->
-</div>
-</section>
-</div>
-<!-- Fullscreen Live Search Overlay (Section 15) -->
-<aside class="search-overlay" id="search-overlay" style="display: none;">
-<div class="search-overlay-header">
-<div class="search-input-field-wrap">
-<svg class="search-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-<circle cx="11" cy="11" r="8"></circle>
-<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-</svg>
-<input
-type="search"
-id="search-query-input"
-class="search-query-input"
-placeholder="Search title, genre, underdog, dragon..."
-autocomplete="off"
-spellcheck="false"
-/>
-<button class="search-clear-btn" id="search-clear-btn" type="button" aria-label="Clear Search" style="display: none;">
-✕
-</button>
-</div>
-<button class="search-cancel-btn" id="search-cancel-btn" type="button">
-Cancel
-</button>
-</div>
-<div class="search-overlay-body" id="search-overlay-body">
-<div class="search-shelf-block" id="hot-search-shelf">
-<div class="search-shelf-header">
-<h4 class="search-shelf-title">🔥 Hot Searches</h4>
-</div>
-<div class="search-tags-wrap" id="hot-tags-list">
-<button class="search-tag-chip" type="button" data-tag="Dragon">Dragon 🐉</button>
-<button class="search-tag-chip" type="button" data-tag="Revenge">Revenge ⚔️</button>
-<button class="search-tag-chip" type="button" data-tag="Underdog">Underdog 👑</button>
-<button class="search-tag-chip" type="button" data-tag="Billionaire">Billionaire 💍</button>
-<button class="search-tag-chip" type="button" data-tag="Mafia">Mafia Romance 🥀</button>
-<button class="search-tag-chip" type="button" data-tag="Fighter">Fighter 🥊</button>
-<button class="search-tag-chip" type="button" data-tag="Urban">Urban Suspense</button>
-</div>
-</div>
-<div class="search-shelf-block" id="recent-search-shelf" style="display: none;">
-<div class="search-shelf-header">
-<h4 class="search-shelf-title">🕒 Recent Searches</h4>
-<button class="btn-clear-recent" id="btn-clear-recent" type="button">Clear All</button>
-</div>
-<div class="search-tags-wrap" id="recent-tags-list"></div>
-</div>
-<div class="search-results-block" id="search-results-block" style="display: none;">
-<div class="search-shelf-header">
-<h4 class="search-shelf-title" id="results-count-title">Results</h4>
-</div>
-<div class="drama-grid-3col" id="search-results-grid"></div>
-</div>
-<div class="search-empty-state" id="search-empty-state" style="display: none;">
-<span class="empty-icon">🔍</span>
-<h4 class="empty-title">No matching dramas found</h4>
-<p class="empty-desc" id="search-empty-desc">
-Try searching for keywords like "Dragon", "Revenge", or "Romance".
-</p>
-</div>
-</div>
-</aside>
-<!-- Interactive 7-Day Streak Daily Gift Modal (Section 19) -->
-<aside class="daily-gift-modal-backdrop" id="daily-gift-modal" style="display: none;">
-<div class="daily-gift-sheet">
-<div class="gift-sheet-header">
-<div class="gift-header-titles">
-<h3 class="gift-sheet-title">Daily Coin Bonus 🎁</h3>
-<p class="gift-sheet-sub">Check in daily to earn coins for instant unlocks</p>
-</div>
-<button class="gift-sheet-close" id="btn-close-gift-modal" type="button" aria-label="Close Modal">✕</button>
-</div>
-<!-- 7-Day Reward Grid -->
-<div class="streak-grid-7days" id="streak-grid-7days">
-<!-- Rendered dynamically by router.js -->
-</div>
-<!-- Footer CTA & Wallet Display -->
-<div class="gift-sheet-footer">
-<button class="btn-claim-reward" id="btn-claim-daily-reward" type="button">
-Claim Today's Reward 🎁
-</button>
-<p class="gift-sheet-hint">
-🪙 Use coins to unlock episodes instantly without watching ads.
-</p>
-</div>
-</div>
-</aside>
+  
+  <!-- Pinned Sticky Top Header -->
+  <header class="home-sticky-header">
+    <div class="home-header-inner">
+      <div class="search-input-pill" id="home-search-pill" role="button" aria-label="Search Dramas">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span class="search-placeholder">Search dramas, episodes, creators...</span>
+      </div>
+
+      <div class="header-action-group">
+        <div class="header-coin-pill" id="header-coin-pill" role="button" aria-label="Coins Balance">
+          <span class="coin-symbol">🪙</span>
+          <span class="coin-count" id="header-coin-count">50</span>
+        </div>
+
+        <button class="header-icon-btn vip-btn" type="button" data-route="/member" aria-label="VIP Membership">
+          <span class="vip-crown">👑</span>
+        </button>
+        <button class="header-icon-btn gift-btn" id="btn-gift-modal" type="button" aria-label="Daily Gift Rewards">
+          <span class="gift-box">🎁</span>
+          <span class="notification-dot" id="gift-notification-dot"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Pinned Horizontal Filter Sub-Nav Tabs -->
+    <nav class="sub-nav-tabs" id="home-sub-nav">
+      <button class="tab-item active" type="button" data-tab="popular">Popular</button>
+      <button class="tab-item" type="button" data-tab="new">New</button>
+      <button class="tab-item" type="button" data-tab="rankings">Rankings</button>
+      <button class="tab-item" type="button" data-tab="categories">Categories</button>
+      <button class="tab-item" type="button" data-tab="creator">Creator Releases</button>
+    </nav>
+
+    <!-- Genre Sub-Chips Bar (Appears when 'Categories' tab is active) -->
+    <div class="category-chips-bar" id="category-chips-bar" style="display: none;">
+      <button class="chip-item active" type="button" data-genre="all">All</button>
+      <button class="chip-item" type="button" data-genre="Urban Drama">Urban</button>
+      <button class="chip-item" type="button" data-genre="Revenge">Revenge</button>
+      <button class="chip-item" type="button" data-genre="Romance">Romance</button>
+      <button class="chip-item" type="button" data-genre="Action">Action</button>
+    </div>
+  </header>
+
+  <div class="home-scroll-body" id="home-scroll-body">
+    
+    <!-- Dynamic Continue Watching Shelf (Only real catalog series) -->
+    <section class="content-section continue-watching-section" id="continue-watching-section" style="display: none;">
+      <div class="section-header">
+        <h2 class="section-heading">Continue Watching</h2>
+        <span class="section-link-more" data-route="/mylist">History ›</span>
+      </div>
+      <div class="continue-watching-scroll" id="continue-watching-list"></div>
+    </section>
+
+    <!-- Dynamic Spotlight Banner (Only rendered if catalog has titles) -->
+    <section class="spotlight-card" id="home-spotlight-card" style="display: none;"></section>
+
+    <!-- Main Dynamic Drama Grid Section -->
+    <section class="content-section" id="home-main-section">
+      <div class="section-header">
+        <h2 class="section-heading" id="grid-section-heading">Popular Series</h2>
+        <span class="section-link-more" id="grid-count-badge">0 Titles</span>
+      </div>
+
+      <div class="drama-grid-3col" id="home-drama-grid"></div>
+    </section>
+
+  </div>
+
+  <!-- Fullscreen Live Search Overlay -->
+  <aside class="search-overlay" id="search-overlay" style="display: none;">
+    <div class="search-overlay-header">
+      <div class="search-input-field-wrap">
+        <svg class="search-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="search"
+          id="search-query-input"
+          class="search-query-input"
+          placeholder="Search dramas, episodes, creators..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="search-clear-btn" id="search-clear-btn" type="button" aria-label="Clear Search" style="display: none;">✕</button>
+      </div>
+      <button class="search-cancel-btn" id="search-cancel-btn" type="button">Cancel</button>
+    </div>
+
+    <div class="search-overlay-body" id="search-overlay-body">
+      <div class="search-shelf-block" id="hot-search-shelf">
+        <div class="search-shelf-header">
+          <h4 class="search-shelf-title">🔥 Popular Searches</h4>
+        </div>
+        <div class="search-tags-wrap" id="hot-tags-list">
+          <button class="search-tag-chip" type="button" data-tag="Drama">Drama 🎬</button>
+          <button class="search-tag-chip" type="button" data-tag="Urban">Urban 🏙️</button>
+          <button class="search-tag-chip" type="button" data-tag="Creator">Creator Release 👑</button>
+          <button class="search-tag-chip" type="button" data-tag="Episode 1">Episode 1 ▶</button>
+        </div>
+      </div>
+
+      <div class="search-shelf-block" id="recent-search-shelf" style="display: none;">
+        <div class="search-shelf-header">
+          <h4 class="search-shelf-title">🕒 Recent Searches</h4>
+          <button class="btn-clear-recent" id="btn-clear-recent" type="button">Clear All</button>
+        </div>
+        <div class="search-tags-wrap" id="recent-tags-list"></div>
+      </div>
+
+      <div class="search-results-block" id="search-results-block" style="display: none;">
+        <div class="search-shelf-header">
+          <h4 class="search-shelf-title" id="results-count-title">Results</h4>
+        </div>
+        <div class="drama-grid-3col" id="search-results-grid"></div>
+      </div>
+
+      <div class="search-empty-state" id="search-empty-state" style="display: none;">
+        <span class="empty-icon">🔍</span>
+        <h4 class="empty-title">No matching dramas found</h4>
+        <p class="empty-desc" id="search-empty-desc">Try searching by series title or creator name.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Interactive 7-Day Streak Daily Gift Modal -->
+  <aside class="daily-gift-modal-backdrop" id="daily-gift-modal" style="display: none;">
+    <div class="daily-gift-sheet">
+      <div class="gift-sheet-header">
+        <div class="gift-header-titles">
+          <h3 class="gift-sheet-title">Daily Coin Bonus 🎁</h3>
+          <p class="gift-sheet-sub">Check in daily to earn coins for instant unlocks</p>
+        </div>
+        <button class="gift-sheet-close" id="btn-close-gift-modal" type="button" aria-label="Close Modal">✕</button>
+      </div>
+
+      <div class="streak-grid-7days" id="streak-grid-7days"></div>
+
+      <div class="gift-sheet-footer">
+        <button class="btn-claim-reward" id="btn-claim-daily-reward" type="button">Claim Today's Reward 🎁</button>
+        <p class="gift-sheet-hint">🪙 Use coins to unlock creator episodes directly.</p>
+      </div>
+    </div>
+  </aside>
+
 </section>

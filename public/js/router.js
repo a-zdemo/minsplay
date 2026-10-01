@@ -1,7 +1,3 @@
-import adminHtml from "../pages/admin.html?raw";
-import { initAdminDashboard } from "./admin.js";
-import creatorHtml from "../pages/creator.html?raw";
-import { initCreatorStudio } from "./creator.js";
 import homeHtml from "../pages/home.html?raw";
 import seriesHtml from "../pages/series.html?raw";
 import watchHtml from "../pages/watch.html?raw";
@@ -17,9 +13,12 @@ import eventsHtml from "../pages/events.html?raw";
 import giftsHtml from "../pages/gifts.html?raw";
 import historyHtml from "../pages/history.html?raw";
 import downloadHtml from "../pages/download.html?raw";
+import creatorHtml from "../pages/creator.html?raw";
+
 import { initPlayer } from "./player.js";
 import { initForYouFeed, destroyForYouFeed } from "./foryou.js";
 import { renderHistoryFeed, renderDownloadPage } from "./profile-subpages.js";
+import { initCreatorStudio } from "./creator.js";
 import {
   getAllProgress,
   clearAllProgress,
@@ -31,7 +30,7 @@ import {
   getVipData,
   activateVip,
   getUserSettings,
-  saveUserSetting
+  saveUserSetting,
 } from "./storage.js";
 import { DRAMA_CATALOG, getSeriesById } from "./series-data.js";
 
@@ -54,10 +53,9 @@ const routes = {
   "/history": historyHtml,
   "/download": downloadHtml,
   "/creator": creatorHtml,
-  "/admin": adminHtml,
 };
 
-let currentActiveSeriesId = "the-beginning";
+let currentActiveSeriesId = "";
 let pendingEpisode = 1;
 
 export function showAppToast(message) {
@@ -81,12 +79,9 @@ export async function navigateTo(path, { seriesId, episode = 1 } = {}) {
 
   let targetUrl = path;
   const params = new URLSearchParams();
-  if (currentActiveSeriesId && currentActiveSeriesId !== "the-beginning") {
-    params.set("id", currentActiveSeriesId);
-  }
-  if (path === "/watch" && episode > 1) {
-    params.set("ep", episode);
-  }
+  if (currentActiveSeriesId) params.set("id", currentActiveSeriesId);
+  if (path === "/watch" && episode > 1) params.set("ep", episode);
+
   const queryString = params.toString();
   if (queryString) targetUrl += `?${queryString}`;
 
@@ -108,35 +103,43 @@ function createDramaCardMarkup(drama, rankNumber = null) {
 
   let statusBadgeHtml = "";
   if (drama.badge && rankNumber === null) {
-    statusBadgeHtml = `<span class="poster-badge ${drama.badgeClass}">${drama.badge}</span>`;
+    statusBadgeHtml = `<span class="poster-badge ${drama.badgeClass || 'badge-hot'}">${drama.badge}</span>`;
   }
+
+  const posterInner = drama.posterUrl
+    ? `<img src="${drama.posterUrl}" class="poster-real-img" alt="${drama.title}" />`
+    : `
+      <div class="poster-gradient-art ${drama.artClass || 'art-gold'}">
+        <span class="art-symbol">${drama.artSymbol || '🎬'}</span>
+        <span class="art-code">${drama.artCode || 'ORIGINAL'}</span>
+      </div>`;
 
   return `
     <article class="drama-card" data-route="/series" data-series="${drama.id}">
       <div class="drama-poster-wrap">
-        ${drama.posterUrl ? `<img src="${drama.posterUrl}" class="poster-real-img" alt="${drama.title}" />` : `
-        <div class="poster-gradient-art ${drama.artClass || 'art-gold'}">
-          <span class="art-symbol">${drama.artSymbol || '🎬'}</span>
-          <span class="art-code">${drama.artCode || 'ORIGINAL'}</span>
-        </div>` }
+        ${posterInner}
         ${rankBadgeHtml}
         ${statusBadgeHtml}
         <div class="poster-play-count">
-          <span class="play-arrow">▶</span> ${drama.plays}
+          <span class="play-arrow">▶</span> ${drama.plays || '1'}
         </div>
       </div>
       <h3 class="drama-title">${drama.title}</h3>
-      <p class="drama-genre">${drama.genre}</p>
+      <p class="drama-genre">${drama.genre || 'Urban Drama'}</p>
     </article>
   `;
 }
 
+// Only shows Continue Watching for dramas that exist in the real catalog
 function updateContinueWatching() {
   const section = document.getElementById("continue-watching-section");
   const container = document.getElementById("continue-watching-list");
   if (!container || !section) return;
 
-  const records = getAllProgress();
+  const records = getAllProgress().filter((rec) =>
+    DRAMA_CATALOG.some((d) => d.id === rec.seriesId)
+  );
+
   if (!records || records.length === 0) {
     section.style.display = "none";
     return;
@@ -144,18 +147,25 @@ function updateContinueWatching() {
 
   section.style.display = "flex";
   container.innerHTML = records
-    .map((rec) => `
-      <article class="continue-card" data-route="/watch" data-series="${rec.seriesId}" data-episode="${rec.episodeId}">
-        <div class="continue-poster">
-          <span style="font-size: 0.72rem; font-weight: 700; color: #fff;">▶ Ep ${rec.episodeId}</span>
-          <div class="continue-progress-bar"><div class="continue-progress-fill" style="width: ${rec.percentage}%;"></div></div>
-        </div>
-        <h4 class="drama-title" style="margin-top: 4px; font-size: 0.75rem;">${rec.seriesTitle}</h4>
-        <p class="drama-genre">${rec.episodeTitle} • ${rec.percentage}%</p>
-      </article>
-    `).join("");
-}
+    .map((rec) => {
+      const drama = DRAMA_CATALOG.find((d) => d.id === rec.seriesId);
+      const thumbMarkup = drama && drama.posterUrl
+        ? `<img src="${drama.posterUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" alt="${rec.seriesTitle}" />`
+        : `<span style="font-size: 0.72rem; font-weight: 700; color: #fff;">▶ Ep ${rec.episodeId}</span>`;
 
+      return `
+        <article class="continue-card" data-route="/watch" data-series="${rec.seriesId}" data-episode="${rec.episodeId}">
+          <div class="continue-poster">
+            ${thumbMarkup}
+            <div class="continue-progress-bar"><div class="continue-progress-fill" style="width: ${rec.percentage}%;"></div></div>
+          </div>
+          <h4 class="drama-title" style="margin-top: 4px; font-size: 0.75rem;">${rec.seriesTitle}</h4>
+          <p class="drama-genre">${rec.episodeTitle} • ${rec.percentage}%</p>
+        </article>
+      `;
+    })
+    .join("");
+}
 function initDailyGiftSystem() {
   const giftBtn = document.getElementById("btn-gift-modal");
   const giftModal = document.getElementById("daily-gift-modal");
@@ -252,7 +262,7 @@ function initHomeFilterSystem() {
   function renderGrid(dramas, isRanked = false) {
     if (!dramas || dramas.length === 0) {
       grid.innerHTML = `
-        <div class="home-empty-catalog" style="grid-column: span 3; text-align: center; padding: 40px 10px;">
+        <div class="home-empty-catalog" style="grid-column: span 3; text-align: center; padding: 36px 12px;">
           <span style="font-size: 2.6rem; display: block; margin-bottom: 8px;">🎬</span>
           <strong style="color: #fff; font-size: 1.05rem; display: block; margin-bottom: 6px;">No Dramas Published Yet</strong>
           <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin: 0 0 16px;">Be the first creator to upload a vertical short drama to your Cloudflare R2 media vault.</p>
@@ -262,10 +272,34 @@ function initHomeFilterSystem() {
         </div>
       `;
       if (countBadge) countBadge.textContent = "0 Titles";
+      if (spotlightCard) spotlightCard.style.display = "none";
       return;
     }
+
     grid.innerHTML = dramas.map((d, idx) => createDramaCardMarkup(d, isRanked ? idx + 1 : null)).join("");
-    if (countBadge) countBadge.textContent = `${dramas.length} Titles`;
+    if (countBadge) countBadge.textContent = `${dramas.length} Title${dramas.length > 1 ? "s" : ""}`;
+
+    // Dynamically spotlight the top drama
+    if (spotlightCard && dramas.length > 0) {
+      const topDrama = dramas[0];
+      spotlightCard.style.display = "block";
+      spotlightCard.setAttribute("data-series", topDrama.id);
+      spotlightCard.innerHTML = `
+        <div class="spotlight-banner">
+          <div class="spotlight-badge">★ LATEST RELEASE</div>
+          <div class="spotlight-info">
+            <h2 class="spotlight-title">${topDrama.title}</h2>
+            <p class="spotlight-meta">${topDrama.genre || 'Drama'} • ${topDrama.episodes ? topDrama.episodes.length : 1} Episode${topDrama.episodes && topDrama.episodes.length > 1 ? 's' : ''}</p>
+            <div class="spotlight-action-row">
+              <button class="btn-spotlight-play" type="button" data-route="/watch" data-series="${topDrama.id}" data-episode="1">
+                ▶ Watch Ep 1 Free
+              </button>
+              <span class="spotlight-views">▶ ${topDrama.plays || '1'} Plays</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
   }
 
   renderGrid(DRAMA_CATALOG);
@@ -283,7 +317,6 @@ function initHomeFilterSystem() {
       chipsBar.style.display = isCategories ? "flex" : "none";
       if (homeScrollBody) homeScrollBody.classList.toggle("with-chips", isCategories);
     }
-    if (spotlightCard) spotlightCard.style.display = tab === "popular" ? "block" : "none";
 
     switch (tab) {
       case "popular":
@@ -292,32 +325,19 @@ function initHomeFilterSystem() {
         break;
       case "new":
         if (heading) heading.textContent = "New Releases";
-        renderGrid(DRAMA_CATALOG.filter((d) => d.badge === "New" || d.id === "bastard-hit-daughter" || d.id === "fake-husband"));
+        renderGrid(DRAMA_CATALOG);
         break;
       case "rankings":
         if (heading) heading.textContent = "Top Rankings";
-        const ranked = [...DRAMA_CATALOG].sort((a, b) => {
-          const valA = a.plays.includes("M") ? parseFloat(a.plays) * 1000000 : parseFloat(a.plays) * 1000;
-          const valB = b.plays.includes("M") ? parseFloat(b.plays) * 1000000 : parseFloat(b.plays) * 1000;
-          return valB - valA;
-        });
-        renderGrid(ranked, true);
+        renderGrid(DRAMA_CATALOG, true);
         break;
       case "categories":
         if (heading) heading.textContent = "Category Catalog";
         renderGrid(DRAMA_CATALOG);
         break;
-      case "anime":
-        if (heading) heading.textContent = "Action & Fantasy Dramas";
-        renderGrid(DRAMA_CATALOG.filter((d) => d.genre.includes("Revenge") || d.genre.includes("Identity") || d.tags.includes("Martial") || d.id.includes("dragon")));
-        break;
-      case "vip":
-        if (heading) heading.textContent = "VIP Exclusives";
-        renderGrid(DRAMA_CATALOG.filter((d) => d.badge === "Hot" || d.plays.includes("M")));
-        break;
-      case "original":
-        if (heading) heading.textContent = "Original+ Series";
-        renderGrid(DRAMA_CATALOG.filter((d) => d.artCode === "ORIGINAL" || d.badge === "Following"));
+      case "creator":
+        if (heading) heading.textContent = "Creator Releases";
+        renderGrid(DRAMA_CATALOG);
         break;
       default:
         renderGrid(DRAMA_CATALOG);
@@ -332,16 +352,17 @@ function initHomeFilterSystem() {
       chip.classList.add("active");
       const genre = chip.getAttribute("data-genre");
       if (genre === "all") {
-        if (heading) heading.textContent = "All Categories";
         renderGrid(DRAMA_CATALOG);
       } else {
-        if (heading) heading.textContent = `${genre} Dramas`;
-        renderGrid(DRAMA_CATALOG.filter((d) => d.genre.toLowerCase().includes(genre.toLowerCase()) || d.tags.toLowerCase().includes(genre.toLowerCase())));
+        renderGrid(
+          DRAMA_CATALOG.filter((d) =>
+            (d.genre || "").toLowerCase().includes(genre.toLowerCase())
+          )
+        );
       }
     });
   }
 }
-
 function initSearchOverlayEngine() {
   const searchPill = document.getElementById("home-search-pill");
   const overlay = document.getElementById("search-overlay");
@@ -355,7 +376,6 @@ function initSearchOverlayEngine() {
   const resultsGrid = document.getElementById("search-results-grid");
   const resultsTitle = document.getElementById("results-count-title");
   const emptyState = document.getElementById("search-empty-state");
-  const emptyDesc = document.getElementById("search-empty-desc");
   const clearRecentBtn = document.getElementById("btn-clear-recent");
 
   if (!searchPill || !overlay || !input) return;
@@ -406,15 +426,11 @@ function initSearchOverlayEngine() {
     if (hotShelf) hotShelf.style.display = "none";
     if (recentShelf) recentShelf.style.display = "none";
 
-    const matched = DRAMA_CATALOG.filter((drama) => {
-      return (
-        drama.title.toLowerCase().includes(q) ||
-        drama.shortTitle.toLowerCase().includes(q) ||
-        drama.synopsis.toLowerCase().includes(q) ||
-        drama.genre.toLowerCase().includes(q) ||
-        drama.tags.toLowerCase().includes(q)
-      );
-    });
+    const matched = DRAMA_CATALOG.filter((drama) =>
+      drama.title.toLowerCase().includes(q) ||
+      (drama.synopsis && drama.synopsis.toLowerCase().includes(q)) ||
+      (drama.genre && drama.genre.toLowerCase().includes(q))
+    );
 
     if (matched.length > 0) {
       if (emptyState) emptyState.style.display = "none";
@@ -423,10 +439,7 @@ function initSearchOverlayEngine() {
       if (resultsGrid) resultsGrid.innerHTML = matched.map((d) => createDramaCardMarkup(d)).join("");
     } else {
       if (resultsBlock) resultsBlock.style.display = "none";
-      if (emptyState) {
-        emptyState.style.display = "flex";
-        if (emptyDesc) emptyDesc.textContent = `No dramas found for "${query}". Try searching "Dragon", "Revenge", or "Romance".`;
-      }
+      if (emptyState) emptyState.style.display = "flex";
     }
   }
 
@@ -584,7 +597,6 @@ function initMemberScreen() {
     };
   }
 }
-
 function initProfileScreen() {
   const coinBal = document.getElementById("profile-coin-balance");
   const streakCount = document.getElementById("profile-streak-count");
@@ -659,7 +671,7 @@ function initSettingsScreen() {
   if (clearHistoryBtn) {
     clearHistoryBtn.onclick = () => {
       clearAllProgress();
-      showAppToast("Watch history cleared 🗑️️");
+      showAppToast("Watch history cleared 🗑️");
     };
   }
   if (guestResetBtn) {
@@ -690,6 +702,10 @@ function initWalletScreen() {
 
 function renderSeriesDetail(seriesId) {
   const drama = getSeriesById(seriesId);
+  if (!drama) {
+    navigateTo("/");
+    return;
+  }
   currentActiveSeriesId = drama.id;
 
   const titleEl = document.getElementById("series-title");
@@ -705,24 +721,23 @@ function renderSeriesDetail(seriesId) {
 
   if (titleEl) titleEl.textContent = drama.title;
   if (navTitleEl) navTitleEl.textContent = drama.shortTitle || "Series Details";
-  if (tagsEl) tagsEl.textContent = drama.tags;
-  if (statsEl) statsEl.textContent = `${drama.episodes.length} Episodes • ${drama.plays} Plays`;
+  if (tagsEl) tagsEl.textContent = drama.tags || "Drama";
+  if (statsEl) statsEl.textContent = `${drama.episodes ? drama.episodes.length : 1} Episodes • ${drama.plays || '1'} Plays`;
   if (synopsisEl) synopsisEl.textContent = drama.synopsis;
 
   if (badgeEl) {
-    badgeEl.textContent = drama.badge || "";
-    badgeEl.style.display = drama.badge ? "inline-block" : "none";
+    badgeEl.textContent = drama.badge || "Creator";
+    badgeEl.style.display = "inline-block";
   }
 
   if (posterEl) {
     if (drama.posterUrl) {
-    posterEl.className = "series-hero-poster has-thumb";
-    posterEl.innerHTML = `<img src="${drama.posterUrl}" class="series-hero-img" alt="${drama.title}" />`;
-  } else {
-    posterEl.className = `series-hero-poster ${drama.artClass || 'art-gold'}`;
-    posterEl.innerHTML = `<span style="font-size: 2.2rem;">${drama.artSymbol || '🎬'}</span>`;
-  }
-    posterEl.innerHTML = `<span style="font-size: 2.2rem;">${drama.artSymbol}</span>`;
+      posterEl.className = "series-hero-poster has-thumb";
+      posterEl.innerHTML = `<img src="${drama.posterUrl}" class="series-hero-img" alt="${drama.title}" />`;
+    } else {
+      posterEl.className = `series-hero-poster ${drama.artClass || 'art-gold'}`;
+      posterEl.innerHTML = `<span style="font-size: 2.2rem;">${drama.artSymbol || '🎬'}</span>`;
+    }
   }
 
   if (startBtn) {
@@ -730,9 +745,9 @@ function renderSeriesDetail(seriesId) {
     startBtn.setAttribute("data-episode", "1");
   }
 
-  if (epCountEl) epCountEl.textContent = `${drama.episodes.length} Total`;
+  if (epCountEl) epCountEl.textContent = `${drama.episodes ? drama.episodes.length : 1} Total`;
 
-  if (epListEl) {
+  if (epListEl && drama.episodes) {
     epListEl.innerHTML = drama.episodes.map((ep) => {
       const unlocked = isEpisodeUnlocked(drama.id, ep.id, ep.isFree);
       return `
@@ -740,7 +755,7 @@ function renderSeriesDetail(seriesId) {
           <div class="episode-index">${ep.id < 10 ? `0${ep.id}` : ep.id}</div>
           <div class="episode-info">
             <h3 class="episode-title">${ep.title}</h3>
-            <p class="episode-duration">${ep.duration}</p>
+            <p class="episode-duration">${ep.duration || '1m 30s'}</p>
           </div>
           <span class="status-tag ${unlocked ? "status-free" : "status-locked"}">
             ${unlocked ? (ep.isFree ? "FREE" : "UNLOCKED") : "🔒 LOCKED"}
@@ -750,28 +765,28 @@ function renderSeriesDetail(seriesId) {
     }).join("");
   }
 }
-
 function initMyListScreen() {
   const tabBar = document.getElementById("mylist-tab-bar");
   const historyList = document.getElementById("history-drama-list");
 
   if (historyList) {
-    const records = getAllProgress();
+    const records = getAllProgress().filter((rec) =>
+      DRAMA_CATALOG.some((d) => d.id === rec.seriesId)
+    );
+
     if (!records || records.length === 0) {
       historyList.innerHTML = `
         <div class="mylist-empty-state">
           <span class="empty-icon">📺</span>
-          <p class="empty-text">No watch history yet. Start watching an episode!</p>
-          <button class="btn-spotlight-play" type="button" data-route="/watch" data-series="the-beginning" data-episode="1">
-            ▶ Watch Ep 1 Free
-          </button>
+          <p class="empty-text">No watch history yet.</p>
+          <button class="btn-spotlight-play" type="button" data-route="/">Browse Dramas</button>
         </div>
       `;
     } else {
       historyList.innerHTML = records.map((rec) => `
         <article class="mylist-card" data-route="/watch" data-series="${rec.seriesId}" data-episode="${rec.episodeId}">
           <div class="mylist-poster-wrap">
-            <div class="poster-gradient-art art-blue"><span class="art-symbol">▶</span></div>
+            <div class="poster-gradient-art art-gold"><span class="art-symbol">▶</span></div>
             <div class="mylist-card-progress-bar"><div class="mylist-card-progress-fill" style="width: ${rec.percentage}%;"></div></div>
           </div>
           <div class="mylist-meta">
@@ -836,7 +851,8 @@ async function renderRoute(path) {
       path === "/events" ||
       path === "/gifts" ||
       path === "/history" ||
-      path === "/download" || path === "/creator" || path === "/admin"
+      path === "/download" ||
+      path === "/creator"
     );
     bottomNav.style.display = isSubpage ? "none" : "flex";
   }
@@ -846,7 +862,8 @@ async function renderRoute(path) {
   updateBottomNavActive(path);
 
   if (path === "/watch") {
-    initPlayer(currentActiveSeriesId, pendingEpisode);
+    const sId = currentActiveSeriesId || (DRAMA_CATALOG.length > 0 ? DRAMA_CATALOG[0].id : "");
+    initPlayer(sId, pendingEpisode);
   } else if (path === "/foryou") {
     initForYouFeed();
   } else if (path === "/series") {
@@ -868,10 +885,12 @@ async function renderRoute(path) {
     initSettingsScreen();
   } else if (path === "/wallet") {
     initWalletScreen();
-  } else if (path === "/creator" || path === "/admin") {
-    initCreatorStudio();
   } else if (path === "/history") {
     renderHistoryFeed();
+  } else if (path === "/download") {
+    renderDownloadPage();
+  } else if (path === "/creator") {
+    initCreatorStudio();
   }
 }
 
@@ -895,7 +914,7 @@ export function initRouter() {
   window.addEventListener("popstate", (e) => {
     const currentPath = window.location.pathname || "/";
     const urlParams = new URLSearchParams(window.location.search);
-    const seriesId = (e.state && e.state.seriesId) || urlParams.get("id") || "the-beginning";
+    const seriesId = (e.state && e.state.seriesId) || urlParams.get("id") || "";
     const episode = (e.state && e.state.episode) || (urlParams.get("ep") ? parseInt(urlParams.get("ep"), 10) : 1);
 
     currentActiveSeriesId = seriesId;
@@ -905,7 +924,7 @@ export function initRouter() {
 
   const initialPath = window.location.pathname || "/";
   const urlParams = new URLSearchParams(window.location.search);
-  const initialSeries = urlParams.get("id") || "the-beginning";
+  const initialSeries = urlParams.get("id") || (DRAMA_CATALOG.length > 0 ? DRAMA_CATALOG[0].id : "");
   const initialEp = urlParams.get("ep") ? parseInt(urlParams.get("ep"), 10) : 1;
 
   currentActiveSeriesId = initialSeries;

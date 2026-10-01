@@ -3338,3 +3338,185 @@
   border-color: #ff2e63;
   color: #ff2e63;
 }
+
+/* ==========================================================================
+   Dedicated Auth Page & Creator CMS Styles
+   ========================================================================== */
+.auth-page-root {
+  min-height: 100vh;
+  background: #09090e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 16px 80px;
+  box-sizing: border-box;
+}
+
+.auth-page-container {
+  width: 100%;
+  max-width: 420px;
+  background: #12121a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85);
+}
+
+.auth-page-header { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.auth-logo-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 46, 99, 0.15);
+  border: 1.5px solid rgba(255, 46, 99, 0.35);
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  margin-bottom: 4px;
+}
+.auth-brand-heading { margin: 0; font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+.auth-brand-sub { margin: 0; font-size: 0.76rem; color: rgba(255, 255, 255, 0.55); line-height: 1.4; }
+
+.auth-mode-tabs {
+  display: flex;
+  background: #181824;
+  padding: 4px;
+  border-radius: 14px;
+  gap: 6px;
+}
+.auth-tab-btn {
+  all: unset;
+  flex: 1;
+  text-align: center;
+  font-size: 0.84rem;
+  font-weight: 800;
+  padding: 8px 0;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+}
+.auth-tab-btn.active {
+  background: #ff2e63;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 46, 99, 0.4);
+}
+
+.auth-form-body { display: flex; flex-direction: column; gap: 12px; }
+.auth-field-group { display: flex; flex-direction: column; gap: 4px; }
+.auth-field-label { font-size: 0.74rem; font-weight: 700; color: rgba(255, 255, 255, 0.7); }
+.auth-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #191924;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.auth-field-icon { color: rgba(255, 255, 255, 0.4); }
+.auth-text-input { all: unset; flex: 1; font-size: 0.88rem; color: #fff; }
+.auth-text-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+.auth-role-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.role-chip {
+  all: unset;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  text-align: center;
+}
+.role-chip strong { font-size: 0.8rem; color: #fff; }
+.role-chip small { font-size: 0.64rem; color: rgba(255, 255, 255, 0.5); }
+.role-chip.active { background: rgba(255, 46, 99, 0.2); border-color: #ff2e63; }
+
+.btn-auth-submit {
+  all: unset;
+  text-align: center;
+  background: linear-gradient(90deg, #ff1765, #ff5e3a);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.92rem;
+  padding: 12px 0;
+  border-radius: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 23, 101, 0.4);
+  margin-top: 4px;
+}
+
+.auth-demo-section { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.auth-demo-divider { display: flex; align-items: center; text-align: center; color: rgba(255, 255, 255, 0.3); font-size: 0.65rem; font-weight: 800; }
+.auth-demo-divider::before, .auth-demo-divider::after { content: ''; flex: 1; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.auth-demo-divider span { padding: 0 8px; }
+.auth-demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.btn-demo-preset {
+  all: unset;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  cursor: pointer;
+}
+.btn-demo-preset:active { background: rgba(0, 210, 252, 0.2); color: #00d2fc; }
+
+/* Creator CMS Tabs & Cards */
+.creator-nav-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.creator-tab-btn {
+  all: unset;
+  padding: 6px 14px;
+  background: #14141e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.creator-tab-btn.active { background: rgba(255, 193, 7, 0.15); border-color: #ffc107; color: #ffc107; }
+
+.cms-header-bar { display: flex; justify-content: space-between; align-items: center; }
+.cms-total-indicator { font-size: 0.74rem; font-weight: 700; color: rgba(255, 255, 255, 0.5); }
+.cms-series-feed { display: flex; flex-direction: column; gap: 12px; }
+.cms-series-card { background: #12121a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.cms-series-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.cms-series-title { font-size: 0.95rem; font-weight: 800; color: #fff; }
+.cms-series-sub { font-size: 0.72rem; color: rgba(255, 255, 255, 0.5); display: block; }
+.btn-cms-delete-series { all: unset; font-size: 0.68rem; font-weight: 700; color: #ff2e63; background: rgba(255, 46, 99, 0.15); padding: 3px 8px; border-radius: 6px; cursor: pointer; }
+
+.cms-episodes-table { display: flex; flex-direction: column; gap: 6px; }
+.cms-ep-row { display: flex; justify-content: space-between; align-items: center; background: #181822; padding: 8px 10px; border-radius: 8px; }
+.cms-ep-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cms-ep-tag { font-size: 0.68rem; font-weight: 800; color: #ffc107; background: rgba(255, 193, 7, 0.12); padding: 2px 6px; border-radius: 4px; }
+.cms-ep-name { font-size: 0.78rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+.cms-price-badge { font-size: 0.62rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
+.cms-price-badge.free { background: rgba(39, 201, 63, 0.15); color: #27c93f; }
+.cms-price-badge.paid { background: rgba(255, 46, 99, 0.15); color: #ff2e63; }
+.cms-ep-actions { display: flex; gap: 6px; }
+.btn-cms-action-pill { all: unset; font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer; }
+.btn-cms-action-pill.edit { background: rgba(0, 210, 252, 0.15); color: #00d2fc; }
+.btn-cms-action-pill.delete { background: rgba(255, 46, 99, 0.15); color: #ff2e63; }
+
+/* Edit Modal */
+.cms-edit-modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+.cms-edit-card { background: #14141e; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; width: 100%; max-width: 400px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.cms-edit-header { display: flex; justify-content: space-between; align-items: center; }
+.cms-edit-title { margin: 0; font-size: 1rem; font-weight: 800; color: #fff; }
+.cms-edit-close { all: unset; color: rgba(255,255,255,0.4); font-size: 1.1rem; cursor: pointer; }
+.cms-edit-form { display: flex; flex-direction: column; gap: 8px; }
+.cms-field-label { font-size: 0.72rem; font-weight: 700; color: rgba(255, 255, 255, 0.7); }
+.cms-field-input { all: unset; box-sizing: border-box; width: 100%; background: #1c1c28; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; color: #fff; }
+.cms-edit-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+.btn-cms-action { all: unset; text-align: center; font-size: 0.8rem; font-weight: 800; padding: 10px 0; border-radius: 8px; cursor: pointer; }
+.btn-cms-action.cancel { background: rgba(255,255,255,0.08); color: #fff; }
+.btn-cms-action.save { background: linear-gradient(90deg, #00d2fc, #0077ff); color: #fff; }

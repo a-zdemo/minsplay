@@ -1,8 +1,8 @@
 import { showAppToast, navigateTo } from "./router.js";
 
 const AUTH_USER_KEY = "minsplay_auth_session_v1";
+const USERS_DB_KEY = "minsplay_registered_users_v1";
 
-// 5-Tier RBAC Role Hierarchy
 export const ROLES = {
   SUPER_ADMIN: "super_admin",
   ADMIN: "admin",
@@ -18,7 +18,7 @@ const DEFAULT_GUEST = {
   role: ROLES.GUEST,
   avatar: "/icons/icon-animated.svg",
   coins: 20,
-  creatorStatus: "none", // 'none' | 'applied' | 'approved'
+  creatorStatus: "none",
 };
 
 export function getCurrentUser() {
@@ -39,17 +39,55 @@ export function saveCurrentUser(user) {
   }
 }
 
-// Single Login Function with Role-Based Routing
+export function registerUser(username, email, password, role = ROLES.USER) {
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanName = username.trim() || cleanEmail.split("@")[0];
+
+  let users = [];
+  try {
+    users = JSON.parse(localStorage.getItem(USERS_DB_KEY) || "[]");
+  } catch (e) {}
+
+  if (users.some((u) => u.email === cleanEmail)) {
+    showAppToast("An account with this email already exists.");
+    return null;
+  }
+
+  const newUser = {
+    id: "usr_" + Math.random().toString(36).substr(2, 6),
+    username: cleanName,
+    email: cleanEmail,
+    role,
+    avatar: role === ROLES.CREATOR ? "🎬" : "👤",
+    coins: 50,
+    creatorStatus: role === ROLES.CREATOR ? "approved" : "none",
+    createdAt: Date.now()
+  };
+
+  users.push(newUser);
+  localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+
+  saveCurrentUser(newUser);
+  showAppToast(`🎉 Welcome ${newUser.username}! Account created.`);
+  redirectBasedOnRole(newUser.role);
+  return newUser;
+}
+
 export function loginWithCredentials(email, role = ROLES.USER) {
   const cleanEmail = email.trim().toLowerCase();
   let assignedRole = role;
 
-  // Auto-detect system roles for standard demo credentials
   if (cleanEmail === "superadmin@minsplay.com") assignedRole = ROLES.SUPER_ADMIN;
   else if (cleanEmail === "admin@minsplay.com") assignedRole = ROLES.ADMIN;
   else if (cleanEmail === "creator@minsplay.com") assignedRole = ROLES.CREATOR;
 
-  const user = {
+  let existingUser = null;
+  try {
+    const users = JSON.parse(localStorage.getItem(USERS_DB_KEY) || "[]");
+    existingUser = users.find((u) => u.email === cleanEmail);
+  } catch (e) {}
+
+  const user = existingUser || {
     id: "usr_" + Math.random().toString(36).substr(2, 6),
     username: cleanEmail.split("@")[0].toUpperCase(),
     email: cleanEmail,
@@ -61,76 +99,37 @@ export function loginWithCredentials(email, role = ROLES.USER) {
 
   saveCurrentUser(user);
   showAppToast(`Signed in as ${user.username} (${user.role.toUpperCase()})`);
+  redirectBasedOnRole(user.role);
+  return user;
+}
 
-  // Target routing based on role
-  if (user.role === ROLES.SUPER_ADMIN || user.role === ROLES.ADMIN) {
+export function redirectBasedOnRole(role) {
+  if (role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN) {
     navigateTo("/admin");
-  } else if (user.role === ROLES.CREATOR) {
+  } else if (role === ROLES.CREATOR) {
     navigateTo("/creator");
   } else {
     navigateTo("/profile");
   }
-
-  return user;
 }
 
 export function logout() {
   saveCurrentUser(DEFAULT_GUEST);
-  showAppToast("Logged out to Guest session");
+  showAppToast("Logged out successfully");
   navigateTo("/");
 }
 
-// Route Guard Verification
 export function canAccessRoute(routePath) {
   const user = getCurrentUser();
-
   if (routePath === "/admin") {
     return user.role === ROLES.SUPER_ADMIN || user.role === ROLES.ADMIN;
   }
-
   if (routePath === "/creator") {
     return user.role === ROLES.CREATOR || user.role === ROLES.SUPER_ADMIN;
   }
-
   return true;
 }
 
-// User Actions
-export function applyForCreatorAccount() {
-  const user = getCurrentUser();
-  if (user.role === ROLES.GUEST) {
-    openAuthModal("creator");
-    return { success: false, reason: "login_required" };
-  }
-
-  user.creatorStatus = "applied";
-  user.role = ROLES.CREATOR; // Fast-track approved in demo
-  saveCurrentUser(user);
-  showAppToast("🎉 Creator Account Activated! Access granted.");
-  navigateTo("/creator");
-  return { success: true };
-}
-
-export function promoteUserToRole(targetUserId, newRole) {
-  const currentUser = getCurrentUser();
-  if (currentUser.role !== ROLES.SUPER_ADMIN) {
-    showAppToast("Permission denied: Super Admin authorization required");
-    return false;
-  }
-
-  showAppToast(`User promoted to ${newRole.toUpperCase()} ✓`);
-  return true;
-}
-
-export function openAuthModal(intendedAction = "") {
-  const modal = document.getElementById("auth-modal");
-  if (modal) {
-    modal.setAttribute("data-intended", intendedAction);
-    modal.style.display = "flex";
-  }
-}
-
-export function closeAuthModal() {
-  const modal = document.getElementById("auth-modal");
-  if (modal) modal.style.display = "none";
+export function openAuthModal(intendedRoute = "") {
+  navigateTo("/auth");
 }

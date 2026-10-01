@@ -3,43 +3,29 @@
     
     <header class="db-subpage-header">
       <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
-      <h2 class="db-subpage-title">Creator Studio</h2>
-      <div class="creator-tier-pill" id="creator-current-tier">Tier 1: Rookie</div>
+      <div class="creator-title-cluster">
+        <h2 class="db-subpage-title">Creator Studio</h2>
+        <span class="creator-tier-pill" id="creator-current-tier">Tier 2: Partner</span>
+      </div>
+      <button class="btn-creator-action-icon" id="btn-refresh-creator-data" type="button" title="Refresh">↻</button>
     </header>
 
-    <!-- Creator Milestone Ladder Card -->
-    <section class="creator-milestone-card">
-      <div class="milestone-card-top">
-        <div>
-          <span class="milestone-badge-tag">Creator Monetization</span>
-          <h3 class="milestone-title">Monetization Milestone</h3>
-        </div>
-        <span class="milestone-crown-icon">👑</span>
-      </div>
-      <p class="milestone-desc">Reach 100 verified plays to unlock custom channel badges and creator earnings.</p>
-      
-      <div class="milestone-track-wrap">
-        <div class="milestone-progress-bar"><div class="milestone-progress-fill" id="creator-progress-fill" style="width: 28%;"></div></div>
-        <div class="milestone-stats-row">
-          <span id="creator-views-count">28 / 100 Views</span>
-          <span id="creator-next-tier-label">Next: Tier 2 Partner</span>
-        </div>
-      </div>
-    </section>
+    <!-- Navigation Tabs: Upload vs Manage Content -->
+    <nav class="creator-nav-tabs" id="creator-nav-tabs">
+      <button class="creator-tab-btn active" type="button" data-pane="upload">Upload Episode 🚀</button>
+      <button class="creator-tab-btn" type="button" data-pane="manage">Manage Content 🗂</button>
+      <button class="creator-tab-btn" type="button" data-pane="milestones">Earnings & Tier 📈</button>
+    </nav>
 
-    <!-- Upload Form -->
-    <section class="creator-upload-section">
-      <h3 class="creator-section-heading">Upload Drama Episode</h3>
-
+    <!-- PANE 1: Upload Form -->
+    <div class="creator-pane active" id="pane-creator-upload">
       <form class="creator-form" id="form-upload-episode" onsubmit="return false;">
         <div class="creator-input-group">
           <label class="creator-label" for="upload-series-select">Series Title</label>
-          <select class="creator-select" id="upload-series-select">
-            <option value="new-series">+ Create New Drama Series...</option>
-          </select>
+          <select class="creator-select" id="upload-series-select"></select>
         </div>
 
-        <div class="creator-input-group" id="group-new-series-title">
+        <div class="creator-input-group" id="group-new-series-title" style="display: none;">
           <label class="creator-label" for="upload-new-series-title">New Drama Title</label>
           <input type="text" class="creator-input" id="upload-new-series-title" placeholder="e.g. The Dark Bees" />
         </div>
@@ -47,13 +33,13 @@
         <div class="creator-row-2col">
           <div class="creator-input-group">
             <label class="creator-label" for="upload-ep-num">Episode #</label>
-            <input type="number" class="creator-input" id="upload-ep-num" value="1" min="1" max="100" />
+            <input type="number" class="creator-input" id="upload-ep-num" value="6" min="1" max="100" />
           </div>
           <div class="creator-input-group">
             <label class="creator-label" for="upload-ep-price">Price (Coins)</label>
             <select class="creator-select" id="upload-ep-price">
-              <option value="0" selected>Free (0 Coins)</option>
-              <option value="30">Standard (30 Coins)</option>
+              <option value="0">Free (0 Coins)</option>
+              <option value="30" selected>Standard (30 Coins)</option>
               <option value="50">Premium (50 Coins)</option>
             </select>
           </div>
@@ -61,35 +47,31 @@
 
         <div class="creator-input-group">
           <label class="creator-label" for="upload-ep-title">Episode Subtitle</label>
-          <input type="text" class="creator-input" id="upload-ep-title" placeholder="e.g. Episode 1: The Dark Bees Return" required />
+          <input type="text" class="creator-input" id="upload-ep-title" placeholder="e.g. Episode 6: Unmasked" required />
         </div>
 
-        <!-- Video Dropzone with Live Frame Thumbnail Preview -->
         <div class="creator-input-group">
           <label class="creator-label">Vertical Video (9:16 MP4 / WebM)</label>
           <div class="creator-dropzone" id="creator-video-dropzone">
             <input type="file" id="upload-video-file" accept="video/mp4,video/webm,video/quicktime" class="creator-file-input" />
-            
             <div class="dropzone-content" id="dropzone-idle-content">
               <span class="dropzone-icon">🎬</span>
               <strong class="dropzone-text">Tap to select drama video</strong>
-              <span class="dropzone-hint">Frame 1 will be automatically extracted as cover</span>
+              <span class="dropzone-hint">Raw phone files supported • No renaming required</span>
             </div>
-
             <div class="dropzone-selected" id="dropzone-selected-content" style="display: none;">
-              <img id="dropzone-thumb-preview" class="dropzone-thumb-img" alt="Captured Thumbnail" style="display: none;" />
+              <span class="dropzone-check">✓</span>
               <div class="selected-video-meta">
                 <strong id="selected-file-name">episode_clip.mp4</strong>
-                <span id="selected-file-specs">Extracting cover thumbnail...</span>
+                <span id="selected-file-specs">Ready to upload</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Real-Time Upload Progress -->
         <div class="upload-progress-container" id="upload-progress-wrap" style="display: none;">
           <div class="progress-header-row">
-            <span class="progress-status-text" id="upload-status-text">Authorizing R2 token...</span>
+            <span class="progress-status-text" id="upload-status-text">Authorizing R2...</span>
             <span class="progress-percent-val" id="upload-percent-text">0%</span>
           </div>
           <div class="upload-progress-track">
@@ -101,7 +83,66 @@
           Publish Episode to R2 Media Vault 🚀
         </button>
       </form>
-    </section>
+    </div>
+
+    <!-- PANE 2: Content Management Dashboard (CMS) -->
+    <div class="creator-pane" id="pane-creator-manage" style="display: none;">
+      <div class="cms-header-bar">
+        <span class="cms-total-indicator" id="cms-total-count">Loading catalog...</span>
+      </div>
+      <div class="cms-series-feed" id="cms-series-feed"></div>
+    </div>
+
+    <!-- PANE 3: Milestones & Earnings -->
+    <div class="creator-pane" id="pane-creator-milestones" style="display: none;">
+      <section class="creator-milestone-card">
+        <div class="milestone-card-top">
+          <div>
+            <span class="milestone-badge-tag">Creator Monetization</span>
+            <h3 class="milestone-title">Monetization Milestone</h3>
+          </div>
+          <span class="milestone-crown-icon">👑</span>
+        </div>
+        <p class="milestone-desc">Maintain verified plays to authorize standard coin paywalls (30 coins/ep).</p>
+        <div class="milestone-track-wrap">
+          <div class="milestone-progress-bar"><div class="milestone-progress-fill" style="width: 75%;"></div></div>
+          <div class="milestone-stats-row">
+            <span>3,750 / 5,000 Views</span>
+            <span>Tier 2 Partner Authorized ✓</span>
+          </div>
+        </div>
+      </section>
+    </div>
 
   </div>
+
+  <!-- In-Dashboard Edit Episode Modal -->
+  <aside class="cms-edit-modal-backdrop" id="cms-edit-modal" style="display: none;">
+    <div class="cms-edit-card">
+      <header class="cms-edit-header">
+        <h3 class="cms-edit-title">Edit Episode Metadata ✏️</h3>
+        <button class="cms-edit-close" id="btn-close-cms-modal" type="button">✕</button>
+      </header>
+
+      <div class="cms-edit-form">
+        <label class="cms-field-label">Episode Subtitle / Title</label>
+        <input type="text" id="cms-edit-ep-title" class="cms-field-input" />
+
+        <label class="cms-field-label">Coin Unlock Price</label>
+        <select id="cms-edit-ep-price" class="cms-field-input">
+          <option value="0">Free (0 Coins)</option>
+          <option value="30">Standard (30 Coins)</option>
+          <option value="50">Premium (50 Coins)</option>
+        </select>
+
+        <label class="cms-field-label">Media Stream Source</label>
+        <input type="url" id="cms-edit-ep-src" class="cms-field-input" />
+
+        <div class="cms-edit-actions">
+          <button class="btn-cms-action cancel" id="btn-cancel-cms-edit" type="button">Cancel</button>
+          <button class="btn-cms-action save" id="btn-save-cms-edit" type="button">Save Changes ✓</button>
+        </div>
+      </div>
+    </div>
+  </aside>
 </section>

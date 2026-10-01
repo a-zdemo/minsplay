@@ -1,61 +1,96 @@
-<aside class="auth-modal-backdrop" id="auth-modal" style="display: none;">
-  <div class="auth-sheet">
-    <div class="auth-sheet-handle"></div>
-
-    <header class="auth-sheet-header">
-      <div class="auth-brand-badge">
-        <span class="auth-badge-icon">🎬</span>
-        <div>
-          <h3 class="auth-title">Welcome to Minsplay</h3>
-          <p class="auth-subtitle">Sign in to manage watchlist, creator releases, and privileges</p>
-        </div>
-      </div>
-      <button class="auth-close-btn" id="btn-close-auth-modal" type="button">✕</button>
+<section class="auth-page-root" id="auth-page-root">
+  <div class="auth-page-container">
+    
+    <header class="auth-page-header">
+      <div class="auth-logo-badge"><span class="auth-logo-icon">🎬</span></div>
+      <h1 class="auth-brand-heading">Minsplay</h1>
+      <p class="auth-brand-sub">Stream & Create High-Octane Vertical Short Dramas</p>
     </header>
 
-    <!-- Role Quick Switcher (For Development & Demonstration) -->
-    <div class="auth-role-tabs" id="auth-quick-roles">
-      <button class="auth-role-btn active" type="button" data-role="user">Viewer 👤</button>
-      <button class="auth-role-btn" type="button" data-role="creator">Creator 🎬</button>
-      <button class="auth-role-btn" type="button" data-role="admin">Admin 🛡️</button>
-      <button class="auth-role-btn" type="button" data-role="super_admin">Super Admin 👑</button>
-    </div>
+    <!-- Tab Switcher: Sign In vs Sign Up -->
+    <nav class="auth-mode-tabs" id="auth-mode-tabs">
+      <button class="auth-tab-btn active" id="tab-btn-signin" type="button" data-mode="signin">Sign In</button>
+      <button class="auth-tab-btn" id="tab-btn-signup" type="button" data-mode="signup">Create Account</button>
+    </nav>
 
-    <!-- Login Form -->
-    <form class="auth-form" id="form-auth-login" onsubmit="return false;">
-      <div class="auth-input-wrap">
-        <span class="auth-input-icon">✉</span>
-        <input 
-          type="email" 
-          id="auth-input-email" 
-          class="auth-input" 
-          placeholder="Enter email (e.g. admin@minsplay.com)" 
-          value="viewer@minsplay.com" 
-          required 
-        />
+    <!-- FORM A: Sign In -->
+    <form class="auth-form-body active" id="form-signin" onsubmit="return false;">
+      <div class="auth-field-group">
+        <label class="auth-field-label" for="signin-email">Email Address</label>
+        <div class="auth-input-container">
+          <span class="auth-field-icon">✉</span>
+          <input type="email" id="signin-email" class="auth-text-input" placeholder="name@minsplay.com" value="creator@minsplay.com" required />
+        </div>
       </div>
 
-      <button class="auth-submit-btn" id="btn-submit-login" type="button">
-        Continue with Minsplay ID ➔
+      <div class="auth-field-group">
+        <label class="auth-field-label" for="signin-password">Password</label>
+        <div class="auth-input-container">
+          <span class="auth-field-icon">🔒</span>
+          <input type="password" id="signin-password" class="auth-text-input" placeholder="••••••••" value="demo1234" required />
+        </div>
+      </div>
+
+      <button class="btn-auth-submit" id="btn-submit-signin" type="button">
+        Sign In to Minsplay ➔
       </button>
+    </form>
 
-      <div class="auth-divider"><span>OR CONTINUE AS</span></div>
-
-      <!-- Quick 1-Tap Role Presets -->
-      <div class="auth-preset-grid">
-        <button class="auth-preset-btn" type="button" data-preset="superadmin@minsplay.com">
-          <span>👑 Super Admin</span>
-          <small>Platform Controls</small>
-        </button>
-        <button class="auth-preset-btn" type="button" data-preset="creator@minsplay.com">
-          <span>🎬 Verified Creator</span>
-          <small>R2 Upload Studio</small>
-        </button>
+    <!-- FORM B: Sign Up (Register) -->
+    <form class="auth-form-body" id="form-signup" style="display: none;" onsubmit="return false;">
+      <div class="auth-field-group">
+        <label class="auth-field-label" for="signup-username">Creator / Display Name</label>
+        <div class="auth-input-container">
+          <span class="auth-field-icon">👤</span>
+          <input type="text" id="signup-username" class="auth-text-input" placeholder="e.g. DarkBeesStudio" required />
+        </div>
       </div>
 
-      <p class="auth-disclaimer">
-        🔒 Role-Based Access Control verified. Content paywalls and moderation portals are protected.
-      </p>
+      <div class="auth-field-group">
+        <label class="auth-field-label" for="signup-email">Email Address</label>
+        <div class="auth-input-container">
+          <span class="auth-field-icon">✉</span>
+          <input type="email" id="signup-email" class="auth-text-input" placeholder="you@studio.com" required />
+        </div>
+      </div>
+
+      <div class="auth-field-group">
+        <label class="auth-field-label" for="signup-password">Create Password</label>
+        <div class="auth-input-container">
+          <span class="auth-field-icon">🔒</span>
+          <input type="password" id="signup-password" class="auth-text-input" placeholder="At least 6 characters" required />
+        </div>
+      </div>
+
+      <div class="auth-field-group">
+        <label class="auth-field-label">Account Privilege Tier</label>
+        <div class="auth-role-select-grid" id="signup-role-picker">
+          <button class="role-chip active" type="button" data-role="user">
+            <strong>Viewer 👤</strong>
+            <small>Watch & Binge</small>
+          </button>
+          <button class="role-chip" type="button" data-role="creator">
+            <strong>Creator 🎬</strong>
+            <small>Upload & Monetize</small>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-auth-submit signup" id="btn-submit-signup" type="button">
+        Create Account & Get 50 Coins 🎁
+      </button>
     </form>
+
+    <!-- Quick Role Switcher for Development & Testing -->
+    <aside class="auth-demo-section">
+      <div class="auth-demo-divider"><span>OR 1-TAP DEMO LOGIN</span></div>
+      <div class="auth-demo-grid">
+        <button class="btn-demo-preset" type="button" data-demo="creator">🎬 Verified Creator</button>
+        <button class="btn-demo-preset" type="button" data-demo="super_admin">👑 Super Admin</button>
+        <button class="btn-demo-preset" type="button" data-demo="admin">🛡️ Content Admin</button>
+        <button class="btn-demo-preset" type="button" data-demo="user">👤 Standard Viewer</button>
+      </div>
+    </aside>
+
   </div>
-</aside>
+</section>

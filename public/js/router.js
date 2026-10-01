@@ -1,3 +1,5 @@
+import authHtml from "../pages/auth.html?raw";
+import { initAuthPage } from "./auth-page.js";
 import { canAccessRoute, openAuthModal, getCurrentUser, ROLES } from "./auth.js";
 import homeHtml from "../pages/home.html?raw";
 import seriesHtml from "../pages/series.html?raw";
@@ -54,6 +56,7 @@ const routes = {
   "/history": historyHtml,
   "/download": downloadHtml,
   "/creator": creatorHtml,
+  "/auth": authHtml,
 };
 
 let currentActiveSeriesId = "";
@@ -866,7 +869,7 @@ async function renderRoute(path) {
       path === "/gifts" ||
       path === "/history" ||
       path === "/download" ||
-      path === "/creator"
+      path === "/creator" || path === "/auth"
     );
     bottomNav.style.display = isSubpage ? "none" : "flex";
   }
@@ -944,7 +947,7 @@ async function renderRoute(path) {
     renderHistoryFeed();
   } else if (path === "/download") {
     renderDownloadPage();
-  } else if (path === "/creator") {
+  } else if (path === "/creator" || path === "/auth") {
     initCreatorStudio();
   }
 }

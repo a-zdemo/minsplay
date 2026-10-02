@@ -1,4 +1,4 @@
-<section class="member-page db-member-screen" id="member-page-root">
+html = '''<section class="member-page db-member-screen" id="member-page-root">
   <div class="db-member-scroll-body">
     
     <header class="db-member-header">
@@ -130,3 +130,8 @@
     </div>
   </aside>
 </section>
+'''
+
+with open("public/pages/member.html", "w", encoding="utf-8") as f:
+    f.write(html)
+print("Updated public/pages/member.html ✓")

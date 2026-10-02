@@ -1,3 +1,34 @@
+
+function renderProfilePage() {
+  const user = getCurrentUser();
+  const nameEl = document.getElementById("profile-display-name");
+  const idEl = document.getElementById("profile-member-id");
+  const coinEl = document.getElementById("profile-coin-balance");
+  const creatorShelf = document.getElementById("profile-creator-shelf");
+  const copyBtn = document.getElementById("btn-copy-id");
+
+  let guestId = localStorage.getItem("minsplay_guest_id");
+  if (!guestId) {
+    guestId = Math.floor(100000000 + Math.random() * 900000000).toString();
+    localStorage.setItem("minsplay_guest_id", guestId);
+  }
+
+  if (idEl) idEl.textContent = user.email ? (user.id || guestId) : guestId;
+  if (nameEl) nameEl.textContent = user.email ? user.username : "Log in";
+  if (coinEl) coinEl.textContent = getUserCoins().toString();
+  if (creatorShelf) creatorShelf.style.display = (user.role === ROLES.CREATOR || user.role === ROLES.SUPER_ADMIN) ? "block" : "none";
+
+  if (copyBtn) {
+    copyBtn.onclick = (e) => {
+      e.stopPropagation();
+      const textToCopy = idEl ? idEl.textContent : guestId;
+      navigator.clipboard?.writeText(textToCopy);
+      showAppToast(`ID ${textToCopy} copied to clipboard 📋`);
+    };
+  }
+}
+
+import { initMemberPage } from "./member.js";
 import authHtml from "../pages/auth.html?raw";
 import adminHtml from "../pages/admin.html?raw";
 import homeHtml from "../pages/home.html?raw";
@@ -432,6 +463,10 @@ async function renderRoute(path) {
     renderHistoryFeed();
   } else if (path === "/download") {
     renderDownloadPage();
+  } else if (path === "/profile") {
+    renderProfilePage();
+  } else if (path === "/member") {
+    initMemberPage();
   } else if (path === "/creator") {
     // ISSUE 8 FIX: Dedicated Creator Studio invocation
     initCreatorStudio();

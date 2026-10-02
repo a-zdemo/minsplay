@@ -1,4 +1,4 @@
-<section class="auth-page-root db-auth-page" id="auth-page-root">
+html = '''<section class="auth-page-root db-auth-page" id="auth-page-root">
   <div class="db-auth-container">
     
     <!-- Top Back Arrow -->
@@ -47,3 +47,7 @@
 
   </div>
 </section>
+'''
+with open("public/pages/auth.html", "w", encoding="utf-8") as f:
+    f.write(html)
+print("Updated public/pages/auth.html (Badge & Switcher removed) ✓")

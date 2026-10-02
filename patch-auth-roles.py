@@ -1,4 +1,4 @@
-import { showAppToast, navigateTo } from "./router.js";
+code = '''import { showAppToast, navigateTo } from "./router.js";
 
 const AUTH_USER_KEY = "minsplay_auth_session_v1";
 const SUPABASE_URL = "https://lekmsvdbthupiauejffo.supabase.co";
@@ -143,3 +143,7 @@ export function canAccessRoute(routePath) {
   }
   return true;
 }
+'''
+with open("public/js/auth.js", "w", encoding="utf-8") as f:
+    f.write(code)
+print("Updated public/js/auth.js with automatic role verification & guards ✓")

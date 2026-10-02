@@ -1,4 +1,4 @@
-import { showAppToast, navigateTo } from "./router.js";
+code = '''import { showAppToast, navigateTo } from "./router.js";
 
 const AUTH_USER_KEY = "minsplay_auth_session_v1";
 const USERS_DB_KEY = "minsplay_registered_users_v1";
@@ -123,3 +123,7 @@ export function canAccessRoute(routePath) {
   if (routePath === "/creator") return user.role === ROLES.CREATOR || user.role === ROLES.SUPER_ADMIN;
   return true;
 }
+'''
+with open("public/js/auth.js", "w", encoding="utf-8") as f:
+    f.write(code)
+print("Updated public/js/auth.js with Supabase OAuth and 5-Tier RBAC ✓")

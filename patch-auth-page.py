@@ -1,4 +1,4 @@
-import { signInWithOAuth, handleOAuthCallback, switchRole, ROLES } from "./auth.js";
+code = '''import { signInWithOAuth, handleOAuthCallback, switchRole, ROLES } from "./auth.js";
 import { showAppToast } from "./router.js";
 
 export function initAuthPage() {
@@ -41,3 +41,7 @@ export function initAuthPage() {
     };
   });
 }
+'''
+with open("public/js/auth-page.js", "w", encoding="utf-8") as f:
+    f.write(code)
+print("Updated public/js/auth-page.js with social login & RBAC triggers ✓")

@@ -1,3 +1,4 @@
+import { handleOAuthCallback } from "./auth.js";
 import { syncCatalogFromVault } from "./series-data.js";
 import { initRouter } from "./router.js";
 import { initPWA } from "./pwa.js";
@@ -8,6 +9,7 @@ import { initProfileSubpages } from "./profile-subpages.js";
 import { initSubtitlesSystem } from "./subtitles.js";
 
 function startApp() {
+    handleOAuthCallback();
   try {
     syncCatalogFromVault(false);
     initRouter();

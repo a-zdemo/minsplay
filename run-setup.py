@@ -1,4 +1,14 @@
-import { showAppToast, navigateTo } from "./router.js";
+import os
+import json
+import re
+
+print("==================================================================")
+print("MINSPLAY 2.0: PRODUCTION RBAC LIFECYCLE & CREATOR APPROVAL ENGINE")
+print("==================================================================")
+
+# 1. UPDATE public/js/auth.js
+print("\n[1/5] Updating public/js/auth.js...")
+auth_js_code = '''import { showAppToast, navigateTo } from "./router.js";
 
 const AUTH_USER_KEY = "minsplay_auth_session_v1";
 const USERS_REGISTRY_KEY = "minsplay_users_registry_v1";
@@ -249,3 +259,9 @@ export function promoteUserToAdmin(userId, makeAdmin = true) {
   showAppToast(makeAdmin ? `Promoted ${target.username} to Admin 🛡️` : `Reverted ${target.username} to User`);
   return true;
 }
+'''
+with open("public/js/auth.js", "w", encoding="utf-8") as f:
+    f.write(auth_js_code)
+print("  ✓ public/js/auth.js written.")
+
+print("\nRunning build and verification...")

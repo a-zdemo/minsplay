@@ -1,3 +1,4 @@
+import { syncCatalogFromVault } from "./series-data.js";
 import { initRouter } from "./router.js";
 import { initPWA } from "./pwa.js";
 import { initCommentsSystem } from "./comments.js";
@@ -8,6 +9,7 @@ import { initSubtitlesSystem } from "./subtitles.js";
 
 function startApp() {
   try {
+    syncCatalogFromVault(false);
     initRouter();
     initPWA();
     initCommentsSystem();

@@ -1,4 +1,7 @@
-const STORAGE_CATALOG_KEY = "minsplay_creator_catalog_v2";
+import re
+
+# 1. Update series-data.js to include dynamic vault sync
+series_data_code = '''const STORAGE_CATALOG_KEY = "minsplay_creator_catalog_v2";
 const R2_BASE = "https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev";
 const ENDPOINT_URL = "https://lekmsvdbthupiauejffo.supabase.co/functions/v1/smart-responder";
 
@@ -65,7 +68,7 @@ export async function syncCatalogFromVault(triggerR2Sync = false) {
         const sample = grouped[sId][0];
         drama = {
           id: sId,
-          title: sample.title || sId.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          title: sample.title || sId.replace(/-/g, " ").replace(/\\b\\w/g, (c) => c.toUpperCase()),
           shortTitle: sample.title || sId,
           genre: "Urban Drama",
           tags: "Cloudflare Sync • Creator Original",
@@ -138,3 +141,18 @@ export function savePublishedEpisode({ seriesId, seriesTitle, episodeNum, title,
   saveCatalogToStorage();
   return drama;
 }
+'''
+with open("public/js/series-data.js", "w", encoding="utf-8") as f:
+    f.write(series_data_code)
+print("Updated public/js/series-data.js ✓")
+
+# 2. Update app.js to trigger background sync on boot
+with open("public/js/app.js", "r", encoding="utf-8") as f:
+    app_js = f.read()
+
+if "syncCatalogFromVault" not in app_js:
+    app_js = 'import { syncCatalogFromVault } from "./series-data.js";\n' + app_js
+    app_js = app_js.replace("initRouter();", "syncCatalogFromVault(false);\n    initRouter();")
+    with open("public/js/app.js", "w", encoding="utf-8") as f:
+        f.write(app_js)
+    print("Updated public/js/app.js to sync catalog on startup ✓")

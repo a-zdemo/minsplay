@@ -445,6 +445,13 @@ async function renderRoute(path) {
 }
 
 export function initRouter() {
+  window.addEventListener("catalogUpdated", () => {
+    const currentPath = window.location.pathname || "/";
+    if (currentPath === "/series" && currentActiveSeriesId) {
+      renderSeriesDetail(currentActiveSeriesId);
+    }
+  });
+
   document.addEventListener("click", (e) => {
     const routeTrigger = e.target.closest("[data-route]");
     if (routeTrigger) {

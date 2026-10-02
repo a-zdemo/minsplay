@@ -1,5 +1,5 @@
 import { showAppToast, navigateTo } from "./router.js";
-import { savePublishedEpisode, DRAMA_CATALOG, saveCatalogToStorage } from "./series-data.js";
+import { savePublishedEpisode, DRAMA_CATALOG, saveCatalogToStorage, syncCatalogFromVault } from "./series-data.js";
 
 const ENDPOINT_URL = "https://lekmsvdbthupiauejffo.supabase.co/functions/v1/smart-responder";
 
@@ -68,6 +68,30 @@ export function initCreatorStudio() {
   }
 
   if (publishBtn) publishBtn.onclick = handleEpisodePublish;
+  if (refreshBtn) {
+    refreshBtn.onclick = async () => {
+      refreshBtn.disabled = true;
+      showAppToast("Syncing with Cloudflare R2... ⚡");
+      try {
+        await syncCatalogFromVault(true);
+        renderCreatorCMSFeed();
+        if (seriesSelect) {
+          const opts = DRAMA_CATALOG.map((d) => `<option value="${d.id}">${d.title}</option>`).join("");
+          seriesSelect.innerHTML = opts + `<option value="new-series">+ Create New Drama Series...</option>`;
+        }
+        showAppToast(`Synced ${DRAMA_CATALOG.reduce((acc, d) => acc + (d.episodes ? d.episodes.length : 0), 0)} episodes from Cloudflare! ✓`);
+      } catch (err) {
+        showAppToast(`Sync failed: ${err.message}`);
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    };
+  }
+
+  // Silent sync to ensure latest episodes are displayed
+  syncCatalogFromVault(false).then(() => {
+    renderCreatorCMSFeed();
+  });
 
   if (refreshBtn) {
     refreshBtn.onclick = () => {

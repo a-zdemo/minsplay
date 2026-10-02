@@ -436,7 +436,7 @@ async function renderRoute(path) {
     const isSubpage = (
       path === "/watch" || path === "/inbox" || path === "/settings" ||
       path === "/wallet" || path === "/rewards" || path === "/events" ||
-      path === "/gifts" || path === "/history" || path === "/download" ||
+      path === "/gifts" || path === "/history" || path === "/download" || path === "/member" ||
       path === "/creator" || path === "/auth" || path === "/admin"
     );
     bottomNav.style.display = isSubpage ? "none" : "flex";

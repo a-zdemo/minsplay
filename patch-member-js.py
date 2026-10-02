@@ -1,4 +1,4 @@
-import { showAppToast, navigateTo } from "./router.js";
+code = '''import { showAppToast, navigateTo } from "./router.js";
 import { getCurrentUser } from "./auth.js";
 import { activateVip } from "./storage.js";
 
@@ -146,3 +146,7 @@ async function handleGooglePlaySubscribe() {
     navigateTo("/profile");
   }, 1200);
 }
+'''
+with open("public/js/member.js", "w", encoding="utf-8") as f:
+    f.write(code)
+print("Updated public/js/member.js with native Google Play integration ✓")

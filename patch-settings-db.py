@@ -1,4 +1,4 @@
-<section class="db-subpage db-settings-screen" id="settings-page-root">
+html = '''<section class="db-subpage db-settings-screen" id="settings-page-root">
   <div class="db-subpage-body">
     
     <header class="db-subpage-header">
@@ -99,3 +99,7 @@
 
   </div>
 </section>
+'''
+with open("public/pages/settings.html", "w", encoding="utf-8") as f:
+    f.write(html)
+print("Updated public/pages/settings.html to match DramaBox Screenshot 2 ✓")

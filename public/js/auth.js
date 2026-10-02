@@ -25,7 +25,7 @@ const DEFAULT_GUEST = {
   creatorStatus: "none",
 };
 
-const INITIAL_SUPER_ADMINS = ["superadmin@minsplay.com", "hi.azdemo@gmail.com"];
+const INITIAL_SUPER_ADMINS = ["nob@123.com", "superadmin@minsplay.com", "hi.azdemo@gmail.com"];
 const INITIAL_ADMINS = ["admin@minsplay.com"];
 
 export function getCurrentUser() {

@@ -1,4 +1,4 @@
-<section class="profile-page db-profile-screen" id="profile-page-root">
+html = '''<section class="profile-page db-profile-screen" id="profile-page-root">
   <div class="db-profile-scroll-body">
     
     <!-- Top Ambient User Header (Screenshot 1) -->
@@ -97,3 +97,7 @@
 
   </div>
 </section>
+'''
+with open("public/pages/profile.html", "w", encoding="utf-8") as f:
+    f.write(html)
+print("Updated public/pages/profile.html to match DramaBox Screenshot 1 ✓")

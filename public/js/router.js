@@ -1,32 +1,48 @@
+import { initSettingsPage } from "./settings.js";
 
 function renderProfilePage() {
   const user = getCurrentUser();
   const nameEl = document.getElementById("profile-display-name");
   const idEl = document.getElementById("profile-member-id");
   const coinEl = document.getElementById("profile-coin-balance");
-  const creatorShelf = document.getElementById("profile-creator-shelf");
+  const avatarWrap = document.getElementById("profile-avatar-badge");
   const copyBtn = document.getElementById("btn-copy-id");
 
-  let guestId = localStorage.getItem("minsplay_guest_id");
-  if (!guestId) {
-    guestId = Math.floor(100000000 + Math.random() * 900000000).toString();
-    localStorage.setItem("minsplay_guest_id", guestId);
+  let guestId = localStorage.getItem("minsplay_guest_id") || "74789317";
+  const rawId = user.email ? (user.id || guestId) : guestId;
+
+  let numericId = "74789317";
+  if (/^\d{7,9}$/.test(rawId)) {
+    numericId = rawId;
+  } else {
+    let hash = 0;
+    for (let i = 0; i < rawId.length; i++) hash = ((hash << 5) - hash) + rawId.charCodeAt(i) | 0;
+    numericId = ((Math.abs(hash) % 90000000) + 10000000).toString();
   }
 
-  if (idEl) idEl.textContent = user.email ? (user.id || guestId) : guestId;
-  if (nameEl) nameEl.textContent = user.email ? user.username : "Log in";
-  if (coinEl) coinEl.textContent = getUserCoins().toString();
-  if (creatorShelf) creatorShelf.style.display = (user.role === ROLES.CREATOR || user.role === ROLES.SUPER_ADMIN) ? "block" : "none";
+  if (idEl) idEl.textContent = numericId;
+  const username = user.email ? (user.username || user.email.split("@")[0]) : "Log in";
+  if (nameEl) nameEl.textContent = username;
+  if (coinEl) coinEl.textContent = (user.coins !== undefined ? user.coins : 10).toString();
+
+  if (avatarWrap) {
+    if (user.avatar && (user.avatar.startsWith("http") || (user.avatar.startsWith("/icons/icon-") && user.email))) {
+      avatarWrap.innerHTML = `<img src="${user.avatar}" alt="${username}" class="db-avatar-img" onerror="this.src='/icons/icon-192.png';" />`;
+    } else {
+      const initial = username.charAt(0).toLowerCase();
+      avatarWrap.innerHTML = `<div class="db-avatar-initial">${initial}</div>`;
+    }
+  }
 
   if (copyBtn) {
     copyBtn.onclick = (e) => {
       e.stopPropagation();
-      const textToCopy = idEl ? idEl.textContent : guestId;
-      navigator.clipboard?.writeText(textToCopy);
-      showAppToast(`ID ${textToCopy} copied to clipboard 📋`);
+      navigator.clipboard?.writeText(numericId);
+      showAppToast(`ID ${numericId} copied to clipboard 📋`);
     };
   }
 }
+
 
 import { initMemberPage } from "./member.js";
 import authHtml from "../pages/auth.html?raw";
@@ -465,6 +481,8 @@ async function renderRoute(path) {
     renderDownloadPage();
   } else if (path === "/profile") {
     renderProfilePage();
+  } else if (path === "/settings") {
+    initSettingsPage();
   } else if (path === "/member") {
     initMemberPage();
   } else if (path === "/creator") {

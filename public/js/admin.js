@@ -1,3 +1,4 @@
+import { syncVaultToDramasTable } from "./series-data.js";
 export async function fetchLiveDramaCount() {
   const dramaMetricEl = document.getElementById("metric-total-dramas");
   const catalogCountEl = document.getElementById("admin-catalog-count");
@@ -40,6 +41,23 @@ export function initAdminDashboard() {
   if (rolesTab) rolesTab.style.display = isSuper ? "inline-flex" : "none";
 
   setupTabSwitching();
+
+  const syncVaultBtn = document.getElementById("btn-sync-vault-now");
+  if (syncVaultBtn && !syncVaultBtn.dataset.wired) {
+    syncVaultBtn.dataset.wired = "true";
+    syncVaultBtn.onclick = async () => {
+      syncVaultBtn.disabled = true;
+      syncVaultBtn.textContent = "Syncing... ⏳";
+      showAppToast("Syncing R2 Vault to dramas catalog... ⚡");
+      const count = await syncVaultToDramasTable();
+      await fetchLiveDramaCount();
+      renderDramaQueue();
+      syncVaultBtn.disabled = false;
+      syncVaultBtn.textContent = "⚡ Sync Vault";
+      showAppToast(`Synced ${count} series to catalog! ✓`);
+    };
+  }
+
   renderDramaQueue();
   fetchLiveDramaCount();
   renderCreatorRequestsQueue();

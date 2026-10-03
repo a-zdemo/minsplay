@@ -1,4 +1,4 @@
-import { DRAMA_CATALOG } from "./series-data.js";
+js_code = '''import { DRAMA_CATALOG } from "./series-data.js";
 import { showAppToast } from "./router.js";
 import { getCurrentUser, ROLES, getCreatorApplications, reviewCreatorApplication } from "./auth.js";
 
@@ -275,3 +275,8 @@ export function renderCreatorRequestsQueue() {
     b.onclick = () => { reviewCreatorApplication(b.dataset.id, false); renderCreatorRequestsQueue(); };
   });
 }
+'''
+
+with open("public/js/admin.js", "w", encoding="utf-8") as f:
+    f.write(js_code)
+print("  ✓ Step 3 Complete: public/js/admin.js wired to live Supabase RPC with pagination & search")

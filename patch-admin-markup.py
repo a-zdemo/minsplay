@@ -1,4 +1,4 @@
-<section class="db-subpage admin-page" id="admin-page-root">
+html = '''<section class="db-subpage admin-page" id="admin-page-root">
   <div class="db-subpage-body admin-body">
     <header class="db-subpage-header admin-header">
       <button class="db-back-btn" type="button" data-route="/profile" aria-label="Back">‹</button>
@@ -89,4 +89,8 @@
       </div>
     </div>
   </div>
-</section>
+</section>'''
+
+with open("public/pages/admin.html", "w", encoding="utf-8") as f:
+    f.write(html)
+print("  ✓ Step 2 Complete: public/pages/admin.html updated with Search & Pagination UI")

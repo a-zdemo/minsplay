@@ -68,8 +68,8 @@
 
   </div>
 
-      <!-- TAB: Creator Requests Queue -->
-    <div class="admin-pane" id="pane-creator-requests" style="display: none;">
+  
+ style="display: none;">
       <div class="pane-action-bar">
         <span class="pane-subtitle">Pending Creator Studio Applications</span>
       </div>
@@ -83,6 +83,78 @@
       </div>
       <div class="admin-items-feed" id="admin-users-roles-feed"></div>
     </div>
+
+  <!-- Interactive Stream Linker Modal -->
+  <aside class="admin-stream-modal" id="admin-stream-modal" style="display: none;">
+    <div class="admin-modal-card">
+      <header class="admin-modal-head">
+        <div>
+          <h3 class="admin-modal-title">Link Video Stream 🎥</h3>
+          <p class="admin-modal-sub" id="modal-editing-title">The Dark Bees • Ep 1</p>
+        </div>
+        <button class="admin-modal-close" id="btn-close-stream-modal" type="button">✕</button>
+      </header>
+
+      <div class="admin-modal-form">
+        <label class="admin-form-label">Video Stream Source URL or R2 File Name</label>
+        <div class="admin-input-wrap">
+          <input 
+            type="url" 
+            id="admin-video-url-input" 
+            class="admin-form-input" 
+            placeholder="https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev/episodes/..." 
+          />
+        </div>
+
+        <div class="admin-quick-presets">
+          <span class="preset-label">Quick R2 Folders:</span>
+          <button class="preset-btn" type="button" data-prefix="episodes/the-dark-bees/">the-dark-bees/</button>
+          <button class="preset-btn" type="button" data-prefix="episodes/the-beginning/">the-beginning/</button>
+        </div>
+
+        <!-- Live In-Modal Video Player Test -->
+        <div class="admin-video-test-stage">
+          <video id="admin-preview-video" class="admin-preview-player" playsinline controls></video>
+          <span class="video-test-badge" id="video-test-badge">Enter a video URL to test</span>
+        </div>
+
+        <div class="admin-modal-actions">
+          <button class="btn-admin-action test" id="btn-test-stream-src" type="button">Verify Stream ▶</button>
+          <button class="btn-admin-action save" id="btn-save-stream-src" type="button">Save & Publish Live ✓</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</section>
+    <!-- TAB: Cloudflare R2 Media Health -->
+    <div class="admin-pane" id="pane-storage" style="display: none;">
+      <div class="admin-card r2-health-card">
+        <h4 class="card-title">Cloudflare R2 Media Vault</h4>
+        <p class="card-desc">Public Domain: <code>https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev</code></p>
+        <div class="r2-status-pill">● Direct Video Gateway Online</div>
+        <button class="btn-admin-outline" id="btn-test-r2-ping" type="button">Test R2 Gateway Ping</button>
+      </div>
+    </div>
+    <!-- TAB: Creator Requests Queue -->
+    <div class="admin-pane" id="pane-creator-requests" style="display: none;">
+      <div class="pane-action-bar">
+        <span class="pane-subtitle">Pending Creator Studio Applications</span>
+      </div>
+      <div class="admin-items-feed" id="admin-creator-apps-feed"></div>
+    </div>
+
+    <!-- TAB: Users & Roles (Super Admin Exclusive) -->
+    <div class="admin-pane" id="pane-roles" style="display: none;">
+      <div class="pane-action-bar">
+        <span class="pane-subtitle">Platform Users & Staff Promotion</span>
+      </div>
+      <div class="admin-promote-bar">
+        <input type="email" id="input-promote-user-email" class="admin-promote-input" placeholder="Enter user email to promote..." />
+        <button class="btn-promote-submit" id="btn-promote-user-submit" type="button">👑 Promote</button>
+      </div>
+      <div class="admin-items-feed" id="admin-users-roles-feed"></div>
+    </div>
+  </div>
 
   <!-- Interactive Stream Linker Modal -->
   <aside class="admin-stream-modal" id="admin-stream-modal" style="display: none;">

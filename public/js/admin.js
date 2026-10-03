@@ -300,9 +300,30 @@ export function renderUsersRolesQueue() {
   const feed = document.getElementById("admin-users-roles-feed");
   if (!feed) return;
 
-  const users = getAllRegisteredUsers();
+  const promoteBtn = document.getElementById("btn-promote-user-submit");
+  const emailInput = document.getElementById("input-promote-user-email");
+  if (promoteBtn && emailInput && !promoteBtn.dataset.wired) {
+    promoteBtn.dataset.wired = "true";
+    promoteBtn.onclick = () => {
+      const email = emailInput.value.trim().toLowerCase();
+      if (!email || !email.includes("@")) {
+        showAppToast("Please enter a valid email address");
+        return;
+      }
+      promoteUserToAdmin(email, true);
+      emailInput.value = "";
+      renderUsersRolesQueue();
+    };
+  }
+
+  let users = getAllRegisteredUsers();
+  const cur = getCurrentUser();
+  if (cur && cur.email && !users.some(u => u.email === cur.email)) {
+    users.unshift(cur);
+  }
+
   if (users.length === 0) {
-    feed.innerHTML = `<div class="admin-empty-state" style="padding:24px;text-align:center;color:rgba(255,255,255,0.5);"><p>No registered users found.</p></div>`;
+    feed.innerHTML = `<div class="admin-empty-state" style="padding:24px;text-align:center;color:rgba(255,255,255,0.5);"><p>No registered users found yet. Use the email box above to promote any user.</p></div>`;
     return;
   }
 
@@ -318,7 +339,7 @@ export function renderUsersRolesQueue() {
         </div>
         <div class="admin-user-action-wrap">
           ${isTargetSuper ? '<span class="super-locked-tag">Platform Owner</span>' : `
-            <button class="btn-user-promote ${isTargetAdmin ? 'demote' : 'promote'}" data-uid="${u.id}" type="button">
+            <button class="btn-user-promote ${isTargetAdmin ? 'demote' : 'promote'}" data-uid="${u.id || u.email}" type="button">
               ${isTargetAdmin ? 'Demote to User' : '👑 Promote to Admin'}
             </button>
           `}
@@ -334,6 +355,3 @@ export function renderUsersRolesQueue() {
     };
   });
 }
-
-function renderCommentQueue() {}
-function attachAdminActions() {}

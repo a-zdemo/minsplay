@@ -236,7 +236,11 @@ export function promoteUserToAdmin(userId, makeAdmin = true) {
   }
 
   const registry = getAllRegisteredUsers();
-  const target = registry.find(u => u.id === userId);
+  let target = registry.find(u => u.id === userId || (u.email && u.email.toLowerCase() === userId.toLowerCase()));
+  if (!target && userId.includes("@")) {
+    target = { id: "usr_" + Math.random().toString(36).substr(2, 6), username: userId.split("@")[0], email: userId, role: makeAdmin ? ROLES.ADMIN : ROLES.USER };
+    registry.push(target);
+  }
   if (!target) return false;
 
   target.role = makeAdmin ? ROLES.ADMIN : ROLES.USER;

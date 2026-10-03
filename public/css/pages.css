@@ -4365,3 +4365,8 @@
 .btn-user-promote.promote { background: rgba(0,210,252,0.15); border: 1px solid rgba(0,210,252,0.4); color: #00d2fc; }
 .btn-user-promote.demote { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
 .super-locked-tag { font-size: 0.7rem; font-weight: 800; color: #ffc107; background: rgba(255,193,7,0.15); padding: 4px 8px; border-radius: 6px; }
+
+.admin-promote-bar { display: flex; gap: 8px; margin-bottom: 14px; }
+.admin-promote-input { all: unset; flex: 1; background: #1a1a26; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #fff; }
+.btn-promote-submit { all: unset; background: linear-gradient(135deg, #00d2fc, #0077ff); color: #fff; font-weight: 800; font-size: 0.82rem; padding: 0 16px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
+.admin-pane { width: 100%; flex-direction: column; }

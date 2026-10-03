@@ -159,97 +159,65 @@ export function canAccessRoute(routePath) {
   return true;
 }
 
-export function submitCreatorApplication(studioName, bio) {
+export async function submitCreatorApplication(studioName, bio) {
   const user = getCurrentUser();
   if (!user.email || user.role === ROLES.GUEST) {
     showAppToast("Please log in to apply for Creator Studio 🔒");
     navigateTo("/auth");
     return false;
   }
-
-  const apps = getCreatorApplications();
-  const existing = apps.find(a => a.userId === user.id && a.status === "pending");
-  if (existing) {
-    showAppToast("Your application is already pending review ⏳");
-    return false;
-  }
-
-  const newApp = {
+  const payload = {
     id: "app_" + Date.now(),
-    userId: user.id,
-    username: user.username,
+    user_id: user.id || user.email,
+    username: user.username || user.email.split("@")[0],
     email: user.email,
-    studioName: studioName.trim() || user.username + " Studios",
+    studio_name: studioName.trim() || user.username + " Studios",
     bio: bio.trim() || "Vertical drama creator.",
-    status: "pending",
-    appliedAt: Date.now()
+    status: "pending"
   };
-
-  apps.unshift(newApp);
-  localStorage.setItem(CREATOR_APPS_KEY, JSON.stringify(apps));
-
-  const updatedUser = { ...user, creatorStatus: "pending" };
-  saveCurrentUser(updatedUser);
-  showAppToast("Creator application submitted successfully! 🎬");
-  return true;
-}
-
-export function getCreatorApplications() {
   try {
-    return JSON.parse(localStorage.getItem(CREATOR_APPS_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-export function reviewCreatorApplication(appId, approve = true) {
-  const apps = getCreatorApplications();
-  const target = apps.find(a => a.id === appId);
-  if (!target) return false;
-
-  target.status = approve ? "approved" : "rejected";
-  target.reviewedAt = Date.now();
-  localStorage.setItem(CREATOR_APPS_KEY, JSON.stringify(apps));
-
-  const registry = getAllRegisteredUsers();
-  const user = registry.find(u => u.id === target.userId || u.email === target.email);
-  if (user) {
-    user.creatorStatus = approve ? "approved" : "rejected";
-    if (approve) user.role = ROLES.CREATOR;
-    localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(registry));
-
-    const current = getCurrentUser();
-    if (current.id === user.id) {
-      saveCurrentUser({ ...current, role: user.role, creatorStatus: user.creatorStatus });
-    }
-  }
-
-  showAppToast(approve ? `Approved ${target.studioName} as Creator! 🎬` : `Rejected application`);
-  return true;
-}
-
-export function promoteUserToAdmin(userId, makeAdmin = true) {
-  const current = getCurrentUser();
-  if (current.role !== ROLES.SUPER_ADMIN) {
-    showAppToast("Only Super Admin can manage staff roles 👑");
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/creator_applications`, {
+      method: "POST",
+      headers: { "apikey": ANON_KEY, "Authorization": `Bearer ${ANON_KEY}`, "Content-Type": "application/json", "Prefer": "return=representation" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error("Supabase insert failed");
+    saveCurrentUser({ ...user, creatorStatus: "pending" });
+    showAppToast("Creator application submitted successfully! 🎬");
+    return true;
+  } catch (err) {
+    showAppToast("Submission failed: " + err.message);
     return false;
   }
+}
 
-  const registry = getAllRegisteredUsers();
-  let target = registry.find(u => u.id === userId || (u.email && u.email.toLowerCase() === userId.toLowerCase()));
-  if (!target && userId.includes("@")) {
-    target = { id: "usr_" + Math.random().toString(36).substr(2, 6), username: userId.split("@")[0], email: userId, role: makeAdmin ? ROLES.ADMIN : ROLES.USER };
-    registry.push(target);
+export async function getCreatorApplications() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/creator_applications?order=applied_at.desc`, {
+      headers: { "apikey": ANON_KEY, "Authorization": `Bearer ${ANON_KEY}` }
+    });
+    if (!res.ok) return [];
+    const rows = await res.json();
+    return rows.map(r => ({
+      id: r.id, userId: r.user_id, username: r.username, email: r.email,
+      studioName: r.studio_name, bio: r.bio, status: r.status, appliedAt: r.applied_at
+    }));
+  } catch { return []; }
+}
+
+export async function reviewCreatorApplication(appId, approve = true) {
+  try {
+    const status = approve ? "approved" : "rejected";
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/creator_applications?id=eq.${appId}`, {
+      method: "PATCH",
+      headers: { "apikey": ANON_KEY, "Authorization": `Bearer ${ANON_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ status, reviewed_at: new Date().toISOString() })
+    });
+    if (!res.ok) throw new Error("Update failed");
+    showAppToast(approve ? "Approved Creator Studio! 🎬" : "Application rejected");
+    return true;
+  } catch (err) {
+    showAppToast("Review failed: " + err.message);
+    return false;
   }
-  if (!target) return false;
-
-  target.role = makeAdmin ? ROLES.ADMIN : ROLES.USER;
-  localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(registry));
-
-  if (current.id === target.id) {
-    saveCurrentUser({ ...current, role: target.role });
-  }
-
-  showAppToast(makeAdmin ? `Promoted ${target.username} to Admin 🛡️` : `Reverted ${target.username} to User`);
-  return true;
 }

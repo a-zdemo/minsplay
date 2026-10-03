@@ -258,13 +258,14 @@ function renderDramaQueue() {
   `).join("");
 }
 
-export function renderCreatorRequestsQueue() {
+export async function renderCreatorRequestsQueue() {
   const feed = document.getElementById("admin-creator-apps-feed");
   const countBadge = document.getElementById("count-creator-requests");
   const metricBadge = document.getElementById("count-creator-requests-metric");
   if (!feed) return;
 
-  const pending = getCreatorApplications().filter(a => a.status === "pending");
+  const allApps = await getCreatorApplications();
+  const pending = allApps.filter(a => a.status === "pending");
   if (countBadge) countBadge.textContent = pending.length.toString();
   if (metricBadge) metricBadge.textContent = pending.length.toString();
 
@@ -274,7 +275,7 @@ export function renderCreatorRequestsQueue() {
   }
 
   feed.innerHTML = pending.map(app => `
-    <article class="admin-app-card">
+    <article class="admin-app-card" data-app-id="${app.id}">
       <div class="admin-app-top">
         <div>
           <strong class="admin-app-title">🎬 ${app.studioName || 'Creator Studio'}</strong>
@@ -290,9 +291,11 @@ export function renderCreatorRequestsQueue() {
   `).join("");
 
   feed.querySelectorAll(".btn-app-action.approve").forEach(b => {
-    b.onclick = () => { reviewCreatorApplication(b.dataset.id, true); renderCreatorRequestsQueue(); };
+    b.onclick = async () => { await reviewCreatorApplication(b.dataset.id, true); await renderCreatorRequestsQueue(); };
   });
   feed.querySelectorAll(".btn-app-action.reject").forEach(b => {
-    b.onclick = () => { reviewCreatorApplication(b.dataset.id, false); renderCreatorRequestsQueue(); };
+    b.onclick = async () => { await reviewCreatorApplication(b.dataset.id, false); await renderCreatorRequestsQueue(); };
   });
 }
+
+

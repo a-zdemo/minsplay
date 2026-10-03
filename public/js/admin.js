@@ -78,6 +78,14 @@ function syncMetrics() {
 
   const flagged = DRAMA_CATALOG.filter((d) => d.status === "flagged" || d.status === "pending").length;
   if (issuesCountEl) issuesCountEl.textContent = flagged.toString();
+  const apps = getCreatorApplications().filter(a => a.status === "pending");
+  const users = getAllRegisteredUsers();
+  const cBadge = document.getElementById("count-creator-requests");
+  const cMetric = document.getElementById("count-creator-requests-metric");
+  const uMetric = document.getElementById("metric-total-users");
+  if (cBadge) cBadge.textContent = apps.length.toString();
+  if (cMetric) cMetric.textContent = apps.length.toString();
+  if (uMetric) uMetric.textContent = Math.max(1, users.length).toString();
 }
 
 export function renderRewardTasksQueue() {
@@ -313,6 +321,7 @@ export function renderUsersRolesQueue() {
       promoteUserToAdmin(email, true);
       emailInput.value = "";
       renderUsersRolesQueue();
+      syncMetrics();
     };
   }
 

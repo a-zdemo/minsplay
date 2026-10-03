@@ -200,9 +200,18 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
       if (playIndicator) playIndicator.classList.remove("active");
       showHUD();
     }).catch(() => {
-      showStatus("");
-      if (playIndicator) playIndicator.classList.add("active");
-      showHUD();
+      video.muted = true;
+      video.play().then(() => {
+        showStatus("");
+        if (playIndicator) playIndicator.classList.remove("active");
+        if (soundBtn) soundBtn.textContent = "🔇";
+        showAppToast("Playing (Muted). Tap 🔊 to unmute");
+        showHUD();
+      }).catch(() => {
+        showStatus("");
+        if (playIndicator) playIndicator.classList.add("active");
+        showHUD();
+      });
     });
   }
 
@@ -313,52 +322,69 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     };
   }
 
-  // Auto-advance
-  video.onended = () => {
+  function goToNextEpisode() {
     if (currentEpisodeIndex < currentEpisodes.length - 1) {
       showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
       loadEpisode(currentEpisodeIndex + 1);
     } else {
+      const cat = getSeriesById() ? (window.DRAMA_CATALOG || []) : [];
       showAppToast("🎬 Series Completed! Great binge.");
     }
-  };
+  }
+
+  function goToPrevEpisode() {
+    if (currentEpisodeIndex > 0) {
+      showAppToast(`◀ Previous: Episode ${currentEpisodes[currentEpisodeIndex - 1].id}`);
+      loadEpisode(currentEpisodeIndex - 1);
+    } else {
+      showAppToast("⏮ You are at Episode 1");
+    }
+  }
+
+  video.onended = () => { goToNextEpisode(); };
 
   // Touch Swipe Gestures
-  let touchStartY = 0, touchStartX = 0;
-  const targetSurface = playerRoot || document;
+  let touchStartY = 0, touchStartX = 0, isTouching = false;
+  const gestureSurface = document.getElementById("video-gesture-surface") || playerRoot || document;
 
-  targetSurface.addEventListener("touchstart", (e) => {
+  gestureSurface.ontouchstart = (e) => {
     if (!e.touches || e.touches.length === 0) return;
     touchStartY = e.touches[0].clientY;
     touchStartX = e.touches[0].clientX;
-  }, { passive: true });
+    isTouching = true;
+  };
 
-  targetSurface.addEventListener("touchend", (e) => {
+  gestureSurface.ontouchmove = (e) => {
+    if (!isTouching || !e.touches || e.touches.length === 0) return;
+    const dy = Math.abs(e.touches[0].clientY - touchStartY);
+    if (dy > 8) e.preventDefault();
+  };
+
+  gestureSurface.ontouchend = (e) => {
+    if (!isTouching) return;
+    isTouching = false;
     if (!e.changedTouches || e.changedTouches.length === 0) return;
     const diffY = touchStartY - e.changedTouches[0].clientY;
     const diffX = touchStartX - e.changedTouches[0].clientX;
 
     if (e.target.closest("button, input, select, .drawer-sheet-box, .auth-sheet, .lock-modal-dialog, .rewarded-ad-modal")) return;
 
-    if (Math.abs(diffY) > 45 && Math.abs(diffY) > Math.abs(diffX) * 1.2) {
-      if (diffY > 0 && currentEpisodeIndex < currentEpisodes.length - 1) {
-        showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
-        loadEpisode(currentEpisodeIndex + 1);
-      } else if (diffY < 0 && currentEpisodeIndex > 0) {
-        showAppToast(`◀ Previous: Episode ${currentEpisodes[currentEpisodeIndex - 1].id}`);
-        loadEpisode(currentEpisodeIndex - 1);
-      }
+    if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX) * 1.1) {
+      if (diffY > 0) goToNextEpisode();
+      else goToPrevEpisode();
       return;
     }
 
-    if (video.paused) {
-      video.play().then(() => playIndicator?.classList.remove("active")).catch(() => {});
-    } else {
-      video.pause();
-      playIndicator?.classList.add("active");
+    if (Math.abs(diffY) < 15 && Math.abs(diffX) < 15) {
+      if (video.paused) {
+        video.play().then(() => playIndicator?.classList.remove("active")).catch(() => {});
+      } else {
+        video.pause();
+        playIndicator?.classList.add("active");
+      }
+      showHUD();
     }
-    showHUD();
-  }, { passive: true });
+  };
 
   video.onloadedmetadata = () => {
     showStatus("");

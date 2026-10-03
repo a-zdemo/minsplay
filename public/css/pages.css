@@ -4680,3 +4680,13 @@
 
 .btn-vault-sync-pill { all: unset !important; margin-left: auto !important; font-size: 0.72rem !important; font-weight: 800 !important; color: #ffc107 !important; background: rgba(255, 193, 7, 0.15) !important; border: 1px solid rgba(255, 193, 7, 0.35) !important; padding: 4px 10px !important; border-radius: 8px !important; cursor: pointer !important; }
 .btn-vault-sync-pill:active { transform: scale(0.95) !important; }
+
+/* Touch Gesture Surface for Mobile Swipe Navigation */
+.video-gesture-surface {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 5 !important;
+  touch-action: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  cursor: pointer !important;
+}

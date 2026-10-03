@@ -507,6 +507,9 @@ export function initRouter() {
     const currentPath = window.location.pathname || "/";
     if (currentPath === "/series" && currentActiveSeriesId) {
       renderSeriesDetail(currentActiveSeriesId);
+    } else if (currentPath === "/watch") {
+      const sId = currentActiveSeriesId || (DRAMA_CATALOG.length > 0 ? DRAMA_CATALOG[0].id : "");
+      initPlayer(sId, pendingEpisode);
     }
   });
 

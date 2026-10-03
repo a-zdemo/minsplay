@@ -1,4 +1,6 @@
-const SUPABASE_URL = "https://lekmsvdbthupiauejffo.supabase.co";
+import os
+
+series_data_code = '''const SUPABASE_URL = "https://lekmsvdbthupiauejffo.supabase.co";
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxla21zdmRidGh1cGlhdWVqZmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDY4MjEsImV4cCI6MjEwNjM4MjgyMX0.26Lu_-rQX17LKXOSJ98d2OPRYIkfW_7S-8WaMsxqqeg";
 
 export let DRAMA_CATALOG = [];
@@ -107,3 +109,8 @@ export async function savePublishedEpisode({ seriesId, seriesTitle, episodeNum, 
 
 export function saveCatalogToStorage() {}
 export async function syncCatalogFromVault() { return fetchCatalogFromDatabase(); }
+'''
+
+with open("public/js/series-data.js", "w", encoding="utf-8") as f:
+    f.write(series_data_code)
+print("  ✓ public/js/series-data.js: Hardcoded fallback removed, live Supabase sync wired")

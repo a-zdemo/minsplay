@@ -2,13 +2,13 @@ export async function fetchLiveDramaCount() {
   const dramaMetricEl = document.getElementById("metric-total-dramas");
   const catalogCountEl = document.getElementById("admin-catalog-count");
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/r2_media_vault?select=series_id`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/dramas?select=id`, {
       headers: { "apikey": ANON_KEY, "Authorization": `Bearer ${ANON_KEY}` }
     });
     if (res.ok) {
       const rows = await res.json();
-      const uniqueSeries = new Set(rows.map(r => r.series_id).filter(Boolean));
-      const count = uniqueSeries.size || DRAMA_CATALOG.length;
+      const count = rows.length;
+      
       if (dramaMetricEl) dramaMetricEl.textContent = count.toString();
       if (catalogCountEl) catalogCountEl.textContent = `Dramas (${count})`;
     }

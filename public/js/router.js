@@ -323,6 +323,11 @@ function initHomeFilterSystem() {
   if (!grid || !subNav) return;
 
   function renderGrid(dramas) {
+    if (dramas.length === 0) {
+      grid.innerHTML = `<div class="admin-empty-state" style="grid-column: span 3; text-align: center; padding: 48px 16px; color: rgba(255,255,255,0.5);"><span>🎬</span><p style="margin: 8px 0 0; font-size: 0.9rem;">No dramas published yet.<br><small style="color: rgba(255,255,255,0.35);">Test creators can upload new dramas in Creator Studio.</small></p></div>`;
+      if (countBadge) countBadge.textContent = "0 Titles";
+      return;
+    }
     grid.innerHTML = dramas.map((d) => createDramaCardMarkup(d)).join("");
     if (countBadge) countBadge.textContent = `${dramas.length} Titles`;
   }

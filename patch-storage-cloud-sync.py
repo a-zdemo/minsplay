@@ -1,4 +1,4 @@
-import { fetchRemoteUserProfile, syncRemoteUserProfile } from "./profile-api.js";
+storage_js = '''import { fetchRemoteUserProfile, syncRemoteUserProfile } from "./profile-api.js";
 
 const PROGRESS_KEY = "minsplay_watch_progress";
 const UNLOCKED_KEY = "minsplay_unlocked";
@@ -227,3 +227,8 @@ export function saveUserSetting(key, val) {
     window.dispatchEvent(new CustomEvent("settingsUpdated", { detail: current }));
   } catch {}
 }
+'''
+
+with open("public/js/storage.js", "w", encoding="utf-8") as f:
+    f.write(storage_js)
+print("  ✓ Step 2 Complete: public/js/storage.js upgraded with live Supabase user_profiles sync")

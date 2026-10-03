@@ -33,8 +33,8 @@
     <!-- Navigation Tabs -->
     <nav class="admin-nav-tabs" id="admin-nav-tabs">
       <button class="admin-tab-btn active" type="button" data-pane="dramas">Content Vault</button>
-      <button class="admin-tab-btn" type="button" data-pane="creators">Creator Ladder</button>
-      <button class="admin-tab-btn" type="button" data-pane="comments">Comments</button>
+      <button class="admin-tab-btn" type="button" data-pane="creator-requests" id="tab-creator-requests">Creator Requests (<span id="count-creator-requests">0</span>)</button>
+      <button class="admin-tab-btn" type="button" data-pane="roles" id="tab-admin-roles" style="display: none;">👑 Users & Roles</button>
       <button class="admin-tab-btn" type="button" data-pane="storage">R2 Storage</button>
     </nav>
 
@@ -67,6 +67,22 @@
     </div>
 
   </div>
+
+      <!-- TAB: Creator Requests Queue -->
+    <div class="admin-pane" id="pane-creator-requests" style="display: none;">
+      <div class="pane-action-bar">
+        <span class="pane-subtitle">Pending Creator Studio Applications</span>
+      </div>
+      <div class="admin-items-feed" id="admin-creator-apps-feed"></div>
+    </div>
+
+    <!-- TAB: Users & Roles (Super Admin Exclusive) -->
+    <div class="admin-pane" id="pane-roles" style="display: none;">
+      <div class="pane-action-bar">
+        <span class="pane-subtitle">Platform Users & Staff Promotion</span>
+      </div>
+      <div class="admin-items-feed" id="admin-users-roles-feed"></div>
+    </div>
 
   <!-- Interactive Stream Linker Modal -->
   <aside class="admin-stream-modal" id="admin-stream-modal" style="display: none;">

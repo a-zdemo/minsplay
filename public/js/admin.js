@@ -1,6 +1,6 @@
 import { DRAMA_CATALOG, saveCatalogToStorage } from "./series-data.js";
 import { showAppToast, navigateTo } from "./router.js";
-import { getCurrentUser, ROLES } from "./auth.js";
+import { getCurrentUser, ROLES, getCreatorApplications, reviewCreatorApplication, getAllRegisteredUsers, promoteUserToAdmin } from "./auth.js";
 import { getStoredTasks, saveStoredTasks, syncTasksFromSupabase } from "./rewards.js";
 import { upsertTaskInDatabase, deleteTaskFromDatabase } from "./tasks-api.js";
 
@@ -8,7 +8,18 @@ const R2_BASE = "https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev";
 let currentEditingTaskId = null;
 
 export function initAdminDashboard() {
+  const user = getCurrentUser();
+  const isSuper = user.role === ROLES.SUPER_ADMIN;
+
+  const badge = document.querySelector(".admin-security-pill");
+  if (badge) badge.textContent = isSuper ? "👑 SUPER ADMIN" : "🛡️ ADMIN";
+
+  const rolesTab = document.getElementById("tab-admin-roles");
+  if (rolesTab) rolesTab.style.display = isSuper ? "inline-flex" : "none";
+
   syncMetrics();
+  renderCreatorRequestsQueue();
+  if (isSuper) renderUsersRolesQueue();
   renderDramaQueue();
   renderRewardTasksQueue();
   renderCreatorQueue();
@@ -46,6 +57,8 @@ export function initAdminDashboard() {
         activePane.style.display = "flex";
         activePane.classList.add("active");
         if (paneId === "tasks") renderRewardTasksQueue();
+        if (paneId === "creator-requests") renderCreatorRequestsQueue();
+        if (paneId === "roles") renderUsersRolesQueue();
       }
     };
   }
@@ -244,6 +257,83 @@ function renderDramaQueue() {
   `).join("");
 }
 
-function renderCreatorQueue() {}
+export function renderCreatorRequestsQueue() {
+  const feed = document.getElementById("admin-creator-apps-feed");
+  const countBadge = document.getElementById("count-creator-requests");
+  const apps = getCreatorApplications();
+  const pending = apps.filter(a => a.status === "pending");
+
+  if (countBadge) countBadge.textContent = pending.length.toString();
+  if (!feed) return;
+
+  if (pending.length === 0) {
+    feed.innerHTML = `<div class="admin-empty-state" style="padding:28px;text-align:center;color:rgba(255,255,255,0.5);"><p>No pending creator requests ✓</p></div>`;
+    return;
+  }
+
+  feed.innerHTML = pending.map(app => `
+    <article class="admin-app-card" data-app-id="${app.id}">
+      <div class="admin-app-top">
+        <div>
+          <strong class="admin-app-title">🎬 ${app.studioName || 'Creator Studio'}</strong>
+          <span class="admin-app-user">${app.username || 'User'} (${app.email})</span>
+          <p class="admin-app-bio">${app.bio || 'Vertical drama creator.'}</p>
+        </div>
+      </div>
+      <div class="admin-app-actions">
+        <button class="btn-app-action approve" data-action="approve" data-id="${app.id}" type="button">✓ Approve Creator</button>
+        <button class="btn-app-action reject" data-action="reject" data-id="${app.id}" type="button">✕ Reject</button>
+      </div>
+    </article>
+  `).join("");
+
+  feed.querySelectorAll(".btn-app-action").forEach(btn => {
+    btn.onclick = () => {
+      reviewCreatorApplication(btn.getAttribute("data-id"), btn.getAttribute("data-action") === "approve");
+      renderCreatorRequestsQueue();
+      syncMetrics();
+    };
+  });
+}
+
+export function renderUsersRolesQueue() {
+  const feed = document.getElementById("admin-users-roles-feed");
+  if (!feed) return;
+
+  const users = getAllRegisteredUsers();
+  if (users.length === 0) {
+    feed.innerHTML = `<div class="admin-empty-state" style="padding:24px;text-align:center;color:rgba(255,255,255,0.5);"><p>No registered users found.</p></div>`;
+    return;
+  }
+
+  feed.innerHTML = users.map(u => {
+    const isTargetAdmin = u.role === ROLES.ADMIN;
+    const isTargetSuper = u.role === ROLES.SUPER_ADMIN;
+    return `
+      <article class="admin-user-role-card">
+        <div class="admin-user-meta">
+          <strong class="admin-user-name">${u.username || 'User'}</strong>
+          <span class="admin-user-email">${u.email}</span>
+          <span class="settings-user-role-tag ${u.role || 'user'}">${(u.role || 'user').toUpperCase()}</span>
+        </div>
+        <div class="admin-user-action-wrap">
+          ${isTargetSuper ? '<span class="super-locked-tag">Platform Owner</span>' : `
+            <button class="btn-user-promote ${isTargetAdmin ? 'demote' : 'promote'}" data-uid="${u.id}" type="button">
+              ${isTargetAdmin ? 'Demote to User' : '👑 Promote to Admin'}
+            </button>
+          `}
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  feed.querySelectorAll(".btn-user-promote").forEach(btn => {
+    btn.onclick = () => {
+      promoteUserToAdmin(btn.getAttribute("data-uid"), !btn.classList.contains("demote"));
+      renderUsersRolesQueue();
+    };
+  });
+}
+
 function renderCommentQueue() {}
 function attachAdminActions() {}

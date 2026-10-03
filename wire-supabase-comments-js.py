@@ -1,4 +1,4 @@
-import { fetchEpisodeComments, postEpisodeComment, likeEpisodeComment } from "./comments-api.js";
+comments_js_code = '''import { fetchEpisodeComments, postEpisodeComment, likeEpisodeComment } from "./comments-api.js";
 import { getCurrentUser } from "./auth.js";
 
 let activeSeriesId = "the-beginning";
@@ -143,3 +143,8 @@ export function initCommentsSystem() {
     openCommentsDrawer(seriesId, parseInt(epId, 10));
   }, true);
 }
+'''
+
+with open("public/js/comments.js", "w", encoding="utf-8") as f:
+    f.write(comments_js_code)
+print("  ✓ public/js/comments.js updated: Hardcoded seeds cleared, wired to live Supabase")

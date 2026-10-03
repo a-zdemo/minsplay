@@ -91,7 +91,7 @@ export async function fetchSupabaseUsers() {
     userTotalRecords = data.total || 0;
 
     if (countEl) countEl.textContent = userTotalRecords.toString();
-    if (foundPill) foundPill.textContent = `${userTotalRecords} Registered`;
+    if (foundPill) foundPill.textContent = `${userTotalRecords} Users`;
 
     renderUsersList(data.users || []);
     renderPaginationFooter(userTotalRecords);
@@ -131,22 +131,25 @@ function wireSearchControls() {
 function renderUsersList(users) {
   const feed = document.getElementById("admin-users-roles-feed");
   if (!feed) return;
-
   if (users.length === 0) {
     feed.innerHTML = `<div class="admin-empty-state" style="padding:28px;text-align:center;color:rgba(255,255,255,0.5);"><p>No matching users found.</p></div>`;
     return;
   }
-
   feed.innerHTML = users.map(u => {
     const isTargetAdmin = u.role === ROLES.ADMIN;
     const isTargetSuper = u.role === ROLES.SUPER_ADMIN || u.email === "hi.azdemo@gmail.com";
+    const shortId = (u.id || "").substring(0, 6).toUpperCase();
+    const joined = (u.created_at || "").substring(0, 10);
+    const rKey = u.role || "user";
     return `
       <article class="admin-user-role-card">
         <div class="admin-user-meta">
-          <strong class="admin-user-name">${u.username || 'User'}</strong>
+          <div class="admin-user-name-line">
+            <strong class="admin-user-name">${u.username || 'User'}</strong>
+            <span class="admin-role-pill ${rKey}">${rKey.toUpperCase()}</span>
+          </div>
           <span class="admin-user-email">${u.email}</span>
-          <span class="admin-user-id-sub">ID: ${u.id.substring(0, 8)}... • Joined: ${(u.created_at || '').substring(0, 10)}</span>
-          <span class="settings-user-role-tag ${u.role || 'user'}">${(u.role || 'user').toUpperCase()}</span>
+          <span class="admin-user-id-sub">#${shortId} • Joined ${joined}</span>
         </div>
         <div class="admin-user-action-wrap">
           ${isTargetSuper ? '<span class="super-locked-tag">Platform Owner</span>' : `
@@ -155,15 +158,12 @@ function renderUsersList(users) {
             </button>
           `}
         </div>
-      </article>
-    `;
+      </article>`;
   }).join("");
 
   feed.querySelectorAll(".btn-user-promote").forEach(btn => {
     btn.onclick = async () => {
-      const uid = btn.getAttribute("data-uid");
-      const targetRole = btn.getAttribute("data-action");
-      await updateRoleInDatabase(uid, targetRole);
+      await updateRoleInDatabase(btn.getAttribute("data-uid"), btn.getAttribute("data-action"));
     };
   });
 }

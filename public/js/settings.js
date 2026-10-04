@@ -2,19 +2,24 @@ import { getCurrentUser, logout, ROLES } from "./auth.js";
 import { showAppToast, navigateTo } from "./router.js";
 
 export function initSettingsPage() {
+  // Declare user first before any property checks
+  const user = getCurrentUser();
+
   const adminRow = document.getElementById("row-admin-console");
   const adminLabel = document.getElementById("label-admin-console");
   const isAdminOrSuper = user.role === ROLES.ADMIN || user.role === ROLES.SUPER_ADMIN;
+
   if (adminRow) {
     adminRow.style.display = isAdminOrSuper ? "flex" : "none";
-    if (adminLabel) adminLabel.textContent = user.role === ROLES.SUPER_ADMIN ? "👑 Super Admin Console" : "🛡️ Admin Console";
+    if (adminLabel) {
+      adminLabel.textContent = user.role === ROLES.SUPER_ADMIN ? "👑 Super Admin Console" : "🛡️ Admin Console";
+    }
   }
-  const user = getCurrentUser();
+
   const creatorRow = document.getElementById("row-become-creator");
   const creatorLabel = document.getElementById("label-creator-tab");
   const creatorVal = document.getElementById("val-creator-status");
 
-  // Determine Creator status
   const isCreatorOrAdmin = user.role === ROLES.CREATOR || user.role === ROLES.SUPER_ADMIN;
   const isPending = user.creatorStatus === "pending";
 
@@ -43,7 +48,6 @@ export function initSettingsPage() {
       } else if (isPending) {
         showAppToast("Your Creator application is currently under review by Admin ⏳");
       } else {
-        // Submit 1-tap application
         user.creatorStatus = "pending";
         localStorage.setItem("minsplay_auth_session_v1", JSON.stringify(user));
         if (creatorVal) creatorVal.textContent = "Under Review ⏳";
@@ -52,7 +56,6 @@ export function initSettingsPage() {
     };
   }
 
-  // Clear Cache Action
   const cacheRow = document.getElementById("row-clear-cache");
   const cacheVal = document.getElementById("settings-cache-val");
   if (cacheRow) {
@@ -62,12 +65,10 @@ export function initSettingsPage() {
     };
   }
 
-  // Logout Action
   const logoutBtn = document.getElementById("btn-db-logout");
   if (logoutBtn) {
     logoutBtn.onclick = () => {
       logout();
-      navigateTo("/");
     };
   }
 }

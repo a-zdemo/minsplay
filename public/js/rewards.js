@@ -1,3 +1,4 @@
+import { showRewardedVideo } from "./admob-manager.js";
 import { getUserCoins, addCoins } from "./storage.js";
 import { showAppToast, navigateTo } from "./router.js";
 import { fetchLiveTasks } from "./tasks-api.js";
@@ -159,12 +160,17 @@ function executeRewardTask(task, tasks) {
 }
 
 function triggerRewardedAd(rewardCoins, taskName, onComplete) {
-  showAppToast(`🎬 Loading sponsored ad for ${taskName}...`);
-  setTimeout(() => {
-    addCoins(rewardCoins);
-    showAppToast(`🎁 Ad watched! +${rewardCoins} Coins added to balance.`);
-    if (typeof onComplete === "function") onComplete();
-  }, 1200);
+  showRewardedVideo({
+    placement: "rewards_loop",
+    onReward: () => {
+      addCoins(rewardCoins);
+      showAppToast(`🎁 Reward granted! +${rewardCoins} Coins added.`);
+      if (typeof onComplete === "function") onComplete();
+    },
+    onDismiss: () => {
+      showAppToast("Watch the full ad to earn coins.");
+    }
+  });
 }
 
 export function initRewardsPage() {

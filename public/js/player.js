@@ -1,3 +1,4 @@
+import { showRewardedVideo, checkAndShowTransitionInterstitial } from "./admob-manager.js";
 import { fetchEpisodeComments, postEpisodeComment, likeEpisodeComment } from "./comments-api.js";
 import { getCurrentUser } from "./auth.js";
 import {
@@ -23,8 +24,7 @@ let currentEpisodeIndex = 0;
 let hudTimer = null;
 let preloadTriggeredForEpisode = -1;
 
-let adTimerInterval = null;
-let adProgressInterval = null;
+// Ad intervals purged in favor of AdMob Engine
 
 function formatTime(seconds) {
   if (isNaN(seconds) || seconds < 0) return "0:00";
@@ -43,7 +43,7 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   const lockModal = document.getElementById("watch-lock-modal");
   const lockedEpNum = document.getElementById("locked-ep-number");
   const unlockCoinsBtn = document.getElementById("btn-unlock-coins");
-  const unlockAdBtn = document.getElementById("btn-unlock-mock");
+  const unlockAdBtn = document.getElementById("btn-unlock-admob") || document.getElementById("btn-unlock-mock");
   const lockOpenDrawerBtn = document.getElementById("btn-lock-open-drawer");
   const lockModalCoinBalance = document.getElementById("lock-modal-coin-balance");
   const statusPill = document.getElementById("hud-status-pill");
@@ -233,74 +233,24 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     };
   }
 
-  // LOCK MODAL FIX: 2. Unlock by watching 5s rewarded ad
-  function startRewardedAdFlow() {
-    const ep = currentEpisodes[currentEpisodeIndex];
-    if (!ep || !currentSeries || !adModal) return;
+  // REWARDED AD: Unlock via AdMob
+  if (unlockAdBtn) {
+    unlockAdBtn.onclick = () => {
+      const ep = currentEpisodes[currentEpisodeIndex];
+      if (!ep || !currentSeries) return;
 
-    if (lockModal) lockModal.style.display = "none";
-    if (adRewardSplash) adRewardSplash.style.display = "none";
-    adModal.style.display = "flex";
-
-    if (adSkipBtn) {
-      adSkipBtn.disabled = true;
-      adSkipBtn.classList.add("disabled");
-      adSkipBtn.textContent = "✕";
-    }
-    if (adProgressFill) adProgressFill.style.width = "0%";
-
-    let remainingSeconds = 5;
-    if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
-
-    const totalDurationMs = 5000;
-    const startTime = Date.now();
-
-    clearInterval(adProgressInterval);
-    adProgressInterval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progressPercent = Math.min(100, (elapsed / totalDurationMs) * 100);
-      if (adProgressFill) adProgressFill.style.width = `${progressPercent}%`;
-      if (elapsed >= totalDurationMs) clearInterval(adProgressInterval);
-    }, 50);
-
-    clearInterval(adTimerInterval);
-    adTimerInterval = setInterval(() => {
-      remainingSeconds -= 1;
-      if (remainingSeconds > 0) {
-        if (adTimerPill) adTimerPill.textContent = `Reward in ${remainingSeconds}s`;
-      } else {
-        clearInterval(adTimerInterval);
-        clearInterval(adProgressInterval);
-        if (adTimerPill) adTimerPill.textContent = "Reward Granted!";
-        if (adProgressFill) adProgressFill.style.width = "100%";
-        if (adSkipBtn) {
-          adSkipBtn.disabled = false;
-          adSkipBtn.classList.remove("disabled");
-          adSkipBtn.textContent = "✓";
-        }
-        if (adRewardSplash) adRewardSplash.style.display = "flex";
-        unlockEpisode(currentSeries.id, ep.id);
-        setTimeout(() => {
-          clearInterval(adTimerInterval);
-          clearInterval(adProgressInterval);
-          if (adModal) adModal.style.display = "none";
-          showAppToast(`🎉 Episode ${ep.id} Unlocked!`);
+      showRewardedVideo({
+        placement: "episode_unlock",
+        onReward: () => {
+          unlockEpisode(currentSeries.id, ep.id);
+          showAppToast(`🎉 Episode ${ep.id} Unlocked via Ad!`);
+          if (lockModal) lockModal.style.display = "none";
           loadEpisode(currentEpisodeIndex);
-        }, 1200);
-      }
-    }, 1000);
-  }
-
-  if (unlockAdBtn) unlockAdBtn.onclick = startRewardedAdFlow;
-
-  if (adSkipBtn) {
-    adSkipBtn.onclick = () => {
-      if (!adSkipBtn.disabled) {
-        clearInterval(adTimerInterval);
-        clearInterval(adProgressInterval);
-        if (adModal) adModal.style.display = "none";
-        loadEpisode(currentEpisodeIndex);
-      }
+        },
+        onDismiss: () => {
+          showAppToast("Watch the full ad to unlock the episode.");
+        }
+      });
     };
   }
 
@@ -325,6 +275,7 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   function goToNextEpisode() {
     if (currentEpisodeIndex < currentEpisodes.length - 1) {
       showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
+      checkAndShowTransitionInterstitial();
       loadEpisode(currentEpisodeIndex + 1);
     } else {
       const cat = getSeriesById() ? (window.DRAMA_CATALOG || []) : [];

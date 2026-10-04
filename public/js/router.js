@@ -80,6 +80,7 @@ import giftsHtml from "../pages/gifts.html?raw";
 import historyHtml from "../pages/history.html?raw";
 import downloadHtml from "../pages/download.html?raw";
 import creatorHtml from "../pages/creator.html?raw";
+import termsHtml from "../pages/terms.html?raw";
 import privacyHtml from "../pages/privacy.html?raw";
 import deletionHtml from "../pages/deletion.html?raw";
 
@@ -126,6 +127,7 @@ const routes = {
   "/download": downloadHtml,
   "/creator": creatorHtml,
   "/admin": adminHtml,
+  "/terms": termsHtml,
   "/auth": authHtml,
   "/privacy": privacyHtml,
   "/deletion": deletionHtml,
@@ -485,7 +487,7 @@ async function renderRoute(path) {
       path === "/watch" || path === "/inbox" || path === "/settings" ||
       path === "/wallet" || path === "/rewards" || path === "/events" ||
       path === "/gifts" || path === "/history" || path === "/download" || path === "/member" ||
-      path === "/creator" || path === "/auth" || path === "/admin" || path === "/privacy" || path === "/deletion"
+      path === "/terms" || path === "/creator" || path === "/auth" || path === "/admin" || path === "/privacy" || path === "/deletion"
     );
     bottomNav.style.display = isSubpage ? "none" : "flex";
   }
@@ -517,7 +519,7 @@ async function renderRoute(path) {
     initSettingsPage();
   } else if (path === "/member") {
     initMemberPage();
-  } else if (path === "/creator") {
+  } else if (path === "/terms" || path === "/creator") {
     // ISSUE 8 FIX: Dedicated Creator Studio invocation
     initCreatorStudio();
   } else if (path === "/auth") {

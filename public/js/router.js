@@ -80,6 +80,8 @@ import giftsHtml from "../pages/gifts.html?raw";
 import historyHtml from "../pages/history.html?raw";
 import downloadHtml from "../pages/download.html?raw";
 import creatorHtml from "../pages/creator.html?raw";
+import privacyHtml from "../pages/privacy.html?raw";
+import deletionHtml from "../pages/deletion.html?raw";
 
 import { initAuthPage } from "./auth-page.js";
 import { initAdminDashboard } from "./admin.js";
@@ -125,6 +127,8 @@ const routes = {
   "/creator": creatorHtml,
   "/admin": adminHtml,
   "/auth": authHtml,
+  "/privacy": privacyHtml,
+  "/deletion": deletionHtml,
 };
 
 let currentActiveSeriesId = "";
@@ -481,7 +485,7 @@ async function renderRoute(path) {
       path === "/watch" || path === "/inbox" || path === "/settings" ||
       path === "/wallet" || path === "/rewards" || path === "/events" ||
       path === "/gifts" || path === "/history" || path === "/download" || path === "/member" ||
-      path === "/creator" || path === "/auth" || path === "/admin"
+      path === "/creator" || path === "/auth" || path === "/admin" || path === "/privacy" || path === "/deletion"
     );
     bottomNav.style.display = isSubpage ? "none" : "flex";
   }
@@ -522,6 +526,19 @@ async function renderRoute(path) {
   } else if (path === "/admin") {
     // ISSUE 9 FIX: Dedicated Admin Dashboard invocation
     initAdminDashboard();
+  }
+  if (path === "/deletion") {
+    const purgeBtn = document.getElementById("btn-request-data-deletion");
+    if (purgeBtn) {
+      purgeBtn.onclick = () => {
+        if (confirm("Are you sure you want to request data deletion? Your local session will be logged out.")) {
+          localStorage.removeItem("minsplay_auth_session_v1");
+          localStorage.removeItem("minsplay_watch_progress");
+          showAppToast("Deletion request submitted 🗑️. Logged out.");
+          setTimeout(() => navigateTo("/"), 1200);
+        }
+      };
+    }
   }
 }
 

@@ -23,9 +23,13 @@ export async function syncVaultToDramasTable() {
         src: it.public_url || `https://pub-446cc5245dc94ce0afede5f9a591d746.r2.dev/${it.object_key}`,
         posterUrl: ""
       }));
-      const title = sId === "the-dark-bees" ? "The Dark Bees" : (sId === "the-beginning" ? "The Beginning" : sId.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()));
+      const title = sId === "the-dark-bees" 
+        ? "The Dark Bees" 
+        : sId.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
       const genre = sId === "the-dark-bees" ? "Urban Suspense" : "Urban Drama";
-      const synopsis = sId === "the-dark-bees" ? "A high-stakes vertical suspense thriller uncovering dark underworld syndicates." : "An empire falls and a ruthless heir rises to claim the throne.";
+      const synopsis = sId === "the-dark-bees" 
+        ? "A high-stakes vertical suspense thriller uncovering dark underworld syndicates." 
+        : `${title} - Exclusive vertical drama series.`;
       await saveDramaToDatabase({
         id: sId, title, genre, synopsis, badge: "HOT", badgeClass: "badge-hot", posterUrl: "", plays: "1.2K", status: "published", episodes
       });

@@ -20,6 +20,23 @@ function renderProfilePage() {
     numericId = ((Math.abs(hash) % 90000000) + 10000000).toString();
   }
 
+    // Dynamic Role Dashboard Shelves
+  const staffShelf = document.getElementById("profile-staff-shelf");
+  const staffTitle = document.getElementById("profile-staff-title");
+  const creatorShelf = document.getElementById("profile-creator-shelf");
+
+  const isSuper = user.role === ROLES.SUPER_ADMIN;
+  const isAdmin = user.role === ROLES.ADMIN || isSuper;
+  const isCreator = user.role === ROLES.CREATOR || isSuper;
+
+  if (staffShelf) {
+    staffShelf.style.display = isAdmin ? "block" : "none";
+    if (staffTitle) staffTitle.textContent = isSuper ? "👑 Super Admin Console" : "🛡️ Admin Console";
+  }
+  if (creatorShelf) {
+    creatorShelf.style.display = isCreator ? "block" : "none";
+  }
+
   if (idEl) idEl.textContent = numericId;
   const username = user.email ? (user.username || user.email.split("@")[0]) : "Log in";
   if (nameEl) nameEl.textContent = username;
@@ -84,7 +101,7 @@ import {
   getUserSettings,
   saveUserSetting,
 } from "./storage.js";
-import { DRAMA_CATALOG, getSeriesById } from "./series-data.js";
+import { DRAMA_CATALOG, getSeriesById, fetchCatalogFromDatabase } from "./series-data.js";
 
 const RECENT_SEARCHES_KEY = "minsplay_recent_searches";
 
@@ -333,6 +350,12 @@ function initHomeFilterSystem() {
   }
 
   renderGrid(DRAMA_CATALOG);
+  if (DRAMA_CATALOG.length === 0) {
+    fetchCatalogFromDatabase().then((fresh) => {
+      renderGrid(fresh && fresh.length > 0 ? fresh : DRAMA_CATALOG);
+      updateContinueWatching();
+    }).catch(() => {});
+  }
 
   subNav.addEventListener("click", (e) => {
     const tabBtn = e.target.closest(".tab-item");

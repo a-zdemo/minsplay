@@ -2,6 +2,13 @@ import { getCurrentUser, logout, ROLES } from "./auth.js";
 import { showAppToast, navigateTo } from "./router.js";
 
 export function initSettingsPage() {
+  const adminRow = document.getElementById("row-admin-console");
+  const adminLabel = document.getElementById("label-admin-console");
+  const isAdminOrSuper = user.role === ROLES.ADMIN || user.role === ROLES.SUPER_ADMIN;
+  if (adminRow) {
+    adminRow.style.display = isAdminOrSuper ? "flex" : "none";
+    if (adminLabel) adminLabel.textContent = user.role === ROLES.SUPER_ADMIN ? "👑 Super Admin Console" : "🛡️ Admin Console";
+  }
   const user = getCurrentUser();
   const creatorRow = document.getElementById("row-become-creator");
   const creatorLabel = document.getElementById("label-creator-tab");

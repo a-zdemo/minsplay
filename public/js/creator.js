@@ -1,5 +1,5 @@
 import { showAppToast, navigateTo } from "./router.js";
-import { savePublishedEpisode, DRAMA_CATALOG, saveCatalogToStorage, syncCatalogFromVault } from "./series-data.js";
+import { savePublishedEpisode, DRAMA_CATALOG, saveDramaToDatabase, deleteEpisodeFromCatalog, deleteSeriesFromCatalog, syncCatalogFromVault } from "./series-data.js";
 
 const ENDPOINT_URL = "https://lekmsvdbthupiauejffo.supabase.co/functions/v1/smart-responder";
 
@@ -340,35 +340,37 @@ function attachCMSEditModalEvents() {
         ep.isFree = price === 0;
         if (src) ep.src = src;
 
-        saveCatalogToStorage();
-        renderCreatorCMSFeed();
-        if (modal) modal.style.display = "none";
-        showAppToast("Episode metadata updated successfully! ✓");
+        saveDramaToDatabase(drama).then(() => {
+          renderCreatorCMSFeed();
+          if (modal) modal.style.display = "none";
+          showAppToast("Episode metadata saved to Supabase! ✓");
+        });
       }
     };
   }
 }
 
-function deleteEpisode(seriesId, epId) {
+async function deleteEpisode(seriesId, epId) {
   const drama = DRAMA_CATALOG.find((d) => d.id === seriesId);
   if (!drama) return;
 
   const idx = drama.episodes.findIndex((e) => e.id === epId);
   if (idx >= 0) {
+    const deletedEp = drama.episodes[idx];
     drama.episodes.splice(idx, 1);
-    saveCatalogToStorage();
+    await deleteEpisodeFromCatalog(seriesId, epId, deletedEp?.src);
     renderCreatorCMSFeed();
-    showAppToast(`Deleted Episode ${epId} 🗑️`);
+    showAppToast(`Permanently deleted Episode ${epId} from catalog & vault 🗑️`);
   }
 }
 
-function deleteSeries(seriesId) {
+async function deleteSeries(seriesId) {
   const idx = DRAMA_CATALOG.findIndex((d) => d.id === seriesId);
   if (idx >= 0) {
     const deletedName = DRAMA_CATALOG[idx].title;
     DRAMA_CATALOG.splice(idx, 1);
-    saveCatalogToStorage();
+    await deleteSeriesFromCatalog(seriesId);
     renderCreatorCMSFeed();
-    showAppToast(`Deleted "${deletedName}" from catalog 🗑️`);
+    showAppToast(`Permanently deleted "${deletedName}" from catalog & vault 🗑️`);
   }
 }

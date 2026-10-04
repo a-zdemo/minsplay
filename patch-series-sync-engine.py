@@ -1,4 +1,4 @@
-const SUPABASE_URL = "https://lekmsvdbthupiauejffo.supabase.co";
+series_data_code = '''const SUPABASE_URL = "https://lekmsvdbthupiauejffo.supabase.co";
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxla21zdmRidGh1cGlhdWVqZmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDY4MjEsImV4cCI6MjEwNjM4MjgyMX0.26Lu_-rQX17LKXOSJ98d2OPRYIkfW_7S-8WaMsxqqeg";
 
 export let DRAMA_CATALOG = [];
@@ -204,7 +204,7 @@ export async function syncVaultToDramasTable() {
 
       const title = existingDrama?.title || (sId === "the-dark-bees" 
         ? "The Dark Bees" 
-        : sId.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()));
+        : sId.replace(/-/g, " ").replace(/\\b\\w/g, c => c.toUpperCase()));
       const genre = existingDrama?.genre || (sId === "the-dark-bees" ? "Urban Suspense" : "Urban Drama");
       const synopsis = existingDrama?.synopsis || (sId === "the-dark-bees" 
         ? "A high-stakes vertical suspense thriller uncovering dark underworld syndicates." 
@@ -231,3 +231,8 @@ export async function syncVaultToDramasTable() {
 
 export function saveCatalogToStorage() {}
 export async function syncCatalogFromVault() { return fetchCatalogFromDatabase(); }
+'''
+
+with open("public/js/series-data.js", "w", encoding="utf-8") as f:
+    f.write(series_data_code)
+print("  ✓ public/js/series-data.js updated with permanent two-way sync and deletion engine")

@@ -1,4 +1,6 @@
 import { showAppToast, navigateTo } from "./router.js";
+import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 
 const AUTH_USER_KEY = "minsplay_auth_session_v1";
 const USERS_REGISTRY_KEY = "minsplay_users_registry_v1";
@@ -84,14 +86,35 @@ export function determineRole(email, userMetadata = {}) {
   return ROLES.USER;
 }
 
-export function signInWithOAuth(provider) {
-  const redirectUri = encodeURIComponent(window.location.origin + "/");
+export async function signInWithOAuth(provider) {
+  const isNative = Capacitor.isNativePlatform();
+  // Deep link callback for native app, standard origin for web
+  const redirectTarget = isNative
+    ? "minsplay://auth-callback"
+    : (window.location.origin + "/");
+
+  const redirectUri = encodeURIComponent(redirectTarget);
   const authUrl = `${SUPABASE_URL}/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`;
-  window.location.href = authUrl;
+
+  if (isNative) {
+    try {
+      await Browser.open({ url: authUrl, windowName: "_blank" });
+    } catch (e) {
+      window.location.href = authUrl;
+    }
+  } else {
+    window.location.href = authUrl;
+  }
 }
 
-export async function handleOAuthCallback() {
-  const hash = window.location.hash.substring(1);
+export async function handleOAuthCallback(customRawUrl = null) {
+  let hash = "";
+  if (customRawUrl && customRawUrl.includes("#")) {
+    hash = customRawUrl.split("#")[1];
+  } else if (window.location.hash) {
+    hash = window.location.hash.substring(1);
+  }
+
   if (!hash) return false;
   const params = new URLSearchParams(hash);
   const token = params.get("access_token");
@@ -122,7 +145,10 @@ export async function handleOAuthCallback() {
     };
 
     saveCurrentUser(userObj);
-    window.history.replaceState({}, "", "/");
+    try {
+      window.history.replaceState({}, "", "/");
+    } catch {}
+
     showAppToast(`Welcome back, ${userObj.username}! ✓`);
     redirectBasedOnRole(role);
     return true;
@@ -143,8 +169,15 @@ export function redirectBasedOnRole(role) {
 }
 
 export function logout() {
+  const user = getCurrentUser();
+  if (!user.email || user.role === ROLES.GUEST) {
+    showAppToast("You are not logged in");
+    navigateTo("/auth");
+    return;
+  }
+
   saveCurrentUser(DEFAULT_GUEST);
-  showAppToast("Logged out successfully");
+  showAppToast("Logged out successfully ✓");
   navigateTo("/");
 }
 

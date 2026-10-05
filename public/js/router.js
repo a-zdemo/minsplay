@@ -1,3 +1,7 @@
+import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
+import { Browser } from "@capacitor/browser";
+import { handleOAuthCallback } from "./auth.js";
 import { initSettingsPage } from "./settings.js";
 
 function renderProfilePage() {
@@ -601,4 +605,91 @@ export function initRouter() {
 
   // ISSUE 3 FIX: Enforce route access right when app boots up
   renderRoute(routes[initialPath] ? initialPath : "/");
+  setupNativeAndroidAppEvents();
+}
+
+
+let lastBackPressTime = 0;
+
+export function setupNativeAndroidAppEvents() {
+  if (!Capacitor.isNativePlatform()) return;
+
+  // 1. Intercept Native Android Hardware / Gesture Back Button
+  App.addListener("backButton", ({ canGoBack }) => {
+    // Check Modals & Overlays first
+    const giftModal = document.getElementById("daily-gift-modal");
+    if (giftModal && giftModal.style.display === "flex") {
+      giftModal.style.display = "none";
+      return;
+    }
+
+    const searchOverlay = document.getElementById("search-overlay");
+    if (searchOverlay && searchOverlay.style.display === "flex") {
+      searchOverlay.style.display = "none";
+      return;
+    }
+
+    const episodeDrawer = document.getElementById("episode-drawer");
+    if (episodeDrawer && (episodeDrawer.classList.contains("open") || episodeDrawer.style.display === "flex")) {
+      episodeDrawer.classList.remove("open");
+      episodeDrawer.style.display = "none";
+      return;
+    }
+
+    const commentsDrawer = document.getElementById("comments-drawer");
+    if (commentsDrawer && (commentsDrawer.classList.contains("open") || commentsDrawer.style.display === "flex")) {
+      commentsDrawer.classList.remove("open");
+      commentsDrawer.style.display = "none";
+      return;
+    }
+
+    const admobDialog = document.getElementById("admob-runtime-dialog");
+    if (admobDialog) {
+      admobDialog.remove();
+      return;
+    }
+
+    // Check Current Route
+    const currentPath = window.location.pathname || "/";
+
+    if (currentPath === "/watch") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const seriesId = urlParams.get("id");
+      if (seriesId) {
+        navigateTo("/series", { seriesId });
+      } else {
+        navigateTo("/");
+      }
+      return;
+    }
+
+    if (currentPath !== "/") {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        navigateTo("/");
+      }
+      return;
+    }
+
+    // On Root Home ("/") -> Double-tap within 2 seconds to exit
+    const now = Date.now();
+    if (now - lastBackPressTime < 2000) {
+      App.exitApp();
+    } else {
+      lastBackPressTime = now;
+      showAppToast("Press back again to exit Minsplay");
+    }
+  });
+
+  // 2. Catch OAuth Deep Link Returns from Chrome Custom Tabs
+  App.addListener("appUrlOpen", async (event) => {
+    try {
+      await Browser.close();
+    } catch {}
+
+    if (event.url && (event.url.includes("access_token") || event.url.includes("auth-callback"))) {
+      await handleOAuthCallback(event.url);
+    }
+  });
 }

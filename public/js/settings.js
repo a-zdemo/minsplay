@@ -2,7 +2,6 @@ import { getCurrentUser, logout, ROLES } from "./auth.js";
 import { showAppToast, navigateTo } from "./router.js";
 
 export function initSettingsPage() {
-  // Declare user first before any property checks
   const user = getCurrentUser();
 
   const adminRow = document.getElementById("row-admin-console");
@@ -65,10 +64,26 @@ export function initSettingsPage() {
     };
   }
 
+  // Dynamic Login / Logout Button Handling
+  const logoutWrap = document.querySelector(".db-logout-wrap");
   const logoutBtn = document.getElementById("btn-db-logout");
-  if (logoutBtn) {
-    logoutBtn.onclick = () => {
-      logout();
-    };
+  const isLoggedIn = Boolean(user && user.email && user.role !== ROLES.GUEST);
+
+  if (logoutBtn && logoutWrap) {
+    if (isLoggedIn) {
+      logoutBtn.textContent = "Log out";
+      logoutBtn.style.background = "rgba(255, 46, 99, 0.15)";
+      logoutBtn.style.color = "#ff2e63";
+      logoutBtn.onclick = () => {
+        logout();
+      };
+    } else {
+      logoutBtn.textContent = "Sign in / Register";
+      logoutBtn.style.background = "linear-gradient(90deg, #00d2fc, #0077ff)";
+      logoutBtn.style.color = "#ffffff";
+      logoutBtn.onclick = () => {
+        navigateTo("/auth");
+      };
+    }
   }
 }

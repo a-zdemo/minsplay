@@ -275,8 +275,9 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   function goToNextEpisode() {
     if (currentEpisodeIndex < currentEpisodes.length - 1) {
       showAppToast(`▶ Next: Episode ${currentEpisodes[currentEpisodeIndex + 1].id}`);
-      checkAndShowTransitionInterstitial();
-      loadEpisode(currentEpisodeIndex + 1);
+      checkAndShowTransitionInterstitial().finally(() => {
+        loadEpisode(currentEpisodeIndex + 1);
+      });
     } else {
       const cat = getSeriesById() ? (window.DRAMA_CATALOG || []) : [];
       showAppToast("🎬 Series Completed! Great binge.");
@@ -292,7 +293,7 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     }
   }
 
-  video.onended = () => { goToNextEpisode(); };
+  video.onended = async () => { goToNextEpisode(); };
 
   // Touch Swipe Gestures
   let touchStartY = 0, touchStartX = 0, isTouching = false;

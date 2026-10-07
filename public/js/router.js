@@ -612,6 +612,12 @@ export function initRouter() {
 let lastBackPressTime = 0;
 
 export function setupNativeAndroidAppEvents() {
+  if (Capacitor.isNativePlatform()) {
+    const b = document.getElementById("pwa-install-banner");
+    if (b) b.remove();
+    const w = document.getElementById("home-pagination-wrap");
+    if (w) w.style.display = "none";
+  }
   if (!Capacitor.isNativePlatform()) return;
 
   // 1. Intercept Native Android Hardware / Gesture Back Button

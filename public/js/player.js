@@ -157,6 +157,17 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
     const ep = currentEpisodes[currentEpisodeIndex];
     if (!ep || !currentSeries) return;
 
+    const splashOverlay = document.getElementById("watch-poster-splash");
+    const splashImg = document.getElementById("splash-poster-img");
+    const splashTitle = document.getElementById("splash-title");
+    const splashBadge = document.getElementById("splash-ep-badge");
+    const splashBlur = document.getElementById("splash-backdrop-blur");
+    const posterSrc = ep.posterUrl || currentSeries.posterUrl || "/icons/icon-192.png";
+    if (splashImg) splashImg.src = posterSrc;
+    if (splashBlur) splashBlur.style.backgroundImage = `url('${posterSrc}')`;
+    if (splashTitle) splashTitle.textContent = currentSeries.title || "Minsplay";
+    if (splashBadge) splashBadge.textContent = `Episode ${ep.id}`;
+    if (splashOverlay) { splashOverlay.classList.remove("splash-hidden"); splashOverlay.style.display = "flex"; }
     preloadTriggeredForEpisode = -1;
     const unlocked = isEpisodeUnlocked(currentSeries.id, ep.id, ep.isFree);
 
@@ -301,6 +312,15 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   }
 
   video.onended = async () => { goToNextEpisode(); };
+
+  video.onplaying = () => {
+    isTransitioningEpisode = false;
+    const pi = document.getElementById("center-play-indicator");
+    if (pi) { pi.classList.remove("active"); pi.style.display = "none"; }
+    const sp = document.getElementById("watch-poster-splash");
+    if (sp) { sp.classList.add("splash-hidden"); setTimeout(() => { if (sp.classList.contains("splash-hidden")) sp.style.display = "none"; }, 320); }
+  };
+
 
   // Touch Swipe Gestures
   let touchStartY = 0, touchStartX = 0, isTouching = false;
@@ -469,6 +489,34 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
       commentInput.value = "";
       sendCommentBtn.disabled = false;
       syncCommentsForCurrentEpisode();
+    };
+  }
+
+    const ccBtn = document.getElementById("btn-cc-toggle");
+  const subModal = document.getElementById("subtitles-modal-backdrop");
+  const closeSubBtn = document.getElementById("btn-close-subtitles-modal");
+  const subCue = document.getElementById("subtitles-cue");
+  if (ccBtn && subModal) { ccBtn.onclick = (e) => { e.stopPropagation(); subModal.style.display = "flex"; }; }
+  if (closeSubBtn && subModal) { closeSubBtn.onclick = () => { subModal.style.display = "none"; }; }
+  if (subModal) {
+    subModal.onclick = (e) => {
+      if (e.target === subModal) subModal.style.display = "none";
+      const opt = e.target.closest(".sub-lang-option");
+      if (opt) {
+        const lang = opt.getAttribute("data-lang");
+        subModal.querySelectorAll(".sub-lang-radio").forEach(r => r.textContent = "");
+        const radio = opt.querySelector(".sub-lang-radio");
+        if (radio) radio.textContent = "✓";
+        if (lang === "off") {
+          if (ccBtn) ccBtn.classList.remove("active");
+          if (subCue) { subCue.textContent = ""; subCue.style.display = "none"; }
+          showAppToast("Subtitles: Off");
+        } else {
+          if (ccBtn) ccBtn.classList.add("active");
+          showAppToast(`Subtitles: ${lang.toUpperCase()}`);
+        }
+        subModal.style.display = "none";
+      }
     };
   }
 

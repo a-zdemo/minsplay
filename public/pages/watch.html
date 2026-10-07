@@ -4,6 +4,17 @@
   <!-- 100dvh Video Stage -->
   <div class="video-stage" id="video-stage">
     <div class="video-gesture-surface" id="video-gesture-surface"></div>
+    <div class="watch-poster-splash" id="watch-poster-splash" style="display: flex;">
+      <div class="splash-backdrop-blur" id="splash-backdrop-blur"></div>
+      <div class="splash-content-box">
+        <div class="splash-poster-frame">
+          <img id="splash-poster-img" class="splash-poster-img" src="/icons/icon-192.png" alt="Poster" />
+          <div class="splash-spinner-ring"></div>
+        </div>
+        <h3 class="splash-title" id="splash-title">Loading Stream...</h3>
+        <p class="splash-ep-badge" id="splash-ep-badge">Episode 1</p>
+      </div>
+    </div>
     <video
       id="minsplay-video"
       class="video-player fullbleed-video"
@@ -39,7 +50,7 @@
     <!-- Unified 3-Button Controls (Speed, CC, Sound) -->
     <div class="watch-top-actions">
       <button class="hud-pill-btn btn-speed-toggle" id="btn-speed-toggle" type="button" aria-label="Playback Speed">1.0x</button>
-      <button class="hud-pill-btn btn-cc-toggle active" id="btn-cc-toggle" type="button" aria-label="Subtitles">CC</button>
+      <button class="hud-pill-btn btn-cc-toggle" id="btn-cc-toggle" type="button" aria-label="Subtitles">CC</button>
       <button class="hud-circle-btn" id="btn-sound-toggle" type="button" aria-label="Sound">🔊</button>
     </div>
   </header>
@@ -132,7 +143,7 @@
       <div class="subtitles-options-list">
         <article class="sub-lang-option" data-lang="en">
           <div class="sub-lang-left"><span class="sub-lang-flag">🇬🇧</span><strong class="sub-lang-name">English</strong></div>
-          <span class="sub-lang-radio">✓</span>
+          <span class="sub-lang-radio"></span>
         </article>
         <article class="sub-lang-option" data-lang="es">
           <div class="sub-lang-left"><span class="sub-lang-flag">🇪🇸</span><strong class="sub-lang-name">Español</strong></div>
@@ -144,7 +155,7 @@
         </article>
         <article class="sub-lang-option" data-lang="off">
           <div class="sub-lang-left"><span class="sub-lang-flag">🚫</span><strong class="sub-lang-name">Off</strong></div>
-          <span class="sub-lang-radio"></span>
+          <span class="sub-lang-radio">✓</span>
         </article>
       </div>
     </div>

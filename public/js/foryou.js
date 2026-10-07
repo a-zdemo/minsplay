@@ -2,7 +2,7 @@ import { DRAMA_CATALOG } from "./series-data.js";
 import { showAppToast, navigateTo } from "./router.js";
 
 let feedObserver = null;
-let isMuted = true;
+let isMuted = false;
 
 export function initForYouFeed() {
   const container = document.getElementById("foryou-feed-container");
@@ -21,7 +21,7 @@ export function initForYouFeed() {
           playsinline 
           webkit-playsinline 
           preload="metadata"
-          ${isMuted ? "muted" : ""}
+          
         ></video>
 
         <!-- Tap-to-toggle play/pause overlay -->

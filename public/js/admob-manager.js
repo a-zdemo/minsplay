@@ -5,7 +5,7 @@ import { showAppToast } from "./router.js";
 const SUPABASE_URL = "https://lekmsvdbthupiauejffo.supabase.co";
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxla21zdmRidGh1cGlhdWVqZmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDY4MjEsImV4cCI6MjEwNjM4MjgyMX0.26Lu_-rQX17LKXOSJ98d2OPRYIkfW_7S-8WaMsxqqeg";
 
-// Official Google AdMob Test Ad Units (Guaranteed fill)
+// Official Google AdMob Test Units
 const GOOGLE_DEMO_REWARDED_UNIT = "ca-app-pub-3940256099942544/5224354917";
 const GOOGLE_DEMO_INTERSTITIAL_UNIT = "ca-app-pub-3940256099942544/1033173712";
 
@@ -30,7 +30,10 @@ let cachedConfig = { ...DEFAULT_CONFIG };
 let isSdkInitialized = false;
 let episodesWatchedCount = 0;
 
-function pauseActiveVideo() {
+// Global lock: Prevents video from playing while ANY ad is covering the screen
+export let isAdDisplayingActive = false;
+
+export function pauseActiveVideo() {
   const video = document.getElementById("minsplay-video");
   if (video && !video.paused) {
     video.pause();
@@ -38,9 +41,7 @@ function pauseActiveVideo() {
 }
 
 export async function initNativeAdMobSDK() {
-  if (isSdkInitialized) return;
-  if (!Capacitor.isNativePlatform()) return;
-
+  if (isSdkInitialized || !Capacitor.isNativePlatform()) return;
   try {
     await AdMob.initialize({ initializeForTesting: true });
     isSdkInitialized = true;
@@ -77,33 +78,8 @@ export function getAdmobConfig() {
   return cachedConfig;
 }
 
-export async function saveAdmobConfig(newConfig) {
-  cachedConfig = { ...cachedConfig, ...newConfig, updated_at: new Date().toISOString() };
-  localStorage.setItem("minsplay_admob_config", JSON.stringify(cachedConfig));
-  try {
-    await fetch(`${SUPABASE_URL}/rest/v1/admob_config`, {
-      method: "POST",
-      headers: {
-        "apikey": ANON_KEY,
-        "Authorization": `Bearer ${ANON_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "resolution=merge-duplicates"
-      },
-      body: JSON.stringify(cachedConfig)
-    });
-    return true;
-  } catch (err) {
-    console.error("Save AdMob config failed:", err);
-    return false;
-  }
-}
-
 fetchAdmobConfig();
 
-/**
- * Verified Rewarded Ad: Pauses background playback and triggers onReward
- * ONLY after the ad screen closes.
- */
 export async function showRewardedVideo({ placement = "episode_unlock", onReward, onDismiss }) {
   const config = getAdmobConfig();
   if (!config.enabled) {
@@ -123,30 +99,35 @@ export async function showRewardedVideo({ placement = "episode_unlock", onReward
         : (placement === "rewards_loop" ? config.rewarded_task_unit : config.rewarded_unlock_unit);
 
       let isRewardEarned = false;
+      isAdDisplayingActive = true;
 
-      const rewardListener = await AdMob.addListener(RewardAdPluginEvents.Rewarded, (rewardItem) => {
-        console.log("✓ AdMob: User earned reward:", rewardItem);
+      const rewardListener = await AdMob.addListener(RewardAdPluginEvents.Rewarded, (item) => {
+        console.log("✓ AdMob: User earned reward:", item);
         isRewardEarned = true;
       });
 
       const dismissListener = await AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
         rewardListener.remove();
         dismissListener.remove();
+        isAdDisplayingActive = false;
 
-        if (isRewardEarned) {
-          if (typeof onReward === "function") onReward();
-        } else {
-          showAppToast("Watch the full ad to unlock the episode 🔒");
-          if (typeof onDismiss === "function") onDismiss();
-        }
+        setTimeout(() => {
+          if (isRewardEarned) {
+            if (typeof onReward === "function") onReward();
+          } else {
+            showAppToast("Watch the full ad to unlock the episode 🔒");
+            if (typeof onDismiss === "function") onDismiss();
+          }
+        }, 250);
       });
 
       const failListener = await AdMob.addListener(RewardAdPluginEvents.FailedToShow, (err) => {
         rewardListener.remove();
         dismissListener.remove();
         failListener.remove();
+        isAdDisplayingActive = false;
         console.warn("Ad failed to show:", err);
-        showAppToast("Ad unavailable right now. Please try again.");
+        showAppToast("Ad unavailable right now.");
         if (typeof onDismiss === "function") onDismiss();
       });
 
@@ -154,6 +135,7 @@ export async function showRewardedVideo({ placement = "episode_unlock", onReward
       await AdMob.showRewardVideoAd();
       return;
     } catch (err) {
+      isAdDisplayingActive = false;
       console.warn("Native AdMob error:", err);
       showAppToast("Ad unavailable right now.");
       if (typeof onDismiss === "function") onDismiss();
@@ -161,29 +143,25 @@ export async function showRewardedVideo({ placement = "episode_unlock", onReward
     }
   }
 
-  // Web fallback (development only - skipped on native APK)
   if (typeof onReward === "function") onReward();
 }
 
-/**
- * Checks and displays an interstitial ad between episodes,
- * pausing playback until the ad is dismissed.
- */
-export async function checkAndShowTransitionInterstitial() {
+export function checkAndShowTransitionInterstitial() {
   const config = getAdmobConfig();
-  if (!config.enabled) return;
+  if (!config.enabled) return Promise.resolve();
 
   episodesWatchedCount++;
   if (episodesWatchedCount % (config.interstitial_frequency || 3) === 0) {
-    await showInterstitial({ placement: "episode_transition" });
+    return showInterstitial({ placement: "episode_transition" });
   }
+  return Promise.resolve();
 }
 
-export async function showInterstitial({ placement = "transition", onClosed } = {}) {
+export function showInterstitial({ placement = "transition", onClosed } = {}) {
   const config = getAdmobConfig();
   if (!config.enabled) {
     if (typeof onClosed === "function") onClosed();
-    return;
+    return Promise.resolve();
   }
 
   pauseActiveVideo();
@@ -192,17 +170,22 @@ export async function showInterstitial({ placement = "transition", onClosed } = 
     return new Promise(async (resolve) => {
       try {
         await initNativeAdMobSDK();
+        isAdDisplayingActive = true;
         const targetUnit = config.test_mode ? GOOGLE_DEMO_INTERSTITIAL_UNIT : config.interstitial_unit;
 
         const dismissListener = await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
           dismissListener.remove();
-          if (typeof onClosed === "function") onClosed();
-          resolve();
+          isAdDisplayingActive = false;
+          setTimeout(() => {
+            if (typeof onClosed === "function") onClosed();
+            resolve();
+          }, 250);
         });
 
         const failListener = await AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
           failListener.remove();
           dismissListener.remove();
+          isAdDisplayingActive = false;
           if (typeof onClosed === "function") onClosed();
           resolve();
         });
@@ -210,6 +193,7 @@ export async function showInterstitial({ placement = "transition", onClosed } = 
         await AdMob.prepareInterstitial({ adId: targetUnit });
         await AdMob.showInterstitial();
       } catch (e) {
+        isAdDisplayingActive = false;
         console.warn("Native interstitial notice:", e);
         if (typeof onClosed === "function") onClosed();
         resolve();
@@ -218,4 +202,26 @@ export async function showInterstitial({ placement = "transition", onClosed } = 
   }
 
   if (typeof onClosed === "function") onClosed();
+  return Promise.resolve();
+}
+
+export async function saveAdmobConfig(newConfig) {
+  cachedConfig = { ...cachedConfig, ...newConfig, updated_at: new Date().toISOString() };
+  localStorage.setItem("minsplay_admob_config", JSON.stringify(cachedConfig));
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/admob_config`, {
+      method: "POST",
+      headers: {
+        "apikey": ANON_KEY,
+        "Authorization": `Bearer ${ANON_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates"
+      },
+      body: JSON.stringify(cachedConfig)
+    });
+    return true;
+  } catch (err) {
+    console.error("Save AdMob config failed:", err);
+    return false;
+  }
 }

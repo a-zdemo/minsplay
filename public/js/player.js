@@ -1,4 +1,5 @@
-import { showRewardedVideo, checkAndShowTransitionInterstitial } from "./admob-manager.js";
+let isTransitioningEpisode = false;
+import { showRewardedVideo, isAdDisplayingActive, checkAndShowTransitionInterstitial } from "./admob-manager.js";
 import { fetchEpisodeComments, postEpisodeComment, likeEpisodeComment } from "./comments-api.js";
 import { getCurrentUser } from "./auth.js";
 import {
@@ -146,6 +147,12 @@ export function initPlayer(seriesId = "the-dark-bees", initialEp = 1) {
   }
 
   async function loadEpisode(index) {
+  if (isAdDisplayingActive) {
+    console.log("Blocking loadEpisode: Ad is active");
+    return;
+  }
+  isTransitioningEpisode = true;
+  if (playIndicator) playIndicator.style.display = "none";
     currentEpisodeIndex = Math.max(0, Math.min(index, currentEpisodes.length - 1));
     const ep = currentEpisodes[currentEpisodeIndex];
     if (!ep || !currentSeries) return;
